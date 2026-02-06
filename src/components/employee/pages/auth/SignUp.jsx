@@ -98,7 +98,7 @@ const SignUp = () => {
     return (
         <>
             <div className="signup-container">
-                <img className='tech-logo' style={{ width: '600px', height: '600px', marginRight: '50px' }} src={logo} alt="tech-logo" />
+                <img className='tech-logo' src={logo} alt="techlogo" /> 
                 <div className="signup-card">
                     <div className="signup-header">
                         <h1>Create Account</h1>
