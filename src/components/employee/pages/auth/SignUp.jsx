@@ -4,7 +4,7 @@ import './SignUp.css';
 import { useAppContext } from '../../../context/AppContext.jsx';
 import { Snackbar } from '@mui/material';
 import MuiAlert from "@mui/material/Alert";
-import { validateEmail, validateMobile, validatePassword, validateRequired } from '../../utils/validation';
+import { validateEmail, validateMobile, validatePassword, validateRequired } from '../../utils/validation.js';
 import logo from '../../../../../public/tech-logo.png';
 
 const SignUp = () => {

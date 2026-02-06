@@ -1,8 +1,8 @@
-import axios from "axios";
-import { createContext, use, useContext, useEffect, useState } from "react";
+import { createContext, useContext, useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { useTheme, useMediaQuery } from "@mui/material";
 import api from "../../services/service.js";
+import axios from "axios";
 
 const AppContext = createContext();
 
@@ -14,9 +14,9 @@ export const AppContextProvider = ({children}) => {
     const [userData, setUserData] = useState(null);
     const navigate = useNavigate();
 
-    const Register = async (username, email, password, role, department, designation, blood_group, mobile_number) => {
+    const Register = async (username,email,password,role,department,designation,blood_group,mobile_number) => {
         try {
-            const res = await api.post("accounts/register/",  {username, email, password, role, department, designation, blood_group,mobile_number} );
+            const res = await axios.post("https://tn-em-backend.onrender.com/api/accounts/register/",  {username,email,password,role,department,designation,blood_group,mobile_number});
             return res.data;
         }catch(err){
             throw err;
@@ -25,7 +25,7 @@ export const AppContextProvider = ({children}) => {
 
     const Login = async (email, password) => {
         try{
-            const res = await api.post("accounts/login/", {email, password});
+            const res = await axios.post("https://tn-em-backend.onrender.com/api/accounts/login/", {email, password});
             localStorage.setItem("token", res.data.token);
             setUserData(res.data);
             return res.data;

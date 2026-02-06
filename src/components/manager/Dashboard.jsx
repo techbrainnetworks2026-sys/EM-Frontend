@@ -31,6 +31,7 @@ function Dashboard(){
             setRows(res.data);
         }catch(err){
             console.log(err);
+            setRows([]);
         }
     }
 
@@ -63,6 +64,7 @@ function Dashboard(){
     };
 
     useEffect(() => {
+        fetchAtendanceData();
         fetchApprovedUsers();
         fetchPendingLeaves();
         fetchPendingUsers();
@@ -72,9 +74,7 @@ function Dashboard(){
     const pendingUsersCount = pendingUsers.length;
     const leaveRequestsCount = leaveRequests.length;
 
-    useEffect(() => {
-        fetchAtendanceData();
-    }, []);
+    
 
     const formatTime = (timeStr) => {
         if (!timeStr) return "--";
@@ -87,7 +87,6 @@ function Dashboard(){
 
         return `${displayHour.toString().padStart(2, "0")}:${minute} ${period}`;
     };
-
 
     return (
         <div>
@@ -239,7 +238,7 @@ function Dashboard(){
 
                             {!isMobile ? (
                             <TableBody>
-                            {rows.slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage).map((row, index) => (
+                            {rows?.slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage).map((row, index) => (
                                 <TableRow key={index} hover>
                                     <TableCell sx={{ color: "whitesmoke" }}>
                                         {row.employee_name}

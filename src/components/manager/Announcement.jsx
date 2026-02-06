@@ -24,7 +24,7 @@ const Announcement = () => {
 
     const fetchAnnouncements = async () => {
         try{
-            const res = await axios.get("http://127.0.0.1:8000/api/announcement/announcements/");
+            const res = await axios.get("https://tn-em-backend.onrender.com/api/announcement/announcements/");
             setAnnouncements(res.data);
         }catch(err){
             console.log(err);
