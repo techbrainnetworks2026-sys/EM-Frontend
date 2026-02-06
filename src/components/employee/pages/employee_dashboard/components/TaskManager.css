@@ -1,0 +1,286 @@
+/* Styles for TaskManager component (migrated from inline styles)
+   Use existing classes in TaskManager.jsx: add-task-form, form-row, input-full, controls-row, compact-input, primary-btn.block, task-list-container, task-item
+*/
+.dashboard-view.task-manager-view {
+  display: flex;
+  flex-direction: column;
+  gap: 15px;
+  background: #1E1E1E;
+  color: whitesmoke;
+}
+
+.card.no-hover.add-task-card {
+  padding: 15px 20px;
+  border-bottom: 1px solid #334155;
+  background-color: #2D2D2D;
+  flex-shrink: 0;
+  color: whitesmoke;
+}
+
+.h3-uppercase {
+  margin-top: 0;
+  margin-bottom: 15px;
+  font-size: 16px;
+  color: whitesmoke;
+  font-weight: bold;
+  text-transform: uppercase;
+}
+
+.add-task-form {
+  display: flex;
+  flex-direction: column;
+  gap: 15px;
+}
+
+.form-row {
+  display: flex;
+  gap: 20px;
+}
+
+.form-row.row-1 {
+  align-items: flex-start;
+}
+
+.form-row .form-group {
+  flex: 1;
+}
+
+.input-full {
+  width: 100%;
+  padding: 10px 14px;
+  border-radius: 4px;
+  border: 1px solid #334155;
+  background: #1E1E1E;
+  color: whitesmoke;
+  font-size: 14px;
+  box-sizing: border-box;
+}
+
+.label-compact {
+  font-size: 13px;
+  font-weight: 600;
+  color: #64748b;
+  display: block;
+  margin-bottom: 8px;
+}
+
+.controls-row {
+  display: flex;
+  gap: 20px;
+  align-items: flex-end;
+}
+
+.compact-input {
+  padding: 10px 14px;
+  border-radius: 4px;
+  border: 1px solid #334155;
+  background: #1E1E1E;
+  color: whitesmoke;
+  font-size: 14px;
+  height: 42px;
+  box-sizing: border-box;
+}
+
+.compact-input::-webkit-calendar-picker-indicator {
+  filter: invert(1);
+  cursor: pointer;
+}
+
+.primary-btn.block {
+  height: 42px;
+  padding: 0 25px;
+  font-size: 14px;
+  font-weight: 700;
+  border-radius: 4px;
+  background-color: #3b82f6;
+  color: #fff;
+  border: none;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: background 0.2s;
+}
+
+.primary-btn.block:hover {
+  background-color: #2563eb;
+}
+
+/* Task list */
+.task-list-container {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+  gap: 15px;
+  padding-bottom: 20px;
+}
+
+.task-item.card {
+  padding: 16px;
+  background: #2D2D2D;
+  border: 1px solid #334155;
+  color: whitesmoke;
+}
+
+.task-item .task-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  margin-bottom: 10px;
+}
+
+.task-title {
+  margin: 0;
+  font-size: 15px;
+  color: whitesmoke;
+  font-weight: bold;
+}
+
+.task-desc {
+  margin: 0 0 12px 0;
+  color: #cbd5e1;
+  font-size: 13px;
+  line-height: 1.5;
+}
+
+.task-meta {
+  display: flex;
+  gap: 15px;
+  font-size: 12px;
+  color: #94a3b8;
+  border-top: 1px solid #334155;
+  padding-top: 10px;
+}
+
+/* Scroll area for task list */
+.task-list-scroll {
+  flex: 1;
+  overflow-y: auto;
+  padding-right: 5px;
+  display: flex;
+  gap: 15px;
+  flex-direction: column;
+}
+
+.task-list-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 10px;
+}
+
+.task-filters {
+  display: flex;
+  gap: 10px;
+}
+
+.task-badge {
+  padding: 3px 8px;
+  border-radius: 4px;
+  font-size: 10px;
+  font-weight: 700;
+  text-transform: uppercase;
+}
+
+/* Status-specific */
+.task-item.status-completed {
+  border-left: 4px solid #16a34a;
+}
+
+.task-item.status-pending {
+  border-left: 4px solid #94a3b8;
+}
+
+.task-item.status-inprogress {
+  border-left: 4px solid #f59e0b;
+}
+
+.task-badge.status-completed {
+  background-color: #dcfce7;
+  color: #166534;
+}
+
+.task-badge.status-pending {
+  background-color: #f1f5f9;
+  color: #475569;
+}
+
+.task-badge.status-inprogress {
+  background-color: #fef3c7;
+  color: #b45309;
+}
+
+.empty-card {
+  text-align: center;
+  padding: 40px;
+  color: #94a3b8;
+  grid-column: 1 / -1;
+  border: 2px dashed #e2e8f0;
+  background-color: transparent;
+  box-shadow: none;
+
+}
+
+/* Prevent overflow on medium widths: allow rows to wrap and children to shrink */
+.form-row,
+.controls-row {
+  flex-wrap: wrap;
+}
+
+.form-row .form-group,
+.controls-row .form-group {
+  min-width: 0; /* allow flex children to shrink below intrinsic width */
+  flex: 1 1 180px; /* grow, shrink, base 180px */
+}
+
+/* Medium breakpoint: ensure compact inputs and Add button use full width when wrapped */
+@media (max-width: 945px) {
+  .controls-row {
+    gap: 12px;
+  }
+
+  .compact-input {
+    width: 100%;
+  }
+
+  .primary-btn.block {
+    width: 100%;
+  }
+}
+
+/* Responsive */
+@media (max-width: 900px) {
+  .form-row {
+    gap: 12px;
+  }
+
+  .compact-input {
+    width: 100%;
+  }
+}
+
+@media (max-width: 600px) {
+.form-row .form-group {
+  flex: 1;
+}
+  .form-row,
+  .controls-row {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .compact-input {
+    width: 100% !important;
+  }
+
+  .primary-btn.block {
+    width: 100% !important;
+  }
+
+  .task-list-container {
+    grid-template-columns: 1fr;
+  }
+
+  .card {
+    padding: 12px;
+  }
+}

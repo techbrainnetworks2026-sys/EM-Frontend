@@ -1,0 +1,400 @@
+@import url('https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700&display=swap');
+
+:root {
+    --primary-color: #6366f1;
+    --primary-hover: #4f46e5;
+    --bg-gradient: linear-gradient(135deg, #0f172a 0%, #1e1b4b 100%);
+    --card-bg: rgba(30, 41, 59, 0.7);
+    --text-main: #f8fafc;
+    --text-muted: #94a3b8;
+    --border-color: rgba(255, 255, 255, 0.1);
+    --input-bg: rgba(15, 23, 42, 0.5);
+}
+
+/* ========================= */
+/* BASE LAYOUT */
+/* ========================= */
+/* ========================= */
+/* BASE LAYOUT */
+/* ========================= */
+.signin-container {
+    height: 100vh;
+    width: 100vw;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: var(--bg-gradient);
+    font-family: 'Outfit', sans-serif;
+
+    color: var(--text-main);
+    overflow: hidden;
+    position: fixed;
+    top: 0;
+    left: 0;
+    gap: 4rem;
+    /* Spacing between logo and card */
+}
+
+.tech-logo {
+    width: 500px;
+    height: auto;
+    object-fit: contain;
+    /* Hide on small screens initially, show on large */
+    display: none;
+}
+
+/* Card */
+.signin-card {
+    background: var(--card-bg);
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
+    border: 1px solid var(--border-color);
+    border-radius: 16px;
+    padding: 2.5rem 2rem;
+    width: 100%;
+    max-width: 420px;
+    box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
+    display: flex;
+    flex-direction: column;
+    animation: signin-fadeIn 0.6s ease-out;
+}
+
+/* Animation */
+@keyframes signin-fadeIn {
+    from {
+        opacity: 0;
+        transform: translateY(10px);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+/* Header */
+.signin-header {
+    text-align: center;
+    margin-bottom: 2rem;
+}
+
+.signin-header h1 {
+    font-size: 2.25rem;
+    font-weight: 700;
+    margin: 0;
+    background: linear-gradient(to right, #818cf8, #c084fc);
+    -webkit-background-clip: text;
+    background-clip: text;
+    -webkit-text-fill-color: transparent;
+}
+
+/* Form */
+.signin-form {
+    display: flex;
+    flex-direction: column;
+    gap: 1.25rem;
+}
+
+.signin-form-group {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+}
+
+.signin-form-group label {
+    font-size: 1rem;
+    font-weight: 500;
+    color: var(--text-muted);
+    margin-left: 0.1rem;
+}
+
+/* Inputs */
+.signin-form-group input {
+    background: var(--input-bg);
+    border: 1px solid var(--border-color);
+    border-radius: 8px;
+    padding: 0.75rem 1rem;
+    color: var(--text-main);
+    font-size: 0.95rem;
+    outline: none;
+    transition: all 0.3s ease;
+    font-family: 'Outfit', sans-serif;
+}
+
+.signin-form-group input::placeholder {
+    color: var(--text-muted);
+    opacity: 0.6;
+}
+
+.signin-form-group input:focus {
+    border-color: var(--primary-color);
+    box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.1);
+}
+
+.signin-form-group input.input-error {
+    border-color: #ef4444;
+}
+
+.signin-form-group input.input-error:focus {
+    box-shadow: 0 0 0 3px rgba(239, 68, 68, 0.1);
+}
+
+.error-message {
+    color: #ef4444;
+    font-size: 0.8rem;
+    margin-top: -0.2rem;
+    margin-left: 0.1rem;
+}
+
+/* Button */
+.signin-auth-button {
+    background: var(--primary-color);
+    color: white;
+    border: none;
+    border-radius: 8px;
+    padding: 0.85rem;
+    font-size: 1.05rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    margin-top: 0.5rem;
+    font-family: 'Outfit', sans-serif;
+}
+
+.signin-auth-button:hover {
+    background: var(--primary-hover);
+    transform: translateY(-1px);
+    box-shadow: 0 4px 12px rgba(99, 102, 241, 0.3);
+}
+
+.signin-auth-button:active {
+    transform: translateY(0);
+}
+
+/* Footer */
+.signin-auth-footer {
+    text-align: center;
+    margin-top: 1.5rem;
+    color: var(--text-muted);
+    font-size: 0.95rem;
+}
+
+.signin-auth-footer a {
+    color: var(--primary-color);
+    text-decoration: none;
+    font-weight: 600;
+    margin-left: 0.3rem;
+    transition: color 0.2s ease;
+}
+
+.signin-auth-footer a:hover {
+    text-decoration: underline;
+    color: var(--primary-hover);
+}
+
+/* ========================= */
+/* 📱 EXTRA SMALL MOBILE (<375px) */
+/* ========================= */
+@media (max-width: 374px) {
+
+    .signin-card {
+        padding: 1.5rem 1rem;
+        border-radius: 0;
+        max-width: 100%;
+        background: transparent;
+        border: none;
+        box-shadow: none;
+        backdrop-filter: none;
+        -webkit-backdrop-filter: none;
+    }
+
+    .signin-header {
+        margin-bottom: 1.5rem;
+    }
+
+    .signin-header h1 {
+        font-size: 1.5rem;
+    }
+
+    .signin-form {
+        gap: 1rem;
+    }
+
+    .signin-form-group {
+        gap: 0.4rem;
+    }
+
+    .signin-form-group label {
+        font-size: 0.85rem;
+    }
+
+    .signin-form-group input {
+        padding: 0.6rem 0.75rem;
+        font-size: 0.85rem;
+    }
+
+    .signin-auth-button {
+        padding: 0.7rem;
+        font-size: 0.9rem;
+    }
+
+    .signin-auth-footer {
+        font-size: 0.8rem;
+        margin-top: 1.25rem;
+    }
+
+    .error-message {
+        font-size: 0.75rem;
+    }
+}
+
+/* ========================= */
+/* 📱 SMALL MOBILE (375px - 480px) */
+/* ========================= */
+@media (min-width: 375px) and (max-width: 480px) {
+
+
+    .signin-card {
+        padding: 1.75rem 1.25rem;
+        border-radius: 0;
+        max-width: 100%;
+        background: transparent;
+        border: none;
+        box-shadow: none;
+        backdrop-filter: none;
+        -webkit-backdrop-filter: none;
+    }
+
+    .signin-header {
+        margin-bottom: 1.75rem;
+    }
+
+    .signin-header h1 {
+        font-size: 1.75rem;
+    }
+
+    .signin-form {
+        gap: 1.1rem;
+    }
+
+    .signin-form-group {
+        gap: 0.45rem;
+    }
+
+    .signin-form-group label {
+        font-size: 0.9rem;
+    }
+
+    .signin-form-group input {
+        padding: 0.65rem 0.85rem;
+        font-size: 0.9rem;
+    }
+
+    .signin-auth-button {
+        padding: 0.75rem;
+        font-size: 0.95rem;
+    }
+
+    .signin-auth-footer {
+        font-size: 0.85rem;
+        margin-top: 1.35rem;
+    }
+}
+
+/* ========================= */
+/* 📱 MEDIUM MOBILE (481px - 640px) */
+/* ========================= */
+@media (min-width: 481px) and (max-width: 640px) {
+
+
+    .signin-card {
+        max-width: 400px;
+        padding: 2rem 1.5rem;
+    }
+
+    .signin-header h1 {
+        font-size: 2rem;
+    }
+
+    .signin-form {
+        gap: 1.15rem;
+    }
+
+    .signin-form-group label {
+        font-size: 0.95rem;
+    }
+
+    .signin-form-group input {
+        padding: 0.7rem 0.9rem;
+        font-size: 0.92rem;
+    }
+
+    .signin-auth-button {
+        padding: 0.8rem;
+        font-size: 1rem;
+    }
+
+    .signin-auth-footer {
+        font-size: 0.9rem;
+    }
+}
+
+/* ========================= */
+/* 📱 TABLETS (641px - 1024px) */
+/* ========================= */
+@media (min-width: 641px) and (max-width: 1024px) {
+    .signin-card {
+        max-width: 420px;
+        padding: 2.25rem 1.75rem;
+    }
+
+    .signin-header h1 {
+        font-size: 2.1rem;
+    }
+
+    .signin-form {
+        gap: 1.2rem;
+    }
+}
+
+/* ========================= */
+/* 🖥️ DESKTOP (1025px+) */
+/* ========================= */
+@media (min-width: 1025px) {
+    .signin-card {
+        max-width: 420px;
+        padding: 2.5rem 2rem;
+    }
+
+    .signin-header h1 {
+        font-size: 2.25rem;
+    }
+
+    .signin-form {
+        gap: 1.25rem;
+    }
+
+    .tech-logo {
+        display: block;
+    }
+}
+
+/* ========================= */
+/* ACCESSIBILITY & TOUCH OPTIMIZATION */
+/* ========================= */
+@media (hover: none) and (pointer: coarse) {
+
+    /* Touch devices - increase tap targets */
+    .signin-form-group input {
+        min-height: 48px;
+    }
+
+    .signin-auth-button {
+        min-height: 48px;
+    }
+
+    .signin-auth-footer a {
+        padding: 0.25rem 0.5rem;
+        margin: -0.25rem -0.5rem;
+    }
+}

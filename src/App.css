@@ -1,0 +1,45 @@
+.app-layout {
+  display: flex;
+  min-height: 100vh;
+}
+
+.main-section {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  min-height: 100vh;
+}
+
+.dashboard-content {
+  margin-top: 60px;
+  padding: 20px;
+}
+
+.widgets {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+  gap: 20px;
+}
+
+.widget-1,
+.widget-2,
+.widget-3 {
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  background: #1e1e1e;
+  padding: 20px;
+  border-radius: 12px;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.2);
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.widget-1:hover,
+.widget-2:hover,
+.widget-3:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 8px 20px rgba(0,0,0,0.5);
+}
+.widget-1 { border-left: 4px solid #ef9a9a; }
+.widget-2 { border-left: 4px solid #b39ddb; }
+.widget-3 { border-left: 4px solid #c5e1a5; }

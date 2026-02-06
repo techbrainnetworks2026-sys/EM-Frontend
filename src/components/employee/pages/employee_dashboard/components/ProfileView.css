@@ -1,0 +1,348 @@
+/* --- ProfileView.css --- */
+
+/* Local container padding so the card doesn't touch screen edges */
+.dashboard-view-profile-view-container {
+    padding: 20px;
+    height: 0vh;
+}
+
+/* Ensure consistent sizing model inside this component */
+.dashboard-view-profile-view-container *,
+.dashboard-view-profile-view-container *::before,
+.dashboard-view-profile-view-container *::after {
+    box-sizing: border-box;
+}
+
+.profile-card {
+    margin: 40px auto;
+    max-width: 900px;
+    width: 100%;
+    background: #1E1E1E;
+    padding: 30px;
+    border-radius: 12px;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+    border: 1px solid #334155;
+    color: whitesmoke;
+    position: relative;
+}
+
+.profile-header-section {
+    display: flex;
+    gap: 30px;
+    align-items: center;
+    margin-bottom: 10px;
+    padding-bottom: 10px;
+    border-bottom: 1px solid #334155;
+}
+
+.profile-image-section {
+    position: relative;
+}
+
+.profile-image-large {
+    width: 140px;
+    height: 140px;
+    border-radius: 50%;
+    overflow: hidden;
+    background: #1e293b;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border: 4px solid #334155;
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.3);
+}
+
+.profile-image-large img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    display: block;
+    border-radius: 50%;
+}
+
+.avatar-placeholder.big {
+    font-size: 70px;
+    color: #94a3b8;
+}
+
+.upload-container {
+    position: absolute;
+    bottom: -10px;
+    left: 50%;
+    transform: translateX(-50%);
+    width: max-content;
+}
+
+.upload-btn {
+    background: #3b82f6;
+    color: white;
+    padding: 6px 12px;
+    border-radius: 20px;
+    font-size: 11px;
+    font-weight: 600;
+    cursor: pointer;
+    box-shadow: 0 2px 8px rgba(59, 130, 246, 0.4);
+    transition: all 0.2s;
+    display: inline-block;
+    white-space: nowrap;
+}
+
+.upload-btn:hover {
+    transform: scale(1.05);
+    background: #2563eb;
+}
+
+.hidden-input {
+    display: none;
+}
+
+.profile-main-info h2 {
+    margin: 0;
+    font-size: 28px;
+    color: whitesmoke;
+}
+
+.designation-text {
+    color: #94a3b8;
+    font-size: 16px;
+    margin: 5px 0 0 0;
+}
+
+.profile-form-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+    gap: 20px;
+}
+
+.form-group {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+}
+
+.form-group label {
+    font-size: 14px;
+    font-weight: 600;
+    color: #94a3b8;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+.form-group input,
+.form-group select,
+.form-group textarea {
+    background: #0f172a;
+    border: 1px solid #334155;
+    border-radius: 8px;
+    padding: 12px 16px;
+    color: whitesmoke;
+    font-size: 15px;
+    transition: all 0.2s;
+    outline: none;
+    width: 100%;
+}
+
+.form-group input:focus,
+.form-group select:focus,
+.form-group textarea:focus {
+    border-color: #3b82f6;
+    box-shadow: 0 0 0 2px rgba(59, 130, 246, 0.2);
+}
+
+.form-group input:disabled,
+.form-group select:disabled,
+.form-group textarea:disabled {
+    opacity: 0.7;
+    cursor: not-allowed;
+    background: #1e293b;
+}
+
+.full-width {
+    grid-column: 1 / -1;
+}
+
+.profile-actions {
+    display: flex;
+    justify-content: flex-end;
+    gap: 15px;
+}
+
+.primary-btn,
+.secondary-btn {
+    padding: 12px 24px;
+    border-radius: 8px;
+    font-weight: 600;
+    font-size: 15px;
+    cursor: pointer;
+    transition: all 0.2s;
+    border: none;
+}
+
+.primary-btn {
+    background: #3b82f6;
+    color: white;
+}
+
+.primary-btn:hover {
+    background: #2563eb;
+    transform: translateY(-1px);
+}
+
+.secondary-btn {
+    background: #1e293b;
+    color: whitesmoke;
+    border: 1px solid #334155;
+}
+
+.secondary-btn:hover {
+    background: #334155;
+}
+
+.mt-10 {
+    margin-top: 10px;
+}
+
+.mt-20 {
+    margin-top: 20px;
+}
+
+/* --- Cropper Modal --- */
+.cropper-modal-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: rgba(0, 0, 0, 0.85);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 2000;
+}
+
+.cropper-modal-content {
+    background: #1e293b;
+    width: 90%;
+    max-width: 500px;
+    border-radius: 16px;
+    overflow: hidden;
+    box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
+    border: 1px solid #334155;
+}
+
+.cropper-container {
+    position: relative;
+    width: 100%;
+    height: min(60vh, 500px);
+    background: #000;
+}
+
+.cropper-controls {
+    padding: 24px;
+    background: #1e293b;
+    border-top: 1px solid #334155;
+}
+
+/* make modal content scroll internally if it exceeds viewport height */
+.cropper-modal-overlay {
+    overflow: auto;
+}
+
+.cropper-modal-content {
+    max-height: calc(100vh - 40px);
+    overflow: auto;
+}
+
+.zoom-range {
+    width: 100%;
+    margin-bottom: 20px;
+    cursor: pointer;
+    accent-color: #3b82f6;
+}
+
+.cropper-actions {
+    display: flex;
+    justify-content: flex-end;
+    gap: 12px;
+}
+
+/* Responsive profile tweaks */
+/* For wide layouts where a sidebar is present, allow offsetting the card */
+@media (max-width: 1200px) {
+    .dashboard-view-profile-view-container {
+    height: 0vh;
+}
+    .profile-card {
+        
+        max-width: 800px;
+    }
+}
+
+@media (max-width: 768px) {
+    .profile-card {
+        margin-top: 20px;
+        padding: 22px;
+    }
+
+    .profile-header-section {
+        flex-direction: column;
+        text-align: center;
+        gap: 20px;
+    }
+
+    .profile-image-large {
+        width: 120px;
+        height: 120px;
+        margin: 0 auto;
+    }
+
+    .profile-form-grid {
+        grid-template-columns: 1fr;
+        gap: 16px;
+    }
+
+    .profile-actions {
+        justify-content: center;
+        margin-top: 8px;
+    }
+}
+
+@media (max-width: 480px) {
+    .profile-card {
+        padding: 16px;
+    }
+
+    .profile-main-info h2 {
+        font-size: 20px;
+    }
+
+    .designation-text {
+        font-size: 13px;
+    }
+
+    .form-group input,
+    .form-group select,
+    .form-group textarea {
+        padding: 10px 12px;
+        font-size: 14px;
+    }
+
+    .primary-btn,
+    .secondary-btn {
+        width: 100%;
+    }
+
+    .cropper-container {
+        height: 300px;
+    }
+
+    .upload-container {
+        position: relative;
+        margin-top: 10px;
+        display: flex;
+        justify-content: center;
+        bottom: auto;
+        left: auto;
+        transform: none;
+    }
+}

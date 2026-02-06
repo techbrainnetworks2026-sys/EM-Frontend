@@ -1,0 +1,134 @@
+/* ApplyLeave component styles and mobile fixes (<=480px)
+   Ensures inputs/buttons scale and submit button is visible on small screens
+*/
+.dashboard-view.apply-leave-view {
+  background: #1E1E1E;
+  padding: 20px;
+  border-radius: 12px;
+  border: 1px solid #334155;
+  color: whitesmoke;
+}
+
+.form-container {
+  max-width: 720px;
+  width: 100%;
+  box-sizing: border-box;
+  display: block;
+}
+
+.form-group {
+  margin-bottom: 16px;
+}
+
+.form-group label {
+  display: block;
+  margin-bottom: 8px;
+  color: #cbd5e1;
+  font-weight: 600;
+  font-size: 14px;
+}
+
+.form-group input,
+.form-group textarea,
+.form-group select {
+  width: 100%;
+  padding: 10px 12px;
+  border: 1px solid #334155;
+  border-radius: 6px;
+  background: #2D2D2D;
+  color: whitesmoke;
+  font-size: 14px;
+  font-family: inherit;
+  box-sizing: border-box;
+}
+
+.form-group input[type="date"]::-webkit-calendar-picker-indicator {
+  filter: invert(1);
+  cursor: pointer;
+}
+
+.form-actions {
+  display: flex;
+  gap: 12px;
+  margin-top: 20px;
+}
+
+.primary-btn {
+  background: #3b82f6;
+  color: white;
+  padding: 10px 18px;
+  border: none;
+  border-radius: 6px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background 0.2s;
+}
+
+.primary-btn:hover {
+  background: #2563eb;
+}
+
+.secondary-btn {
+  background: #1E1E1E;
+  border: 1px solid #334155;
+  color: whitesmoke;
+  padding: 10px 18px;
+  border-radius: 6px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.secondary-btn:hover {
+  background: #2D2D2D;
+  border-color: #3b82f6;
+}
+
+/* Focus states */
+.form-group input:focus,
+.form-group textarea:focus,
+.form-group select:focus {
+  outline: none;
+  border-color: var(--accent-color);
+}
+
+/* Small screen fixes */
+@media (max-width: 480px) {
+  .dashboard-view.apply-leave-view {
+    padding: 12px;
+  }
+
+  .form-container {
+    padding: 0;
+  }
+
+  .form-group label {
+    font-size: 13px;
+    margin-bottom: 6px;
+  }
+
+  .form-group input,
+  .form-group textarea,
+  .form-group select {
+    font-size: 14px;
+    padding: 10px;
+  }
+
+  /* Stack actions vertically and make buttons full width so submit is visible */
+  .form-actions {
+    flex-direction: column;
+    gap: 10px;
+  }
+
+  .form-actions .primary-btn,
+  .form-actions .secondary-btn {
+    width: 100%;
+    padding: 12px 14px;
+    box-sizing: border-box;
+  }
+
+  /* Reduce spacing inside card to keep everything visible */
+  .card {
+    padding: 12px;
+  }
+}

@@ -1,0 +1,239 @@
+/* LeaveHistory component styles
+   All class names use the `lh-` prefix to avoid collisions.
+*/
+
+.lh-view {
+  background: #1e1e1e;
+  padding: 20px;
+  border-radius: 12px;
+  border: 1px solid #e2e8f0;
+  display: flex;
+  flex-direction: column;
+  height: 82vh;
+  overflow: hidden;
+  color: whitesmoke;
+}
+
+.lh-heading {
+  color: whitesmoke;
+  margin-bottom: 20px;
+}
+thead{
+  text-align: left;
+  left: 20px;
+}
+
+.lh-container {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  overflow-y: auto;
+  /* This area scrolls */
+  /* Space for scrollbar */
+}
+
+.lh-scroll {
+  /* overflow-y removed to prevent internal scrolling */
+  -webkit-overflow-scrolling: touch;
+}
+
+.lh-table-wrapper {
+  overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
+}
+
+.lh-table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+.lh-table th {
+  white-space: nowrap;
+  position: sticky;
+  top: 0;
+  z-index: 10;
+  background: #f8fafc;
+  color: #64748b;
+  border-bottom: 2px solid #e2e8f0;
+}
+
+.lh-table td {
+  padding: 14px;
+  border-bottom: 1px solid #f1f5f9;
+  color: whitesmoke;
+}
+
+.lh-col-date,
+.lh-col-type,
+.lh-col-status {
+  white-space: nowrap;
+}
+
+.lh-col-reason {
+  white-space: normal;
+  word-break: break-word;
+  min-width: 200px;
+  /* Give reason more space to wrap nicely */
+}
+
+
+
+.lh-td-value {
+margin-left: -14px;  
+  display: inline-block;
+}
+
+.lh-status {
+  padding: 6px 12px;
+  border-radius: 20px;
+  font-size: 12px;
+  font-weight: 600;
+  display: inline-block;
+  white-space: nowrap;
+}
+
+.status-approved {
+  background: #dcfce7;
+  color: #166534;
+}
+
+.status-pending {
+  background: #fef3c7;
+  color: #92400e;
+}
+
+.status-rejected {
+  background: #fee2e2;
+  color: #991b1b;
+}
+
+.lh-table .lh-empty {
+  text-align: center;
+  padding: 60px 40px;
+  color: whitesmoke;
+  font-size: 18px;
+  font-weight: 500;
+}
+
+/* =========================
+   Mobile View (Card Layout)
+   ========================= */
+@media (max-width: 600px) {
+  .lh-view {
+    padding: 12px;
+  }
+h2.lh-heading{
+  background-color: #1e1e1e;
+  color: whitesmoke;
+}
+  .lh-table {
+    width: 100%;
+    border: none;
+  }
+
+  .lh-table thead {
+    
+    display: none;
+  }
+
+  .lh-table tbody tr {
+    display: block;
+    margin-bottom: 12px;
+    padding: 10px;
+    border: 1px solid #e2e8f0;
+    border-radius: 8px;
+    background: #1e1e1e;
+  }
+
+  .lh-table td {
+    display: flex;
+    align-items: center;
+    padding: 8px 6px;
+    border: none;
+    font-size: 14px;
+    min-width: 0;
+  }
+  .lh-table .lh-empty {
+ margin-left: -110px;
+  padding: 60px 40px;
+  color: whitesmoke;
+  
+}
+
+  .lh-table td::before {
+    content: attr(data-label);
+    font-weight: 600;
+    color: #64748b;
+    flex: 0 0 40%;
+    padding-right: 8px;
+  }
+
+  .lh-td-value {
+    flex: 1;
+    text-align: right;
+    word-break: break-word;
+  }
+
+  .lh-status {
+    padding: 5px 10px;
+    font-size: 11px;
+  }
+
+  .lh-heading {
+    position: sticky;
+    top: -12px;
+    background: #fff;
+    padding: 10px 0;
+    z-index: 20;
+    border-bottom: 1px solid #e2e8f0;
+    margin: 0;
+    color: #1e1e1e;
+  }
+
+  .lh-scroll {
+    /* max-height removed to let it expand */
+    padding-top: 8px;
+  }
+}
+
+/* =========================
+   Desktop / Tablet View
+   ========================= */
+@media (min-width: 601px) {
+  .lh-table thead {
+    display: table-header-group;
+  }
+
+  .lh-table tbody tr {
+    display: table-row;
+    border: none;
+    background: transparent;
+  }
+
+  .lh-table td {
+    display: table-cell;
+    padding: 14px;
+    border-bottom: 1px solid #f1f5f9;
+    text-align: left;
+  }
+ 
+
+  .lh-table td::before {
+    content: none;
+  }
+
+  .lh-td-value {
+    text-align: left;
+  }
+
+  .lh-heading {
+    position: relative;
+    border-bottom: none;
+    padding: 0;
+  }
+
+  .lh-scroll {
+    max-height: none;
+    padding-top: 0;
+  }
+}
