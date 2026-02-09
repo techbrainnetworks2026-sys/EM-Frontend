@@ -7,7 +7,7 @@ import { useAppContext } from '../../context/AppContext.jsx';
 
 function Navbar(){
 
-    const { sidebarOpen, setSidebarOpen } = useAppContext();
+    const { sidebarOpen, setSidebarOpen, userData } = useAppContext();
     const navigate = useNavigate();
 
     const handleSidebarOpen = () => {
@@ -34,7 +34,9 @@ function Navbar(){
                     </Box>
                     <Box sx={{display : "flex", alignItems : "center", gap : "10px"}}>
                         <IconButton onClick={() => navigate('/manager/profile')}>
-                            <Avatar sx={{ backgroundColor : "orangered", width : "32px", height : "32px", cursor : "pointer" }}>M</Avatar>
+                            <Avatar sx={{ backgroundColor : "orangered", width : "32px", height : "32px", cursor : "pointer" }}>
+                                {userData?.username ? userData.username.charAt(0).toUpperCase() : "M"}
+                            </Avatar>
                         </IconButton>
                         <Box>
                             <IconButton onClick={handleLogout}>
