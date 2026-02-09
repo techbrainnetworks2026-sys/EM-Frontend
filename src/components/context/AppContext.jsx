@@ -46,6 +46,15 @@ export const AppContextProvider = ({children}) => {
         fetchUserDetails();
     }, []);
 
+    useEffect(() => {
+        if (isMobile) {
+            setSidebarOpen(false);
+        } else {
+            setSidebarOpen(true);
+        }
+    }, [isMobile]);
+
+
 
     const value = {
         sidebarOpen,
