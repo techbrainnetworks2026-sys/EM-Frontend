@@ -14,6 +14,12 @@ function Sidebar(){
     const navigate = useNavigate();
     const { sidebarOpen, setSidebarOpen, isMobile } = useAppContext();
 
+    const handleNavSidebar = () => {
+        if(isMobile){
+            setSidebarOpen(false);
+        }
+    }
+
     return (
         <>
         <div style={{ width : isMobile ? (sidebarOpen ? "300px" : "0px") : (sidebarOpen ? "300px" : "80px"), height : "100dvh",position: "fixed",top : 0, left : 0, zIndex: 1500, border : "white", background : "rgb(8, 15, 37)",boxShadow: isMobile && sidebarOpen ? "0 0 15px rgba(0,0,0,0.5)" : "none", overflow: "hidden",}}>
@@ -32,7 +38,7 @@ function Sidebar(){
                 <List sx={{ display : "flex", rowGap : "15px", flexDirection : "column", paddingTop : "20px"}}>
                     <ListItem disablePadding> 
                         {sidebarOpen ? (
-                            <ListItemButton component={NavLink} to="/manager/dashboard" sx={{padding : "15px", justifyContent : "flex-start",paddingLeft: "24px", gap: "12px", fontSize : "20px", fontFamily : "work sans",color : "whitesmoke",
+                            <ListItemButton onClick={handleNavSidebar} component={NavLink} to="/manager/dashboard" sx={{padding : "15px", justifyContent : "flex-start",paddingLeft: "24px", gap: "12px", fontSize : "20px", fontFamily : "work sans",color : "whitesmoke",
                                 "&.active": {
                                     backgroundColor: "rgba(255,255,255,0.15)",
                                     borderLeft: "4px solid #90caf9",
@@ -57,7 +63,7 @@ function Sidebar(){
                     </ListItem>
                     <ListItem disablePadding>
                         {sidebarOpen ? (
-                            <ListItemButton component={NavLink} to="/manager/addemployee" sx={{padding : "15px", justifyContent : "flex-start",paddingLeft: "24px", gap: "12px", fontSize : "20px", fontFamily : "work sans",color : "whitesmoke",
+                            <ListItemButton onClick={handleNavSidebar} component={NavLink} to="/manager/addemployee" sx={{padding : "15px", justifyContent : "flex-start",paddingLeft: "24px", gap: "12px", fontSize : "20px", fontFamily : "work sans",color : "whitesmoke",
                                 "&.active": {
                                     backgroundColor: "rgba(255,255,255,0.15)",
                                     borderLeft: "4px solid #90caf9",
@@ -82,7 +88,7 @@ function Sidebar(){
                     </ListItem>
                     <ListItem disablePadding>
                         {sidebarOpen ? (
-                            <ListItemButton component={NavLink} to="/manager/addRole" sx={{padding : "15px", justifyContent : "flex-start",paddingLeft: "24px", gap: "12px", fontSize : "20px", fontFamily : "work sans",color : "whitesmoke",
+                            <ListItemButton onClick={handleNavSidebar} component={NavLink} to="/manager/addRole" sx={{padding : "15px", justifyContent : "flex-start",paddingLeft: "24px", gap: "12px", fontSize : "20px", fontFamily : "work sans",color : "whitesmoke",
                                 "&.active": {
                                     backgroundColor: "rgba(255,255,255,0.15)",
                                     borderLeft: "4px solid #90caf9",
@@ -107,7 +113,7 @@ function Sidebar(){
                     </ListItem>
                     <ListItem disablePadding>
                         {sidebarOpen ? (
-                            <ListItemButton component={NavLink} to="/manager/leave-management" sx={{padding : "15px", justifyContent : "flex-start",paddingLeft: "24px", gap: "12px", fontSize : "20px", fontFamily : "work sans",color : "whitesmoke",
+                            <ListItemButton onClick={handleNavSidebar} component={NavLink} to="/manager/leave-management" sx={{padding : "15px", justifyContent : "flex-start",paddingLeft: "24px", gap: "12px", fontSize : "20px", fontFamily : "work sans",color : "whitesmoke",
                                 "&.active": {
                                     backgroundColor: "rgba(255,255,255,0.15)",
                                     borderLeft: "4px solid #90caf9",
@@ -133,7 +139,7 @@ function Sidebar(){
                     </ListItem>
                     <ListItem disablePadding>
                         {sidebarOpen ? (
-                            <ListItemButton component={NavLink} to="/manager/task-assign" sx={{padding : "15px", justifyContent : "flex-start",paddingLeft: "24px", gap: "12px", fontSize : "20px", fontFamily : "work sans",color : "whitesmoke",
+                            <ListItemButton onClick={handleNavSidebar} component={NavLink} to="/manager/task-assign" sx={{padding : "15px", justifyContent : "flex-start",paddingLeft: "24px", gap: "12px", fontSize : "20px", fontFamily : "work sans",color : "whitesmoke",
                                 "&.active": {
                                     backgroundColor: "rgba(255,255,255,0.15)",
                                     borderLeft: "4px solid #90caf9",
@@ -158,7 +164,7 @@ function Sidebar(){
                     </ListItem>
                     <ListItem disablePadding>
                         {sidebarOpen ? (
-                            <ListItemButton component={NavLink} to="/manager/announcement" sx={{padding : "15px", justifyContent : "flex-start",paddingLeft: "24px", gap: "12px", fontSize : "20px", fontFamily : "work sans",color : "whitesmoke",
+                            <ListItemButton onClick={handleNavSidebar} component={NavLink} to="/manager/announcement" sx={{padding : "15px", justifyContent : "flex-start",paddingLeft: "24px", gap: "12px", fontSize : "20px", fontFamily : "work sans",color : "whitesmoke",
                                 "&.active": {
                                     backgroundColor: "rgba(255,255,255,0.15)",
                                     borderLeft: "4px solid #90caf9",
