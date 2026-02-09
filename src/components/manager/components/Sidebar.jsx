@@ -12,10 +12,10 @@ import { useAppContext } from '../../context/AppContext.jsx';
 function Sidebar(){
 
     const navigate = useNavigate();
-    const { sidebarOpen, setSidebarOpen } = useAppContext();
+    const { sidebarOpen, setSidebarOpen, isMobile } = useAppContext();
 
     return (
-        <div style={{ width : sidebarOpen ? "300px" : "80px", height : "100vh",position: "fixed",top : 0, left : 0, zIndex: 1200, border : "white", background : "rgb(8, 15, 37)" }}>
+        <div style={{ width : isMobile ? (sidebarOpen ? "300px" : "0px") : (sidebarOpen ? "300px" : "80px"), height : "100dvh",position: "fixed",top : 0, left : 0, zIndex: 1200, border : "white", background : "rgb(8, 15, 37)",boxShadow: isMobile && sidebarOpen ? "0 0 15px rgba(0,0,0,0.5)" : "none", }}>
             <div style={{display : "flex", alignItems : "center", justifyContent : "center", height : "80px", padding : "10px", columnGap : "10px", textAlign : "center"}}>
                 {sidebarOpen && 
                     <>
@@ -183,6 +183,20 @@ function Sidebar(){
                     </ListItem>
                 </List>
             </div>
+            {isMobile && sidebarOpen && (
+                <div
+                    onClick={() => setSidebarOpen(false)}
+                    style={{
+                    position: "fixed",
+                    top: 0,
+                    left: 0,
+                    width: "100vw",
+                    height: "100vh",
+                    background: "rgba(0,0,0,0.4)",
+                    zIndex: 1100
+                    }}
+                />
+            )}
         </div>
     )
 }
