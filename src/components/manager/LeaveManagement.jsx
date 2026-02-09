@@ -270,7 +270,7 @@ const LeaveManagement = () => {
                                         </TableCell>
                                     </TableRow>
                                 ))
-                                : leaveWithDuration.filter((leave) => leave.status === "APPROVED").map((row, index) => (
+                                : approvedWithDuration.filter((leave) => leave.status === "APPROVED").map((row, index) => (
                                     <TableRow key={index} sx={{ background : "#333"}}>
                                         <TableCell colSpan={4} sx={{ borderBottom: "none" }}>
                                             <Box sx={{ background: "#1e1e1e", borderRadius: "12px", padding: "14px", mb: 1, display: "flex", flexDirection: "column", gap: 1,}}>

@@ -316,7 +316,7 @@ const AddEmplyee = () => {
                                         </TableCell>
                                     </TableRow>
                                 ))
-                            : rows.filter((pending) => pending.is_approved === true).map((row, index) => (
+                            : arows.filter((pending) => pending.is_approved === true).map((row, index) => (
                                 <TableRow key={index} sx={{ background : "#333"}}>
                                     <TableCell colSpan={4} sx={{ borderBottom: "none" }}>
                                         <Box sx={{ background: "#1e1e1e", borderRadius: "12px", padding: "12px", mb: 1, display: "flex", flexDirection: "column", gap: 1 }}>
