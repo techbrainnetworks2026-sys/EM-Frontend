@@ -11,9 +11,9 @@ function ManagerLayout() {
     return (
         <div className="app-layout">
             <Sidebar />
-            <div className="main-section" style={{ marginLeft : sidebarOpen ? "300px" : "80px"}}>
+            <div className="main-section" style={{ marginLeft : isMobile ? "0px" : (sidebarOpen ? "300px" : "80px"), transition: "margin 0.3s ease",}}>
                 <Navbar />
-                <div className="dashboard-content" >
+                <div className="dashboard-content">
                     <Outlet />
                 </div>
             </div>
