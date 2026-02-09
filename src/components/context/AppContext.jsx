@@ -8,7 +8,7 @@ const AppContext = createContext();
 
 export const AppContextProvider = ({children}) => {
 
-    const [sidebarOpen, setSidebarOpen] = useState(false);
+    const [sidebarOpen, setSidebarOpen] = useState(true);
     const theme = useTheme();
     const isMobile = useMediaQuery(theme.breakpoints.down("sm"));
     const [userData, setUserData] = useState(null);
