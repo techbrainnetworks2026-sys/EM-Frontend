@@ -6,7 +6,7 @@ import { useAppContext } from "../context/AppContext.jsx";
 
 function ManagerLayout() {
 
-    const { sidebarOpen } = useAppContext();
+    const { sidebarOpen, isMobile } = useAppContext();
 
     return (
         <div className="app-layout">
