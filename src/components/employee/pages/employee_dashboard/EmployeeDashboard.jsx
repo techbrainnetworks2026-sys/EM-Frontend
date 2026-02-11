@@ -18,7 +18,8 @@ export default function EmployeeDashboard() {
   const [active, setActive] = useState("dashboard");
   const [showProfile, setShowProfile] = useState(false);
   const [sidebarOpen, setSidebarOpen] = useState(false);
-  const [notificationCount, setNotificationCount] = useState(); // Dynamic count
+  const [notificationCount, setNotificationCount] = useState(0); // Dynamic count
+  const [showNewNotificationAnimation, setShowNewNotificationAnimation] = useState(false);
   const profileRef = useRef(null);
 
   // Data State
@@ -63,9 +64,32 @@ export default function EmployeeDashboard() {
     }
   };
 
+  // Fetch notification count
+  const fetchNotificationCount = async () => {
+    try {
+      const response = await api.get('notifications/unread-count/');
+      const newCount = response.data.unread_count || 0;
+      
+      // Show shake animation only when count increases
+      if (newCount > notificationCount) {
+        setShowNewNotificationAnimation(true);
+        setTimeout(() => setShowNewNotificationAnimation(false), 600);
+      }
+      
+      setNotificationCount(newCount);
+    } catch (err) {
+      console.log('Error fetching notification count:', err);
+    }
+  };
+
   useEffect(() => {
     if(userData){
       fetchDashboardData();
+      fetchNotificationCount();
+      
+      // Refresh notification count every 10 seconds
+      const interval = setInterval(fetchNotificationCount, 10000);
+      return () => clearInterval(interval);
     }
 
   }, [userData]);
@@ -180,6 +204,7 @@ export default function EmployeeDashboard() {
 
   const handleNotificationClick = () => {
     setNotificationCount(0);
+    setShowNewNotificationAnimation(false);
     setActive("announcements");
   };
 
@@ -242,12 +267,16 @@ export default function EmployeeDashboard() {
           <div className="logo">Techbrain Networks</div>
         </div>
         <div className="header-right">
-          <div className={`notification ${notificationCount > 0 ? 'has-notifications' : ''}`} onClick={handleNotificationClick}>
+          <div 
+            className={`notification ${notificationCount > 0 ? 'has-notifications' : ''} ${showNewNotificationAnimation ? 'new-notification' : ''}`} 
+            onClick={handleNotificationClick}
+            title={notificationCount > 0 ? `You have ${notificationCount} new notification(s)` : 'No new notifications'}
+          >
             <svg className="notification-icon" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
               <path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"></path>
               <path d="M13.73 21a2 2 0 0 1-3.46 0"></path>
             </svg>
-            {notificationCount > 0 && <span className="badge">{notificationCount}</span>}
+            {notificationCount > 0 && <span className="badge" title={`${notificationCount} new`}>{notificationCount}</span>}
           </div>
           <div className="profile-area" ref={profileRef}>
             <button

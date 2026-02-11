@@ -179,76 +179,127 @@ body {
   transform: scale(1.05);
 }
 
-.notification.has-notifications .notification-icon {
-  animation: notificationPulse 2s ease-in-out infinite;
+.notification {
+  position: relative;
 }
 
 .notification-icon {
+  width: 24px;
+  height: 24px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
   transition: color 0.3s ease;
 }
 
+/* Continuous gentle pulse when notifications exist */
+.notification.has-notifications .notification-icon {
+  animation: bellPulse 2s ease-in-out infinite;
+}
+
+/* Shake animation when new notification arrives */
+.notification.new-notification .notification-icon {
+  animation: bellShake 0.5s ease-in-out;
+}
+
+/* Hover effect */
 .notification.has-notifications:hover .notification-icon {
   color: var(--accent-color);
-  animation: notificationRing 0.5s ease-in-out;
+  animation: bellShake 0.5s ease-in-out;
 }
 
-@keyframes notificationPulse {
+/* Bell Pulse - Gentle continuous animation */
+@keyframes bellPulse {
   0% {
     opacity: 1;
+    color: currentColor;
   }
   50% {
-    opacity: 0.6;
+    opacity: 0.7;
+    color: var(--accent-color);
   }
   100% {
     opacity: 1;
+    color: currentColor;
   }
 }
 
-@keyframes notificationRing {
+/* Bell Shake - Stronger animation when new notification arrives */
+@keyframes bellShake {
   0% {
-    transform: rotate(0);
+    transform: rotate(0deg) translateY(0);
   }
-  25% {
-    transform: rotate(15deg);
+  10% {
+    transform: rotate(-25deg) translateY(-3px);
+  }
+  20% {
+    transform: rotate(20deg) translateY(-2px);
+  }
+  30% {
+    transform: rotate(-20deg) translateY(-3px);
+  }
+  40% {
+    transform: rotate(15deg) translateY(-2px);
   }
   50% {
-    transform: rotate(-15deg);
+    transform: rotate(-10deg) translateY(-3px);
   }
-  75% {
-    transform: rotate(10deg);
+  60% {
+    transform: rotate(10deg) translateY(-2px);
   }
-  100% {
-    transform: rotate(0);
+  70% {
+    transform: rotate(-5deg) translateY(-2px);
+  }
+  80% {
+    transform: rotate(3deg) translateY(-1px);
+  }
+  90%, 100% {
+    transform: rotate(0deg) translateY(0);
   }
 }
 
+/* Badge styling */
 .badge {
+  position: absolute;
+  top: -10px;
+  right: -10px;
   background: var(--danger);
   color: white;
   border-radius: 50%;
-  padding: 2px 6px;
+  width: 22px;
+  height: 22px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
   font-size: 11px;
-  position: absolute;
-  top: -8px;
-  right: -8px;
   font-weight: bold;
-  animation: badgePulse 2s ease-in-out infinite;
-  box-shadow: 0 0 0 2px rgba(239, 68, 68, 0.3);
+  border: 2px solid white;
+  box-shadow: 0 2px 8px rgba(239, 68, 68, 0.4);
+  animation: badgeBounce 2s ease-in-out infinite;
 }
 
-@keyframes badgePulse {
-  0% {
+/* Badge bounce and glow animation */
+@keyframes badgeBounce {
+  0%, 100% {
     transform: scale(1);
-    box-shadow: 0 0 0 2px rgba(239, 68, 68, 0.3);
+    box-shadow: 0 2px 8px rgba(239, 68, 68, 0.4);
+  }
+  25% {
+    transform: scale(1.2);
   }
   50% {
-    transform: scale(1.15);
-    box-shadow: 0 0 0 6px rgba(239, 68, 68, 0.2);
+    transform: scale(0.95);
+    box-shadow: 0 2px 16px rgba(239, 68, 68, 0.6);
   }
-  100% {
-    transform: scale(1);
-    box-shadow: 0 0 0 2px rgba(239, 68, 68, 0.3);
+  75% {
+    transform: scale(1.1);
   }
+}
+
+/* Badge glow effect for new notifications */
+.notification.new-notification .badge {
+  animation: badgeBounce 0.8s cubic-bezier(0.68, -0.55, 0.265, 1.55);
+  box-shadow: 0 0 12px rgba(239, 68, 68, 0.8);
 }
 
 .profile-toggle {

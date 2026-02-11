@@ -266,7 +266,7 @@ const AddTask = () => {
                         </Grid>
 
                         <Grid item size={{xs: 12, sm: 6, md: 4}}>
-                            <TextField select label="Priority" fullWidth required value={assignedTo} onChange={(e) => setAssignedTo(e.target.value)}>
+                            <TextField select label="Assigned to" fullWidth required value={assignedTo} onChange={(e) => setAssignedTo(e.target.value)}>
                                 {arows.map((row,id) => (
                                     <MenuItem key={id} value={row.id}> {row.username} </MenuItem>
                                 ))}

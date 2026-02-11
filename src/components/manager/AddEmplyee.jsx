@@ -22,6 +22,7 @@ const AddEmplyee = () => {
     const [name, setName ] = useState("");
     const [email, setEmail ] = useState("");
     const [mobile, setMobile ] = useState("");
+    const [dob, setDob ] = useState("");
     const [bloodgrp, setBloodgrp ] = useState("");
     const [dept, setDept ] = useState("");
     const [design, setDesign ] = useState("");
@@ -29,7 +30,124 @@ const AddEmplyee = () => {
     const [cpass, setCPass ] = useState("");
     const [role, setRole ] = useState("");
 
+    // Error states for validation
+    const [errors, setErrors] = useState({
+        name: "",
+        email: "",
+        mobile: "",
+        dob: "",
+        bloodgrp: "",
+        dept: "",
+        design: "",
+        pass: "",
+        cpass: "",
+        role: ""
+    });
+
     const handleSnackClose = () => setSOpen(false);
+
+    // Validation functions
+    const validateName = (value) => {
+        if (!value || value.trim().length === 0) return "Name is required";
+        if (value.trim().length < 3) return "Name must be at least 3 characters";
+        if (!/^[a-zA-Z\s]+$/.test(value)) return "Name can only contain letters and spaces";
+        return "";
+    };
+
+    const validateEmail = (value) => {
+        if (!value) return "Email is required";
+        const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+        if (!emailRegex.test(value)) return "Please enter a valid email";
+        return "";
+    };
+
+    const validateMobile = (value) => {
+        if (!value) return "Mobile number is required";
+        if (!/^[0-9]{10}$/.test(value)) return "Mobile number must be 10 digits";
+        return "";
+    };
+
+    const validatePassword = (value) => {
+        if (!value) return "Password is required";
+        if (value.length < 6) return "Password must be at least 6 characters";
+        return "";
+    };
+
+    const validateConfirmPassword = (value, password) => {
+        if (!value) return "Confirm password is required";
+        if (value !== password) return "Passwords do not match";
+        return "";
+    };
+
+    const validateSelect = (value, fieldName) => {
+        if (!value) return `${fieldName} is required`;
+        return "";
+    };
+
+    // Handle field changes with validation
+    const handleNameChange = (e) => {
+        const value = e.target.value;
+        setName(value);
+        setErrors(prev => ({ ...prev, name: validateName(value) }));
+    };
+
+    const handleEmailChange = (e) => {
+        const value = e.target.value;
+        setEmail(value);
+        setErrors(prev => ({ ...prev, email: validateEmail(value) }));
+    };
+
+    const handleMobileChange = (e) => {
+        const value = e.target.value;
+        setMobile(value);
+        setErrors(prev => ({ ...prev, mobile: validateMobile(value) }));
+    };
+
+    const handlePasswordChange = (e) => {
+        const value = e.target.value;
+        setPass(value);
+        setErrors(prev => ({ ...prev, pass: validatePassword(value) }));
+    };
+
+    const handleConfirmPasswordChange = (e) => {
+        const value = e.target.value;
+        setCPass(value);
+        setErrors(prev => ({ ...prev, cpass: validateConfirmPassword(value, pass) }));
+    };
+
+    const handleBloodGroupChange = (e) => {
+        const value = e.target.value;
+        setBloodgrp(value);
+        setErrors(prev => ({ ...prev, bloodgrp: validateSelect(value, "Blood Group") }));
+    };
+
+    const handleDepartmentChange = (e) => {
+        const value = e.target.value;
+        setDept(value);
+        setErrors(prev => ({ ...prev, dept: validateSelect(value, "Department") }));
+    };
+
+    const handleDesignationChange = (e) => {
+        const value = e.target.value;
+        setDesign(value);
+        setErrors(prev => ({ ...prev, design: validateSelect(value, "Designation") }));
+    };
+
+    const handleRoleChange = (e) => {
+        const value = e.target.value;
+        setRole(value);
+        setErrors(prev => ({ ...prev, role: validateSelect(value, "Role") }));
+    };
+
+    const handleDobChange = (e) => {
+        const value = e.target.value;
+        setDob(value);
+        if (!value) {
+            setErrors(prev => ({ ...prev, dob: "Date of birth is required" }));
+        } else {
+            setErrors(prev => ({ ...prev, dob: "" }));
+        }
+    };
 
     const handleUOpen = (row) => {
         setUOpen(true);
@@ -88,34 +206,89 @@ const AddEmplyee = () => {
 
     const handleAddEmployee = async (e) => {
         e.preventDefault();
+        
+        // Validate all fields
+        const nameErr = validateName(name);
+        const emailErr = validateEmail(email);
+        const mobileErr = validateMobile(mobile);
+        const dobErr = !dob ? "Date of birth is required" : "";
+        const bloodgrpErr = validateSelect(bloodgrp, "Blood Group");
+        const deptErr = validateSelect(dept, "Department");
+        const designErr = validateSelect(design, "Designation");
+        const passErr = validatePassword(pass);
+        const cpassErr = validateConfirmPassword(cpass, pass);
+        const roleErr = validateSelect(role, "Role");
+
+        const newErrors = {
+            name: nameErr,
+            email: emailErr,
+            mobile: mobileErr,
+            dob: dobErr,
+            bloodgrp: bloodgrpErr,
+            dept: deptErr,
+            design: designErr,
+            pass: passErr,
+            cpass: cpassErr,
+            role: roleErr
+        };
+
+        setErrors(newErrors);
+
+        // Check if any errors exist
+        const hasErrors = Object.values(newErrors).some(err => err !== "");
+        if (hasErrors) {
+            setMessage("Please fix all validation errors");
+            setSeverity("error");
+            setSOpen(true);
+            return;
+        }
+
         try{
-            if(!name || !email || !mobile || !bloodgrp || !dept || !design || !pass || !cpass || !role){
-                setOpen(true);
-                setMessage("Please fill all the fields");
-                setSeverity("error");
-                return;
-            }else if(pass !== cpass){
-                setOpen(true);
-                setMessage("Password and Confirm Password do not match");
-                setSeverity("error");
-                return;
-            }else{
-                const res = await Register(name, email,pass, role, dept, design,bloodgrp, mobile,);
-                setOpen(true);
-                setMessage("User Data uploaded Successfully!")
-                setSeverity('success');
-                await fetchPendingUsers();
-            }
+            const res = await Register(name, email, pass, role, dept, design, bloodgrp, mobile);
+            setMessage("Employee registered successfully! Awaiting approval.");
+            setSeverity('success');
+            setSOpen(true);
+            
+            // Reset form
+            setName("");
+            setEmail("");
+            setMobile("");
+            setDob("");
+            setBloodgrp("");
+            setDept("");
+            setDesign("");
+            setPass("");
+            setCPass("");
+            setRole("");
+            setErrors({
+                name: "",
+                email: "",
+                mobile: "",
+                dob: "",
+                bloodgrp: "",
+                dept: "",
+                design: "",
+                pass: "",
+                cpass: "",
+                role: ""
+            });
+            
+            handleClose();
+            await fetchPendingUsers();
         }catch(err){
             if(err.response?.data?.error){
-                const errorMsg =  err.response?.data?.error;
-                setMessage(errorMsg );
+                const errorMsg = err.response?.data?.error;
+                setMessage(errorMsg);
                 setSeverity("error");
-                setOpen(true);
+                setSOpen(true);
+            }else if(err.response?.data?.email){
+                setMessage("Email already exists. Please use another email.");
+                setSeverity("error");
+                setSOpen(true);
             }else{
-                setMessage("Something went wrong, Please try again later.");
+                setMessage("Something went wrong. Please try again later.");
                 setSeverity("error");
-                setOpen(true);
+                setSOpen(true);
             }
         }
     }
@@ -316,7 +489,7 @@ const AddEmplyee = () => {
                                         </TableCell>
                                     </TableRow>
                                 ))
-                            : arows.filter((pending) => pending.is_approved === true).map((row, index) => (
+                            : rows.filter((pending) => pending.is_approved === true).map((row, index) => (
                                 <TableRow key={index} sx={{ background : "#333"}}>
                                     <TableCell colSpan={4} sx={{ borderBottom: "none" }}>
                                         <Box sx={{ background: "#1e1e1e", borderRadius: "12px", padding: "12px", mb: 1, display: "flex", flexDirection: "column", gap: 1 }}>
@@ -376,17 +549,43 @@ const AddEmplyee = () => {
                     <Grid container spacing={2}>
                         {/* Name */}
                         <Grid item size={{xs: 12, sm: 6, md: 4}}>
-                            <TextField label="Full Name" fullWidth required value={name} onChange={(e) => setName(e.target.value)} />
+                            <TextField 
+                                label="Full Name" 
+                                fullWidth 
+                                required 
+                                value={name} 
+                                onChange={handleNameChange}
+                                error={!!errors.name}
+                                helperText={errors.name}
+                            />
                         </Grid>
 
                         {/* Email */}
                         <Grid item size={{xs: 12, sm: 6, md: 4}}>
-                            <TextField label="Email" type="email" fullWidth required value={email} onChange={(e) => setEmail(e.target.value)} />
+                            <TextField 
+                                label="Email" 
+                                type="email" 
+                                fullWidth 
+                                required 
+                                value={email} 
+                                onChange={handleEmailChange}
+                                error={!!errors.email}
+                                helperText={errors.email}
+                            />
                         </Grid>
 
                         {/* Mobile */}
                         <Grid item size={{xs: 12, sm: 6, md: 4}}>
-                            <TextField label="Mobile Number" fullWidth required value={mobile} onChange={(e) => setMobile(e.target.value)} />
+                            <TextField 
+                                label="Mobile Number" 
+                                fullWidth 
+                                required 
+                                value={mobile} 
+                                onChange={handleMobileChange}
+                                error={!!errors.mobile}
+                                helperText={errors.mobile}
+                                placeholder="10 digits"
+                            />
                         </Grid>
 
                         {/* DOB */}
@@ -397,9 +596,13 @@ const AddEmplyee = () => {
                                 InputLabelProps={{ shrink: true }}
                                 fullWidth
                                 required
+                                value={dob}
+                                onChange={handleDobChange}
+                                error={!!errors.dob}
+                                helperText={errors.dob}
                                 sx={{
                                     "& input::-webkit-calendar-picker-indicator": {
-                                        filter: "invert(0)"   // makes icon BLACK
+                                        filter: "invert(0)"
                                     }
                                 }}
                             />
@@ -407,45 +610,100 @@ const AddEmplyee = () => {
 
                         {/* Blood Group */}
                         <Grid item size={{xs: 12, sm: 6, md: 4}}>
-                            <TextField select label="Blood Group" fullWidth required value={bloodgrp} onChange={(e) => setBloodgrp(e.target.value)}>
-                            {["A+", "A-", "B+", "B-", "O+", "O-", "AB+", "AB-"].map(bg => (
-                                <MenuItem key={bg} value={bg}>
-                                    {bg}
-                                </MenuItem>
-                            ))}
+                            <TextField 
+                                select 
+                                label="Blood Group" 
+                                fullWidth 
+                                required 
+                                value={bloodgrp} 
+                                onChange={handleBloodGroupChange}
+                                error={!!errors.bloodgrp}
+                                helperText={errors.bloodgrp}
+                            >
+                                {["A+", "A-", "B+", "B-", "O+", "O-", "AB+", "AB-"].map(bg => (
+                                    <MenuItem key={bg} value={bg}>
+                                        {bg}
+                                    </MenuItem>
+                                ))}
                             </TextField>
                         </Grid>
 
-                        {/* Role */}
+                        {/* Designation */}
                         <Grid item size={{xs: 12, sm: 6, md: 4}}>
-                            <TextField select label="Designation" fullWidth required value={design} onChange={(e) => setDesign(e.target.value)}>
-                                <MenuItem value="MERN-Stack">MERN Stack</MenuItem>
-                                <MenuItem value="Backend-Developer">Backend</MenuItem>
-                                <MenuItem value="Digital-Marketing">Digital Marketing</MenuItem>
-                                <MenuItem value="Graphic-Designer">Graphic Designer</MenuItem>
-                                <MenuItem value="Video-Creator">Video Creator</MenuItem>
-                                <MenuItem value="Android-Developer">Android Developer</MenuItem>
+                            <TextField 
+                                select 
+                                label="Designation" 
+                                fullWidth 
+                                required 
+                                value={design} 
+                                onChange={handleDesignationChange}
+                                error={!!errors.design}
+                                helperText={errors.design}
+                            >
+                                <MenuItem value="MERN Stack">MERN Stack</MenuItem>
+                                <MenuItem value="Backend Development">Backend Development</MenuItem>
+                                <MenuItem value="Digital Marketing">Digital Marketing</MenuItem>
+                                <MenuItem value="Graphic Designing">Graphic Designing</MenuItem>
+                                <MenuItem value="Android Development">Android Development</MenuItem>
                             </TextField>
                         </Grid>
                        
+                        {/* Department */}
                         <Grid item size={{xs: 12, sm: 6, md: 4}}>
-                            <TextField label="Department" fullWidth required value={dept} onChange={(e) => setDept(e.target.value)} />
+                            <TextField 
+                                label="Department" 
+                                fullWidth 
+                                required 
+                                value={dept} 
+                                onChange={handleDepartmentChange}
+                                error={!!errors.dept}
+                                helperText={errors.dept}
+                            />
                         </Grid>
 
                         {/* Type */}
                         <Grid item size={{xs: 12, sm: 6, md: 4}}>
-                            <TextField select label="Role" fullWidth required value={role} onChange={(e) => setRole(e.target.value)}>
+                            <TextField 
+                                select 
+                                label="Role" 
+                                fullWidth 
+                                required 
+                                value={role} 
+                                onChange={handleRoleChange}
+                                error={!!errors.role}
+                                helperText={errors.role}
+                            >
                                 <MenuItem value="MANAGER">Manager</MenuItem>
                                 <MenuItem value="EMPLOYEE">Employee</MenuItem>
                             </TextField>
                         </Grid>
 
+                        {/* Password */}
                         <Grid item size={{xs: 12, sm: 6, md: 4}}>
-                            <TextField label="Password" type='password' fullWidth required value={pass} onChange={(e) => setPass(e.target.value)} />
+                            <TextField 
+                                label="Password" 
+                                type='password' 
+                                fullWidth 
+                                required 
+                                value={pass} 
+                                onChange={handlePasswordChange}
+                                error={!!errors.pass}
+                                helperText={errors.pass || "Minimum 6 characters"}
+                            />
                         </Grid>
 
+                        {/* Confirm Password */}
                         <Grid item size={{xs: 12, sm: 6, md: 4}}>
-                            <TextField label="Confirm Password" type='password' fullWidth required value={cpass} onChange={(e) => setCPass(e.target.value)} />
+                            <TextField 
+                                label="Confirm Password" 
+                                type='password' 
+                                fullWidth 
+                                required 
+                                value={cpass} 
+                                onChange={handleConfirmPasswordChange}
+                                error={!!errors.cpass}
+                                helperText={errors.cpass}
+                            />
                         </Grid>
                         
                     </Grid>

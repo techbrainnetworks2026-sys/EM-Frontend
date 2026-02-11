@@ -270,7 +270,7 @@ const LeaveManagement = () => {
                                         </TableCell>
                                     </TableRow>
                                 ))
-                                : approvedWithDuration.filter((leave) => leave.status === "APPROVED").map((row, index) => (
+                                : leaveWithDuration.filter((leave) => leave.status === "APPROVED").map((row, index) => (
                                     <TableRow key={index} sx={{ background : "#333"}}>
                                         <TableCell colSpan={4} sx={{ borderBottom: "none" }}>
                                             <Box sx={{ background: "#1e1e1e", borderRadius: "12px", padding: "14px", mb: 1, display: "flex", flexDirection: "column", gap: 1,}}>
@@ -378,6 +378,28 @@ const LeaveManagement = () => {
                                     {formatDate(selectedLeave.applied_on)}
                                 </Typography>
                             </Grid>
+
+                            {selectedLeave.status === "APPROVED" && (
+                                <>
+                                    <Grid item size={6}>
+                                        <Typography sx={{ fontSize: "13px", opacity: 0.6, color : "#1e1e1e" }}>
+                                            Approved On
+                                        </Typography>
+                                        <Typography sx={{ fontWeight: 500, color : "#1e1e1e" }}>
+                                            {selectedLeave.action_date ? formatDate(selectedLeave.action_date) : "N/A"}
+                                        </Typography>
+                                    </Grid>
+
+                                    <Grid item size={6}>
+                                        <Typography sx={{ fontSize: "13px", opacity: 0.6, color : "#1e1e1e" }}>
+                                            Approved By
+                                        </Typography>
+                                        <Typography sx={{ fontWeight: 500, color : "#1e1e1e" }}>
+                                            {selectedLeave.action_by_name || "N/A"}
+                                        </Typography>
+                                    </Grid>
+                                </>
+                            )}
                             
                         </Grid>
                         <Box sx={{ background: "#121212", padding: "12px", borderRadius: "8px", }}>

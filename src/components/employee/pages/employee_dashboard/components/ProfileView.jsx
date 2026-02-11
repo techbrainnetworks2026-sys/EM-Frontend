@@ -1,17 +1,21 @@
 import React, { useState, useEffect } from 'react';
 import Cropper from 'react-easy-crop';
 import './ProfileView.css';
-import { useAppContext } from "../../../../context/AppContext.jsx"; 
+import { useAppContext } from "../../../../context/AppContext.jsx";
+import api from "../../../../../services/service.js";
 
 const ProfileView = () => {
 
     const { userData, setUserData } = useAppContext();
     const [editProfile, setEditProfile] = useState(false);
+    const [loading, setLoading] = useState(false);
+    const [message, setMessage] = useState('');
 
     const [imageToCrop, setImageToCrop] = useState(null);
     const [crop, setCrop] = useState({ x: 0, y: 0 });
     const [zoom, setZoom] = useState(1);
     const [croppedAreaPixels, setCroppedAreaPixels] = useState(null);
+    const [croppedImage, setCroppedImage] = useState(null);
 
     const onCropComplete = (croppedArea, croppedAreaPixels) => {
         setCroppedAreaPixels(croppedAreaPixels);
@@ -51,22 +55,19 @@ const ProfileView = () => {
         return new Promise((resolve) => {
             canvas.toBlob((blob) => {
                 if (!blob) return;
-                const reader = new FileReader();
-                reader.readAsDataURL(blob);
-                reader.onloadend = () => {
-                    resolve(reader.result);
-                };
+                resolve(blob);
             }, 'image/jpeg');
         });
     };
 
     const handleApplyCrop = async () => {
         try {
-            const croppedImage = await getCroppedImg(imageToCrop, croppedAreaPixels);
-            setUser({ ...user, profilePicture: croppedImage });
+            const croppedBlob = await getCroppedImg(imageToCrop, croppedAreaPixels);
+            setCroppedImage(croppedBlob);
             setImageToCrop(null);
         } catch (e) {
             console.error(e);
+            setMessage('Error cropping image');
         }
     };
 
@@ -92,7 +93,75 @@ const ProfileView = () => {
     }, [imageToCrop]);
 
     const handleProfileChange = (e) => {
-        setUser({ ...user, [e.target.name]: e.target.value });
+        setUserData({ 
+            ...userData, 
+            [e.target.name]: e.target.value 
+        });
+    };
+
+    const handleSaveProfile = async () => {
+        try {
+            setLoading(true);
+            setMessage('');
+
+            const formData = new FormData();
+            
+            // Only add fields that are actually editable
+            if (userData.blood_group) {
+                formData.append('blood_group', userData.blood_group);
+            }
+            if (userData.mobile_number) {
+                formData.append('mobile_number', userData.mobile_number);
+            }
+            
+            // Add cropped image if available
+            if (croppedImage) {
+                formData.append('profile_picture', croppedImage, 'profile_picture.jpg');
+            }
+
+            // Debug: Log what we're sending
+            console.log('Sending profile update with:');
+            for (let [key, value] of formData.entries()) {
+                if (key === 'profile_picture') {
+                    console.log(`  ${key}: File (${value.size} bytes)`);
+                } else {
+                    console.log(`  ${key}: ${value}`);
+                }
+            }
+
+            const response = await api.patch('/accounts/profile/update/', formData);
+
+            console.log('Profile update response:', response.data);
+
+            // Update userData with response
+            if (response.data && response.data.user) {
+                setUserData({
+                    ...userData,
+                    ...response.data.user,
+                });
+            }
+            setCroppedImage(null);
+            setMessage('Profile saved successfully!');
+            setEditProfile(false);
+            setTimeout(() => setMessage(''), 3000);
+        } catch (error) {
+            console.error('Error saving profile:', error);
+            console.error('Error response:', error.response?.data);
+            console.error('Error status:', error.response?.status);
+            
+            // Get detailed error message
+            const errorMessage = error.response?.data?.error 
+                || error.response?.data?.detail
+                || error.response?.data?.message
+                || (error.response?.data && Object.entries(error.response.data)
+                    .map(([key, value]) => `${key}: ${value}`)
+                    .join(', '))
+                || 'Error saving profile. Please try again.';
+            
+            setMessage(errorMessage);
+        } finally {
+            setLoading(false);
+        }
     };
 
     if (!userData) {
@@ -143,8 +212,10 @@ const ProfileView = () => {
                 <div className="profile-header-section">
                     <div className="profile-image-section">
                         <div className="profile-image-large">
-                            {userData.profilePicture ? (
-                                <img src={userData.profilePicture} alt="User Profile" />
+                            {croppedImage ? (
+                                <img src={URL.createObjectURL(croppedImage)} alt="Cropped Profile" />
+                            ) : userData.profile_picture_url ? (
+                                <img src={userData.profile_picture_url} alt="User Profile" />
                             ) : (
                                 <span className="avatar-placeholder big">👤</span>
                             )}
@@ -173,22 +244,17 @@ const ProfileView = () => {
                 <div className="profile-form-grid">
                     <div className="form-group">
                         <label>Name</label>
-                        <input name="name" value={userData.username} disabled={!editProfile} onChange={handleProfileChange} />
+                        <input name="username" value={userData.username || ''} disabled={!editProfile} onChange={handleProfileChange} />
                     </div>
 
                     <div className="form-group">
                         <label>Email</label>
-                        <input value={userData.email} disabled />
-                    </div>
-
-                    <div className="form-group">
-                        <label>Date of Birth</label>
-                        <input type="date" name="dob" value={userData.dob || ""} disabled />
+                        <input value={userData.email || ''} disabled />
                     </div>
 
                     <div className="form-group">
                         <label>Blood Group</label>
-                        <select name="bloodGroup" value={userData.blood_group || ""} disabled={!editProfile} onChange={handleProfileChange}>
+                        <select name="blood_group" value={userData.blood_group || ""} disabled={!editProfile} onChange={handleProfileChange}>
                             <option value="">Select Group</option>
                             <option value="A+">A+</option>
                             <option value="A-">A-</option>
@@ -203,29 +269,38 @@ const ProfileView = () => {
 
                     <div className="form-group">
                         <label>Mobile</label>
-                        <input name="mobile" value={userData.mobile_number} disabled={!editProfile} onChange={handleProfileChange} />
+                        <input name="mobile_number" value={userData.mobile_number || ''} disabled={!editProfile} onChange={handleProfileChange} />
                     </div>
                     <div className="form-group">
                         <label>Department</label>
-                        <input value={userData.department} disabled  />
+                        <input value={userData.department || ''} disabled />
                     </div>
 
                     <div className="form-group">
                         <label>Designation</label>
-                        <input value={userData.designation} disabled />
+                        <input value={userData.designation || ''} disabled />
                     </div>
                 </div>
 
-                {/* <div className="form-group full-width mt-10">
-                    <label>Address</label>
-                    <textarea name="address" value={user.address} disabled={!editProfile} onChange={handleProfileChange} />
-                </div> */}
+                {message && (
+                    <div className={`message ${message.includes('successfully') ? 'success' : 'error'}`}>
+                        {message}
+                    </div>
+                )}
 
                 <div className="profile-actions mt-20">
                     {!editProfile ? (
                         <button className="primary-btn" onClick={() => setEditProfile(true)}>Edit Profile</button>
                     ) : (
-                        <button className="primary-btn" onClick={() => setEditProfile(false)}>Save Changes</button>
+                        <>
+                            <button className="secondary-btn" onClick={() => {
+                                setEditProfile(false);
+                                setCroppedImage(null);
+                            }} disabled={loading}>Cancel</button>
+                            <button className="primary-btn" onClick={handleSaveProfile} disabled={loading}>
+                                {loading ? 'Saving...' : 'Save Changes'}
+                            </button>
+                        </>
                     )}
                 </div>
             </div>
