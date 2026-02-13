@@ -104,7 +104,7 @@ function Dashboard(){
                             </Box>
                         </Box>
                         
-                        <Button size="small"
+                        <Button size="small" onClick={() => navigate('/manager/addemployee')}
                             sx={{
                                 alignSelf: "flex-end",
                                 textTransform: "none",
