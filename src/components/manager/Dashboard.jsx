@@ -9,9 +9,6 @@ import { useNavigate } from 'react-router-dom';
 import { useAppContext } from '../context/AppContext.jsx';
 import api from '../../services/service.js';
 import EmployeeLeaveWidget from './components/EmployeeLeaveWidget.jsx';
-import Analytics from './components/Analytics.jsx';
-import BarChartIcon from '@mui/icons-material/BarChart';
-import TableChartIcon from '@mui/icons-material/TableChart';
 
 
 function Dashboard() {
@@ -23,9 +20,6 @@ function Dashboard() {
     const [approvedUsers, setApprovedUsers] = useState([]);
     const [pendingUsers, setPendingUsers] = useState([]);
     const [leaveRequests, setLeaveRequests] = useState([]);
-    const [tasks, setTasks] = useState([]);
-    const [fullAttendance, setFullAttendance] = useState([]);
-    const [viewMode, setViewMode] = useState("table"); // "table" or "analytics"
 
     const rowsPerPage = 5;
     const today = new Date();
@@ -69,25 +63,13 @@ function Dashboard() {
         }
     };
 
-    const fetchAllData = async () => {
-        try {
-            const [tasksRes, attRes] = await Promise.all([
-                api.get("task/tasks/"),
-                api.get("attendance/history/") // Assuming this works for managers too or similar endpoint
-            ]);
-            setTasks(tasksRes.data);
-            setFullAttendance(attRes.data);
-        } catch (err) {
-            console.log("Error fetching analytics data:", err);
-        }
-    }
+
 
     useEffect(() => {
         fetchAtendanceData();
         fetchApprovedUsers();
         fetchPendingLeaves();
         fetchPendingUsers();
-        fetchAllData();
     }, []);
 
     const approvedUsersCount = approvedUsers.length;
@@ -151,7 +133,7 @@ function Dashboard() {
                             </Box>
                         </Box>
 
-                        <Button size="small" onClick={() => navigate('/manager/addemployee')}
+                        <Button size="small" onClick={() => navigate('/manager/pending-employees')}
                             sx={{
                                 alignSelf: "flex-end",
                                 textTransform: "none",
@@ -202,27 +184,16 @@ function Dashboard() {
                     marginTop: "20px",
                 }}
                 >
-                    <Box sx={{ display: "flex", alignItems: "center", gap: 2 }}>
-                        <Typography
-                            sx={{
-                                fontFamily: "work sans",
-                                fontWeight: 500,
-                                fontSize: "20px",
-                                color: "black"
-                            }}
-                        >
-                            {viewMode === "table" ? "Employees Daily Login Status" : "Team Performance Analytics"}
-                        </Typography>
-                        <Button
-                            variant="outlined"
-                            size="small"
-                            startIcon={viewMode === "table" ? <BarChartIcon /> : <TableChartIcon />}
-                            onClick={() => setViewMode(viewMode === "table" ? "analytics" : "table")}
-                            sx={{ color: "grey", borderColor: "grey", textTransform: "none" }}
-                        >
-                            {viewMode === "table" ? "Show Analytics" : "Show Table"}
-                        </Button>
-                    </Box>
+                    <Typography
+                        sx={{
+                            fontFamily: "work sans",
+                            fontWeight: 500,
+                            fontSize: "20px",
+                            color: "black"
+                        }}
+                    >
+                        Employees Daily Login Status
+                    </Typography>
 
                     <Box
                         sx={{
@@ -243,8 +214,7 @@ function Dashboard() {
                 </div>
 
                 <div style={{ marginTop: "10px" }}>
-                    {viewMode === "table" ? (
-                        <TableContainer component={Paper}
+                    <TableContainer component={Paper}
                             sx={{
                                 background: "#ffffff",
                                 borderRadius: "12px",
@@ -347,9 +317,6 @@ function Dashboard() {
                                 />
                             </Table>
                         </TableContainer>
-                    ) : (
-                        <Analytics tasks={tasks} attendance={fullAttendance} />
-                    )}
                 </div>
 
             </div>

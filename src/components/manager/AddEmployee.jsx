@@ -307,17 +307,15 @@ const AddEmployee = () => {
                 <Button onClick={() => setOpen(true)} sx={{ textTransform: "none", background: "#00838f", color: "whitesmoke" }}> + Add Employee </Button>
             </Box>
             <Box sx={{ marginTop: "20px" }}>
-                <Box>
-                    <Typography variant='h6' sx={{ fontFamily: "work sans", fontWeight: 600, color: "#080808" }}> Pending Employees List</Typography>
-                </Box>
+                {/* <Box>
+                    <Typography variant='h6' sx={{ fontFamily: "work sans", fontWeight: 600, color: "#080808" }}> Approved Employees List</Typography>
+                </Box> */}
                 <TableContainer
                     component={Paper}
                     sx={{
                         mt: 1,
-                        background: "#ffffff",
+                        background: "white",
                         borderRadius: "12px",
-                        boxShadow: "0 4px 12px rgba(0,0,0,0.05)",
-                        border: "1px solid #e2e8f0"
                     }}
                 >
                     <Table>
@@ -343,7 +341,7 @@ const AddEmployee = () => {
 
                         <TableBody>
                             {!isMobile ?
-                                rows.filter((pending) => pending.is_approved === false).map((row, index) => (
+                                arows.filter((pending) => pending.is_approved === true).map((row, index) => (
                                     <TableRow key={index} hover>
                                         <TableCell sx={{ color: "#334155" }}>
                                             <div style={{ display: "flex", alignItems: "left", justifyContent: "left", columnGap: "10px" }}>
@@ -360,120 +358,6 @@ const AddEmployee = () => {
                                             {row.designation}
                                         </TableCell>
                                         <TableCell align="left" sx={{ color: "#334155" }}>
-                                            <Chip label={"PENDING"} size="small"
-                                                sx={{
-                                                    width: "fit-content",
-                                                    backgroundColor: "#ffd600",
-                                                    color: "#000",
-                                                    fontWeight: 600,
-                                                }}
-                                            />
-                                        </TableCell>
-
-                                        <TableCell align="center">
-                                            <IconButton sx={{ color: "#90caf9" }} onClick={() => handleUOpen(row)}>
-                                                <VisibilityIcon />
-                                            </IconButton>
-                                        </TableCell>
-                                    </TableRow>
-                                ))
-                                : rows.filter((pending) => pending.is_approved === false).map((row, index) => (
-                                    <TableRow key={index} sx={{ background: "#333" }}>
-                                        <TableCell colSpan={4} sx={{ borderBottom: "none" }}>
-                                            <Box sx={{ background: "#1e1e1e", borderRadius: "12px", padding: "12px", mb: 1, display: "flex", flexDirection: "column", gap: 1 }}>
-                                                <Box sx={{ display: "flex", alignItems: "center", gap: 1 }}>
-                                                    <Avatar sx={{ width: 36, height: 36, bgcolor: "#0d47a1" }}>
-                                                        {row.username.charAt(0).toUpperCase()}
-                                                    </Avatar>
-
-                                                    <Typography sx={{ fontWeight: 600, color: "whitesmoke" }}>
-                                                        {row.username}
-                                                    </Typography>
-                                                </Box>
-
-                                                <Typography sx={{ fontSize: "14px", opacity: 0.7, color: "whitesmoke", display: "flex", alignItems: "center", columnGap: "7px" }}>
-                                                    <EmailIcon /> {row.email}
-                                                </Typography>
-
-                                                <Typography sx={{ fontSize: "14px", opacity: 0.7, color: "whitesmoke", display: "flex", alignItems: "center", columnGap: "7px" }}>
-                                                    <PersonIcon /> {row.designation}
-                                                </Typography>
-
-                                                <Chip label={"PENDING"} size="small"
-                                                    sx={{
-                                                        mt: 1,
-                                                        width: "fit-content",
-                                                        backgroundColor: "#ffd600",
-                                                        color: "#000",
-                                                        fontWeight: 600,
-                                                    }}
-                                                />
-
-                                                <Box sx={{ textAlign: "right" }}>
-                                                    <IconButton sx={{ color: "#90caf9" }} onClick={() => handleUOpen(row)}>
-                                                        <VisibilityIcon />
-                                                    </IconButton>
-                                                </Box>
-                                            </Box>
-                                        </TableCell>
-                                    </TableRow>
-                                ))}
-                        </TableBody>
-                    </Table>
-                </TableContainer>
-            </Box>
-            <Box sx={{ marginTop: "20px" }}>
-                <Box>
-                    <Typography variant='h6' sx={{ fontFamily: "work sans", fontWeight: 600, color: "#080808" }}> Approved Employees List</Typography>
-                </Box>
-                <TableContainer
-                    component={Paper}
-                    sx={{
-                        mt: 1,
-                        background: "white",
-                        borderRadius: "12px",
-                    }}
-                >
-                    <Table>
-                        <TableHead sx={{ display: { xs: "none", sm: "table-header-group" } }}>
-                            <TableRow>
-                                <TableCell align="center" sx={{ color: "#1e293b", fontWeight: 600 }}>
-                                    Employee
-                                </TableCell>
-                                <TableCell align="center" sx={{ color: "#1e293b", fontWeight: 600 }}>
-                                    Email
-                                </TableCell>
-                                <TableCell align="center" sx={{ color: "#1e293b", fontWeight: 600 }}>
-                                    Designation
-                                </TableCell>
-                                <TableCell align="center" sx={{ color: "#1e293b", fontWeight: 600 }}>
-                                    Status
-                                </TableCell>
-                                <TableCell align="center" sx={{ color: "#1e293b", fontWeight: 600 }}>
-                                    View
-                                </TableCell>
-                            </TableRow>
-                        </TableHead>
-
-                        <TableBody>
-                            {!isMobile ?
-                                arows.filter((pending) => pending.is_approved === true).map((row, index) => (
-                                    <TableRow key={index} hover>
-                                        <TableCell sx={{ color: "#334155" }}>
-                                            <div style={{ display: "flex", alignItems: "center", justifyContent: "center", columnGap: "10px" }}>
-                                                <Avatar sx={{ width: 32, height: 32, background: "#0d47a1" }}>
-                                                    {row.username.charAt(0).toUpperCase()}
-                                                </Avatar>
-                                                {row.username}
-                                            </div>
-                                        </TableCell>
-                                        <TableCell align="center" sx={{ color: "#334155" }}>
-                                            {row.email}
-                                        </TableCell>
-                                        <TableCell align="center" sx={{ color: "#334155" }}>
-                                            {row.designation}
-                                        </TableCell>
-                                        <TableCell align="center" sx={{ color: "#334155" }}>
                                             <Chip label={"APPROVED"}
                                                 size="small"
                                                 sx={{
@@ -484,7 +368,7 @@ const AddEmployee = () => {
                                                 }}
                                             />
                                         </TableCell>
-                                        <TableCell align="center">
+                                        <TableCell align="left">
                                             <IconButton sx={{ color: "#90caf9" }} onClick={() => handleUOpen(row)}>
                                                 <VisibilityIcon />
                                             </IconButton>
