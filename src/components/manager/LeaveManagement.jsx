@@ -30,20 +30,20 @@ const LeaveManagement = () => {
     };
 
     const fetchPendingLeaves = async () => {
-        try{
+        try {
             const res = await api.get("leave/manager/pending-leaves/");
             setLeaveRequests(res.data);
-        }catch(err){
-            console.log(err);
+        } catch (err) {
+            // Error handled
         }
     };
 
     const fetchApprovedLeaves = async () => {
-        try{
+        try {
             const res = await api.get("leave/manager/approved-leaves/");
             setApprovedRequests(res.data);
-        }catch(err){
-            console.log(err);
+        } catch (err) {
+            // Error handled
         }
     };
 
@@ -60,7 +60,6 @@ const LeaveManagement = () => {
             setSeverity("success");
             await fetchPendingLeaves();
         } catch (err) {
-            console.log(err.response?.data);
             setMessage(err.response?.data?.message);
             setSOpen(true);
             setSeverity("error");
@@ -80,12 +79,12 @@ const LeaveManagement = () => {
 
     const leaveWithDuration = leaveRequests.map((leave) => ({
         ...leave,
-        days : getLeaveDuration(leave.start_date, leave.end_date),
+        days: getLeaveDuration(leave.start_date, leave.end_date),
     }))
 
     const approvedWithDuration = approvedRequests.map((leave) => ({
         ...leave,
-        days : getLeaveDuration(leave.start_date, leave.end_date),
+        days: getLeaveDuration(leave.start_date, leave.end_date),
     }))
 
     const formatDate = (dateString) => {
@@ -96,36 +95,38 @@ const LeaveManagement = () => {
     return (
         <div>
             <Typography variant='h5' component='p' sx={{
-                fontFamily : "work sans",
-                fontWeight : "600",
-                color : "#080808"
+                fontFamily: "work sans",
+                fontWeight: "600",
+                color: "#080808"
             }}> Employees Leave Management </Typography>
-            <div style={{ marginTop : "15px"}}>
-                <Typography variant='h6' sx={{ fontFamily : "work sans"}}>Pending Approvals</Typography>
-                <Box sx={{marginTop : "10px"}}>
+            <div style={{ marginTop: "15px" }}>
+                <Typography variant='h6' sx={{ fontFamily: "work sans",color:"#080808" }}>Pending Approvals</Typography>
+                <Box sx={{ marginTop: "10px" }}>
                     <TableContainer
                         component={Paper}
                         sx={{
-                            background: "#1e1e1e",
+                            background: "#ffffff",
                             borderRadius: "12px",
+                            boxShadow: "0 4px 12px rgba(0,0,0,0.05)",
+                            border: "1px solid #e2e8f0"
                         }}
-                        >
+                    >
                         <Table>
                             <TableHead sx={{ display: { xs: "none", sm: "table-header-group" } }}>
                                 <TableRow>
-                                    <TableCell align="center" sx={{ color: "whitesmoke", fontWeight: 600 }}>
+                                    <TableCell align="center" sx={{ color: "#1e293b", fontWeight: 600 }}>
                                         Employee
                                     </TableCell>
-                                    <TableCell align="center" sx={{ color: "whitesmoke", fontWeight: 600 }}>
+                                    <TableCell align="center" sx={{ color: "#1e293b", fontWeight: 600 }}>
                                         Days
                                     </TableCell>
-                                    <TableCell align="center" sx={{ color: "whitesmoke", fontWeight: 600 }}>
+                                    <TableCell align="center" sx={{ color: "#1e293b", fontWeight: 600 }}>
                                         Status
                                     </TableCell>
-                                    <TableCell align="center" sx={{ color: "whitesmoke", fontWeight: 600 }}>
+                                    <TableCell align="center" sx={{ color: "#1e293b", fontWeight: 600 }}>
                                         View
                                     </TableCell>
-                                    <TableCell align="center" sx={{ color: "whitesmoke", fontWeight: 600 }}>
+                                    <TableCell align="center" sx={{ color: "#1e293b", fontWeight: 600 }}>
                                         Action
                                     </TableCell>
                                 </TableRow>
@@ -133,173 +134,174 @@ const LeaveManagement = () => {
 
                             <TableBody>
                                 {!isMobile ?
-                                leaveWithDuration.filter((leave) => leave.status === "PENDING").map((row, index) => (
-                                    <TableRow key={index} hover>
-                                        <TableCell align="center" sx={{ color: "whitesmoke" }}>
-                                            {row.employee_name}
-                                        </TableCell>
-                                        <TableCell align="center" sx={{ color: "whitesmoke" }}>
-                                            {row.days}
-                                        </TableCell>
-                                        <TableCell align="center" sx={{ color: "whitesmoke" }}>
-                                            <Chip label={row.status}
-                                                size="small"
-                                                sx={{
-                                                    backgroundColor: "#ffd600",
-                                                    color: "#000",
-                                                    fontWeight: 600,
-                                                    textTransform: "capitalize",
-                                                }}
-                                            />
-                                        </TableCell>
-                                        <TableCell align="center">
-                                            <IconButton sx={{ color: "#90caf9" }} onClick={() => handleOpen(row)}>
-                                                <VisibilityIcon />
-                                            </IconButton>
-                                        </TableCell>
-                                        <TableCell sx={{display : "flex", justifyContent : "center"}}>
-                                            <Box sx={{ display : "flex", columnGap : "20px"}}>
-                                                <IconButton sx={{ color: "#43a047" }} onClick={() => processLeave(row.id, "APPROVE")}>
-                                                    <ThumbUpTwoToneIcon />
-                                                </IconButton>
-                                                <IconButton sx={{ color: "#e53935" }} onClick={() => processLeave(row.id, "REJECT")}>
-                                                    <ThumbDownAltTwoToneIcon />
-                                                </IconButton>
-                                            </Box>
-                                        </TableCell>
-                                    </TableRow>
-                                )) : 
-                                leaveWithDuration.filter((leave) => leave.status === "PENDING").map((row, index) => (
-                                    <TableRow key={index} sx={{ background : "#333"}}>
-                                        <TableCell colSpan={5} sx={{ borderBottom: "none" }}>
-                                            <Box sx={{ background: "#1e1e1e", borderRadius: "12px", padding: "14px", mb: 1, display: "flex", flexDirection: "column", gap: 1,}}>
-                                                <Typography sx={{ fontWeight: 600, color: "whitesmoke" }}>
-                                                    {row.employee_name}
-                                                </Typography>
-
-                                                <Typography sx={{ fontSize: "14px", opacity: 0.7, color: "whitesmoke"}}>
-                                                    🗓️ {row.days} day(s)
-                                                </Typography>
-
-                                                <Chip label={row.status} size="small"
+                                    leaveWithDuration.filter((leave) => leave.status === "PENDING").map((row, index) => (
+                                        <TableRow key={index} hover sx={{ borderBottom: "1px solid #f1f5f9" }}>
+                                            <TableCell align="center" sx={{ color: "#334155" }}>
+                                                {row.employee_name}
+                                            </TableCell>
+                                            <TableCell align="center" sx={{ color: "#334155" }}>
+                                                {row.days}
+                                            </TableCell>
+                                            <TableCell align="center">
+                                                <Chip label={row.status}
+                                                    size="small"
                                                     sx={{
-                                                        width: "fit-content",
-                                                        backgroundColor: "#ffd600",
+                                                        backgroundColor: "#ffc107",
                                                         color: "#000",
                                                         fontWeight: 600,
+                                                        textTransform: "capitalize",
                                                     }}
                                                 />
-
-                                                <Box sx={{ display: "flex", justifyContent: "space-between", mt: 1,}}>
-                                                    <IconButton sx={{ color: "#90caf9" }} onClick={() => handleOpen(row)}>
-                                                        <VisibilityIcon />
+                                            </TableCell>
+                                            <TableCell align="center">
+                                                <IconButton sx={{ color: "#0d47a1" }} onClick={() => handleOpen(row)}>
+                                                    <VisibilityIcon />
+                                                </IconButton>
+                                            </TableCell>
+                                            <TableCell sx={{ display: "flex", justifyContent: "center" }}>
+                                                <Box sx={{ display: "flex", columnGap: "20px" }}>
+                                                    <IconButton sx={{ color: "#2e7d32" }} onClick={() => processLeave(row.id, "APPROVE")}>
+                                                        <ThumbUpTwoToneIcon />
                                                     </IconButton>
+                                                    <IconButton sx={{ color: "#d32f2f" }} onClick={() => processLeave(row.id, "REJECT")}>
+                                                        <ThumbDownAltTwoToneIcon />
+                                                    </IconButton>
+                                                </Box>
+                                            </TableCell>
+                                        </TableRow>
+                                    )) :
+                                    leaveWithDuration.filter((leave) => leave.status === "PENDING").map((row, index) => (
+                                        <TableRow key={index}>
+                                            <TableCell colSpan={5} sx={{ borderBottom: "none" }}>
+                                                <Box sx={{ background: "#ffffff", borderRadius: "12px", border: "1px solid #e2e8f0", padding: "14px", mb: 1, display: "flex", flexDirection: "column", gap: 1, boxShadow: "0 2px 8px rgba(0,0,0,0.05)" }}>
+                                                    <Typography sx={{ fontWeight: 600, color: "#1e293b" }}>
+                                                        {row.employee_name}
+                                                    </Typography>
 
-                                                    <Box sx={{ display: "flex", gap: 1 }}>
-                                                        <IconButton sx={{ color: "#43a047" }} onClick={() => processLeave(row.id, "APPROVE")}>
-                                                            <ThumbUpTwoToneIcon />
+                                                    <Typography sx={{ fontSize: "14px", opacity: 0.7, color: "#64748b" }}>
+                                                        🗓️ {row.days} day(s)
+                                                    </Typography>
+
+                                                    <Chip label={row.status} size="small"
+                                                        sx={{
+                                                            width: "fit-content",
+                                                            backgroundColor: "#ffc107",
+                                                            color: "#000",
+                                                            fontWeight: 600,
+                                                        }}
+                                                    />
+
+                                                    <Box sx={{ display: "flex", justifyContent: "space-between", mt: 1, }}>
+                                                        <IconButton sx={{ color: "#0d47a1" }} onClick={() => handleOpen(row)}>
+                                                            <VisibilityIcon />
                                                         </IconButton>
-                                                        <IconButton sx={{ color: "#e53935" }} onClick={() => processLeave(row.id, "APPROVE")}>
-                                                            <ThumbDownAltTwoToneIcon />
-                                                        </IconButton>
+
+                                                        <Box sx={{ display: "flex", gap: 1 }}>
+                                                            <IconButton sx={{ color: "#2e7d32" }} onClick={() => processLeave(row.id, "APPROVE")}>
+                                                                <ThumbUpTwoToneIcon />
+                                                            </IconButton>
+                                                            <IconButton sx={{ color: "#d32f2f" }} onClick={() => processLeave(row.id, "REJECT")}>
+                                                                <ThumbDownAltTwoToneIcon />
+                                                            </IconButton>
+                                                        </Box>
                                                     </Box>
                                                 </Box>
-                                            </Box>
-                                        </TableCell>
-                                    </TableRow>
-                                ))}
+                                            </TableCell>
+                                        </TableRow>
+                                    ))}
                             </TableBody>
                         </Table>
                     </TableContainer>
                 </Box>
             </div>
-            <div style={{ marginTop : "15px"}}>
-                <Typography variant='h6' sx={{ fontFamily : "work sans"}}> Approved List </Typography>
-                <Box sx={{marginTop : "10px"}}>
+            <div style={{ marginTop: "15px" }}>
+                <Typography variant='h6' sx={{ fontFamily: "work sans",color:"#080808" }}> Approved List </Typography>
+                <Box sx={{ marginTop: "10px" }}>
                     <TableContainer
                         component={Paper}
                         sx={{
-                            background: "#1e1e1e",
+                            background: "#ffffff",
                             borderRadius: "12px",
+                            boxShadow: "0 4px 12px rgba(0,0,0,0.05)",
+                            border: "1px solid #e2e8f0"
                         }}
-                        >
+                    >
                         <Table>
                             <TableHead sx={{ display: { xs: "none", sm: "table-header-group" } }}>
                                 <TableRow>
-                                    <TableCell align="center" sx={{ color: "whitesmoke", fontWeight: 600 }}>
+                                    <TableCell align="center" sx={{ color: "#1e293b", fontWeight: 600 }}>
                                         Employee
                                     </TableCell>
-                                    <TableCell align="center" sx={{ color: "whitesmoke", fontWeight: 600 }}>
+                                    <TableCell align="center" sx={{ color: "#1e293b", fontWeight: 600 }}>
                                         Days
                                     </TableCell>
-                                    <TableCell align="center" sx={{ color: "whitesmoke", fontWeight: 600 }}>
+                                    <TableCell align="center" sx={{ color: "#1e293b", fontWeight: 600 }}>
                                         Status
                                     </TableCell>
-                                    <TableCell align="center" sx={{ color: "whitesmoke", fontWeight: 600 }}>
+                                    <TableCell align="center" sx={{ color: "#1e293b", fontWeight: 600 }}>
                                         View
                                     </TableCell>
-                                    
                                 </TableRow>
                             </TableHead>
 
                             <TableBody>
                                 {!isMobile ?
-                                approvedWithDuration.filter((leave) => leave.status === "APPROVED").map((row, index) => (
-                                    <TableRow key={index} hover>
-                                        <TableCell align="center" sx={{ color: "whitesmoke" }}>
-                                            {row.employee_name}
-                                        </TableCell>
-                                        <TableCell align="center" sx={{ color: "whitesmoke" }}>
-                                            {row.days}
-                                        </TableCell>
-                                        <TableCell align="center" sx={{ color: "whitesmoke" }}>
-                                            <Chip label={row.status}
-                                                size="small"
-                                                sx={{
-                                                    backgroundColor: "#2e7d32",
-                                                    color: "white",
-                                                    fontWeight: 600,
-                                                    textTransform: "capitalize",
-                                                }}
-                                            />
-                                        </TableCell>
-                                        <TableCell align="center">
-                                            <IconButton sx={{ color: "#90caf9" }} onClick={() => handleOpen(row)}>
-                                                <VisibilityIcon />
-                                            </IconButton>
-                                        </TableCell>
-                                    </TableRow>
-                                ))
-                                : leaveWithDuration.filter((leave) => leave.status === "APPROVED").map((row, index) => (
-                                    <TableRow key={index} sx={{ background : "#333"}}>
-                                        <TableCell colSpan={4} sx={{ borderBottom: "none" }}>
-                                            <Box sx={{ background: "#1e1e1e", borderRadius: "12px", padding: "14px", mb: 1, display: "flex", flexDirection: "column", gap: 1,}}>
-                                                <Typography sx={{ fontWeight: 600, color: "whitesmoke" }}>
-                                                    {row.employee_name}
-                                                </Typography>
-
-                                                <Typography sx={{ fontSize: "14px", opacity: 0.7, color : "whitesmoke" }}>
-                                                    🗓️ {row.days} day(s)
-                                                </Typography>
-
-                                                <Chip label={row.status} size="small"
+                                    approvedWithDuration.filter((leave) => leave.status === "APPROVED").map((row, index) => (
+                                        <TableRow key={index} hover>
+                                            <TableCell align="center" sx={{ color: "black" }}>
+                                                {row.employee_name}
+                                            </TableCell>
+                                            <TableCell align="center" sx={{ color: "black" }}>
+                                                {row.days}
+                                            </TableCell>
+                                            <TableCell align="center" sx={{ color: "black" }}>
+                                                <Chip label={row.status}
+                                                    size="small"
                                                     sx={{
-                                                        width: "fit-content",
                                                         backgroundColor: "#2e7d32",
                                                         color: "white",
                                                         fontWeight: 600,
+                                                        textTransform: "capitalize",
                                                     }}
                                                 />
+                                            </TableCell>
+                                            <TableCell align="center">
+                                                <IconButton sx={{ color: "#90caf9" }} onClick={() => handleOpen(row)}>
+                                                    <VisibilityIcon />
+                                                </IconButton>
+                                            </TableCell>
+                                        </TableRow>
+                                    ))
+                                    : leaveWithDuration.filter((leave) => leave.status === "APPROVED").map((row, index) => (
+                                        <TableRow key={index}>
+                                            <TableCell colSpan={4} sx={{ borderBottom: "none" }}>
+                                                <Box sx={{ background: "#ffffff", borderRadius: "12px", border: "1px solid #e2e8f0", padding: "14px", mb: 1, display: "flex", flexDirection: "column", gap: 1, boxShadow: "0 2px 8px rgba(0,0,0,0.05)" }}>
+                                                    <Typography sx={{ fontWeight: 600, color: "#1e293b" }}>
+                                                        {row.employee_name}
+                                                    </Typography>
 
-                                                <Box sx={{ textAlign: "right" }}>
-                                                    <IconButton sx={{ color: "#90caf9" }} onClick={() => handleOpen(row)}>
-                                                        <VisibilityIcon />
-                                                    </IconButton>
+                                                    <Typography sx={{ fontSize: "14px", opacity: 0.7, color: "#64748b" }}>
+                                                        🗓️ {row.days} day(s)
+                                                    </Typography>
+
+                                                    <Chip label={row.status} size="small"
+                                                        sx={{
+                                                            width: "fit-content",
+                                                            backgroundColor: "#2e7d32",
+                                                            color: "white",
+                                                            fontWeight: 600,
+                                                        }}
+                                                    />
+
+                                                    <Box sx={{ textAlign: "right" }}>
+                                                        <IconButton sx={{ color: "#0d47a1" }} onClick={() => handleOpen(row)}>
+                                                            <VisibilityIcon />
+                                                        </IconButton>
+                                                    </Box>
                                                 </Box>
-                                            </Box>
-                                        </TableCell>
-                                    </TableRow>
-                                ))}
+                                            </TableCell>
+                                        </TableRow>
+                                    ))}
                             </TableBody>
                         </Table>
                     </TableContainer>
@@ -312,105 +314,105 @@ const LeaveManagement = () => {
 
                 <DialogContent dividers>
                     {selectedLeave && (
-                    <Box sx={{ display: "flex", flexDirection: "column", gap: 2 }}>
-                        <Box sx={{ display: "flex", alignItems: "center", gap: 1, background: "#121212", padding: "12px", borderRadius: "8px", }}>
-                            <AccountCircleIcon sx={{ fontSize: 36, color: "#90caf9" }} />
-                            <Box>
-                                <Typography sx={{ fontWeight: 600, fontSize: "18px", color : "whitesmoke"  }}>
-                                    {selectedLeave.employee_name}
+                        <Box sx={{ display: "flex", flexDirection: "column", gap: 2 }}>
+                            <Box sx={{ display: "flex", alignItems: "center", gap: 1, background: "#f8fafc", padding: "12px", borderRadius: "8px", border: "1px solid #e2e8f0" }}>
+                                <AccountCircleIcon sx={{ fontSize: 36, color: "#0d47a1" }} />
+                                <Box>
+                                    <Typography sx={{ fontWeight: 600, fontSize: "18px", color: "#1e293b" }}>
+                                        {selectedLeave.employee_name}
+                                    </Typography>
+                                    <Typography sx={{ fontSize: "13px", opacity: 0.6, color: "#64748b" }}>
+                                        Leave Request Details
+                                    </Typography>
+                                </Box>
+                            </Box>
+
+                            <Grid container spacing={2}>
+                                <Grid item size={6}>
+                                    <Typography sx={{ fontSize: "13px", opacity: 0.6, color: "#1e1e1e" }}>
+                                        From
+                                    </Typography>
+                                    <Typography sx={{ fontWeight: 500, color: "#1e1e1e" }}>
+                                        {selectedLeave.start_date}
+                                    </Typography>
+                                </Grid>
+
+                                <Grid item size={6}>
+                                    <Typography sx={{ fontSize: "13px", opacity: 0.6, color: "#1e1e1e" }}>
+                                        To
+                                    </Typography>
+                                    <Typography sx={{ fontWeight: 500, color: "#1e1e1e" }}>
+                                        {selectedLeave.end_date}
+                                    </Typography>
+                                </Grid>
+
+                                <Grid item size={6}>
+                                    <Typography sx={{ fontSize: "13px", opacity: 0.6, color: "#1e1e1e" }}>
+                                        Duration
+                                    </Typography>
+                                    <Typography sx={{ fontWeight: 500, color: "#1e1e1e" }}>
+                                        {selectedLeave.days} day(s)
+                                    </Typography>
+                                </Grid>
+
+                                <Grid item size={6}>
+                                    <Typography sx={{ fontSize: "13px", opacity: 0.6, color: "#1e1e1e" }}>
+                                        Status
+                                    </Typography>
+                                    <Chip
+                                        label={selectedLeave.status}
+                                        size="small"
+                                        sx={{
+                                            mt: "4px",
+                                            backgroundColor:
+                                                selectedLeave.status === "APPROVED" ? "#2e7d32" : "#ffd600",
+                                            color: selectedLeave.status === "APPROVED" ? "white" : "black",
+                                            fontWeight: 600,
+                                        }}
+                                    />
+                                </Grid>
+
+                                <Grid item size={6}>
+                                    <Typography sx={{ fontSize: "13px", opacity: 0.6, color: "#1e1e1e" }}>
+                                        Applied On
+                                    </Typography>
+                                    <Typography sx={{ fontWeight: 500, color: "#1e1e1e" }}>
+                                        {formatDate(selectedLeave.applied_on)}
+                                    </Typography>
+                                </Grid>
+
+                                {selectedLeave.status === "APPROVED" && (
+                                    <>
+                                        <Grid item size={6}>
+                                            <Typography sx={{ fontSize: "13px", opacity: 0.6, color: "#1e1e1e" }}>
+                                                Approved On
+                                            </Typography>
+                                            <Typography sx={{ fontWeight: 500, color: "#1e1e1e" }}>
+                                                {selectedLeave.action_date ? formatDate(selectedLeave.action_date) : "N/A"}
+                                            </Typography>
+                                        </Grid>
+
+                                        <Grid item size={6}>
+                                            <Typography sx={{ fontSize: "13px", opacity: 0.6, color: "#1e1e1e" }}>
+                                                Approved By
+                                            </Typography>
+                                            <Typography sx={{ fontWeight: 500, color: "#1e1e1e" }}>
+                                                {selectedLeave.action_by_name || "N/A"}
+                                            </Typography>
+                                        </Grid>
+                                    </>
+                                )}
+
+                            </Grid>
+                            <Box sx={{ background: "#f8fafc", padding: "12px", borderRadius: "8px", border: "1px solid #e2e8f0" }}>
+                                <Typography sx={{ fontSize: "13px", opacity: 0.6, mb: 0.5, color: "#64748b" }}>
+                                    Reason
                                 </Typography>
-                                <Typography sx={{ fontSize: "13px", opacity: 0.6, color : "whitesmoke" }}>
-                                    Leave Request Details
+                                <Typography sx={{ fontWeight: 400, color: "#334155" }}>
+                                    {selectedLeave.reason}
                                 </Typography>
                             </Box>
                         </Box>
-
-                        <Grid container spacing={2}>
-                            <Grid item size={6}>
-                                <Typography sx={{ fontSize: "13px", opacity: 0.6, color : "#1e1e1e" }}>
-                                    From
-                                </Typography>
-                                <Typography sx={{ fontWeight: 500, color : "#1e1e1e" }}>
-                                    {selectedLeave.start_date}
-                                </Typography>
-                            </Grid>
-
-                            <Grid item size={6}>
-                                <Typography sx={{ fontSize: "13px", opacity: 0.6, color : "#1e1e1e" }}>
-                                    To
-                                </Typography>
-                                <Typography sx={{ fontWeight: 500, color : "#1e1e1e" }}>
-                                    {selectedLeave.end_date}
-                                </Typography>
-                            </Grid>
-
-                            <Grid item size={6}>
-                                <Typography sx={{ fontSize: "13px", opacity: 0.6, color : "#1e1e1e" }}>
-                                    Duration
-                                </Typography>
-                                <Typography sx={{ fontWeight: 500, color : "#1e1e1e" }}>
-                                    {selectedLeave.days} day(s)
-                                </Typography>
-                            </Grid>
-
-                            <Grid item size={6}>
-                                <Typography sx={{ fontSize: "13px", opacity: 0.6, color : "#1e1e1e" }}>
-                                    Status
-                                </Typography>
-                                <Chip
-                                    label={selectedLeave.status}
-                                    size="small"
-                                    sx={{
-                                    mt: "4px",
-                                    backgroundColor:
-                                        selectedLeave.status === "APPROVED" ? "#2e7d32" : "#ffd600",
-                                    color: selectedLeave.status === "APPROVED" ? "white" : "black",
-                                    fontWeight: 600,
-                                    }}
-                                />
-                            </Grid>
-
-                            <Grid item size={6}>
-                                <Typography sx={{ fontSize: "13px", opacity: 0.6, color : "#1e1e1e" }}>
-                                    Applied On
-                                </Typography>
-                                <Typography sx={{ fontWeight: 500, color : "#1e1e1e" }}>
-                                    {formatDate(selectedLeave.applied_on)}
-                                </Typography>
-                            </Grid>
-
-                            {selectedLeave.status === "APPROVED" && (
-                                <>
-                                    <Grid item size={6}>
-                                        <Typography sx={{ fontSize: "13px", opacity: 0.6, color : "#1e1e1e" }}>
-                                            Approved On
-                                        </Typography>
-                                        <Typography sx={{ fontWeight: 500, color : "#1e1e1e" }}>
-                                            {selectedLeave.action_date ? formatDate(selectedLeave.action_date) : "N/A"}
-                                        </Typography>
-                                    </Grid>
-
-                                    <Grid item size={6}>
-                                        <Typography sx={{ fontSize: "13px", opacity: 0.6, color : "#1e1e1e" }}>
-                                            Approved By
-                                        </Typography>
-                                        <Typography sx={{ fontWeight: 500, color : "#1e1e1e" }}>
-                                            {selectedLeave.action_by_name || "N/A"}
-                                        </Typography>
-                                    </Grid>
-                                </>
-                            )}
-                            
-                        </Grid>
-                        <Box sx={{ background: "#121212", padding: "12px", borderRadius: "8px", }}>
-                            <Typography sx={{ fontSize: "13px", opacity: 0.6, mb: 0.5, color : "whitesmoke" }}>
-                                Reason
-                            </Typography>
-                            <Typography sx={{ fontWeight: 400, color : "whitesmoke" }}>
-                                {  selectedLeave.reason}
-                            </Typography>
-                        </Box>
-                    </Box>
                     )}
                 </DialogContent>
 

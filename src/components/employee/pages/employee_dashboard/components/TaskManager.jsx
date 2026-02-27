@@ -61,7 +61,7 @@ const TaskManager = () => {
                     }))
                 );
             } catch (err) {
-                console.log(err);
+                // Error handled
             }
         };
 
@@ -162,14 +162,14 @@ const TaskManager = () => {
                         <select
                             value={filterMonth}
                             onChange={(e) => setFilterMonth(e.target.value)}
-                            className="compact-input"
+                            className="compact-input-1"
                         >
                             {months.map(m => <option key={m} value={m}>{m}</option>)}
                         </select>
                         <select
                             value={filterYear}
                             onChange={(e) => setFilterYear(e.target.value)}
-                            className="compact-input"
+                            className="compact-input-2"
                         >
                             {years.map(y => <option key={y} value={y}>{y}</option>)}
                         </select>

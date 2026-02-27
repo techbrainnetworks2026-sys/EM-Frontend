@@ -3,24 +3,26 @@
 */
 
 .lh-view {
-  background: #1e1e1e;
-  padding: 20px;
-  border-radius: 12px;
-  border: 1px solid #e2e8f0;
+  background: var(--primary-bg);
+  padding: 32px;
+  border-radius: 16px;
+  border: 1px solid var(--border-color);
   display: flex;
   flex-direction: column;
   height: 82vh;
   overflow: hidden;
-  color: whitesmoke;
+  color: var(--text-white);
+  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05);
 }
 
 .lh-heading {
-  color: whitesmoke;
-  margin-bottom: 20px;
+  color: var(--text-white);
+  margin-bottom: 24px;
+  font-weight: 700;
 }
-thead{
+
+thead {
   text-align: left;
-  left: 20px;
 }
 
 .lh-container {
@@ -28,18 +30,12 @@ thead{
   flex-direction: column;
   gap: 8px;
   overflow-y: auto;
-  /* This area scrolls */
-  /* Space for scrollbar */
-}
-
-.lh-scroll {
-  /* overflow-y removed to prevent internal scrolling */
-  -webkit-overflow-scrolling: touch;
 }
 
 .lh-table-wrapper {
   overflow-x: auto;
-  -webkit-overflow-scrolling: touch;
+  border-radius: 12px;
+  border: 1px solid var(--border-color);
 }
 
 .lh-table {
@@ -48,39 +44,29 @@ thead{
 }
 
 .lh-table th {
-  white-space: nowrap;
+  padding: 16px;
+  text-align: left;
+  background: var(--secondary-bg);
+  color: var(--text-gray);
+  font-size: 13px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  border-bottom: 1px solid var(--border-color);
   position: sticky;
   top: 0;
   z-index: 10;
-  background: #f8fafc;
-  color: #64748b;
-  border-bottom: 2px solid #e2e8f0;
 }
 
 .lh-table td {
-  padding: 14px;
-  border-bottom: 1px solid #f1f5f9;
-  color: whitesmoke;
+  padding: 16px;
+  border-bottom: 1px solid var(--border-color);
+  color: var(--text-white);
+  font-size: 14px;
 }
 
-.lh-col-date,
-.lh-col-type,
-.lh-col-status {
-  white-space: nowrap;
-}
-
-.lh-col-reason {
-  white-space: normal;
-  word-break: break-word;
-  min-width: 200px;
-  /* Give reason more space to wrap nicely */
-}
-
-
-
-.lh-td-value {
-margin-left: -14px;  
-  display: inline-block;
+.lh-table tbody tr:hover {
+  background: #f8fafc;
 }
 
 .lh-status {
@@ -89,7 +75,6 @@ margin-left: -14px;
   font-size: 12px;
   font-weight: 600;
   display: inline-block;
-  white-space: nowrap;
 }
 
 .status-approved {
@@ -110,130 +95,39 @@ margin-left: -14px;
 .lh-table .lh-empty {
   text-align: center;
   padding: 60px 40px;
-  color: whitesmoke;
-  font-size: 18px;
-  font-weight: 500;
+  color: var(--text-gray);
+  font-size: 16px;
 }
 
-/* =========================
-   Mobile View (Card Layout)
-   ========================= */
 @media (max-width: 600px) {
   .lh-view {
-    padding: 12px;
-  }
-h2.lh-heading{
-  background-color: #1e1e1e;
-  color: whitesmoke;
-}
-  .lh-table {
-    width: 100%;
-    border: none;
+    padding: 20px;
   }
 
   .lh-table thead {
-    
     display: none;
   }
 
   .lh-table tbody tr {
     display: block;
-    margin-bottom: 12px;
-    padding: 10px;
-    border: 1px solid #e2e8f0;
-    border-radius: 8px;
-    background: #1e1e1e;
+    margin-bottom: 16px;
+    padding: 16px;
+    border: 1px solid var(--border-color);
+    border-radius: 12px;
+    background: var(--primary-bg);
   }
 
   .lh-table td {
     display: flex;
-    align-items: center;
-    padding: 8px 6px;
+    justify-content: space-between;
+    padding: 8px 0;
     border: none;
-    font-size: 14px;
-    min-width: 0;
   }
-  .lh-table .lh-empty {
- margin-left: -110px;
-  padding: 60px 40px;
-  color: whitesmoke;
-  
-}
 
   .lh-table td::before {
     content: attr(data-label);
     font-weight: 600;
-    color: #64748b;
-    flex: 0 0 40%;
-    padding-right: 8px;
-  }
-
-  .lh-td-value {
-    flex: 1;
-    text-align: right;
-    word-break: break-word;
-  }
-
-  .lh-status {
-    padding: 5px 10px;
-    font-size: 11px;
-  }
-
-  .lh-heading {
-    position: sticky;
-    top: -12px;
-    background: #fff;
-    padding: 10px 0;
-    z-index: 20;
-    border-bottom: 1px solid #e2e8f0;
-    margin: 0;
-    color: #1e1e1e;
-  }
-
-  .lh-scroll {
-    /* max-height removed to let it expand */
-    padding-top: 8px;
-  }
-}
-
-/* =========================
-   Desktop / Tablet View
-   ========================= */
-@media (min-width: 601px) {
-  .lh-table thead {
-    display: table-header-group;
-  }
-
-  .lh-table tbody tr {
-    display: table-row;
-    border: none;
-    background: transparent;
-  }
-
-  .lh-table td {
-    display: table-cell;
-    padding: 14px;
-    border-bottom: 1px solid #f1f5f9;
-    text-align: left;
-  }
- 
-
-  .lh-table td::before {
-    content: none;
-  }
-
-  .lh-td-value {
-    text-align: left;
-  }
-
-  .lh-heading {
-    position: relative;
-    border-bottom: none;
-    padding: 0;
-  }
-
-  .lh-scroll {
-    max-height: none;
-    padding-top: 0;
+    color: var(--text-gray);
+    margin-right: 16px;
   }
 }

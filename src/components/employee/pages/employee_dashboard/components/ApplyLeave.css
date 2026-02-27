@@ -2,11 +2,12 @@
    Ensures inputs/buttons scale and submit button is visible on small screens
 */
 .dashboard-view.apply-leave-view {
-  background: #1E1E1E;
-  padding: 20px;
-  border-radius: 12px;
-  border: 1px solid #334155;
-  color: whitesmoke;
+  background: var(--primary-bg);
+  padding: 32px;
+  border-radius: 16px;
+  border: 1px solid var(--border-color);
+  color: var(--text-white);
+  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05);
 }
 
 .form-container {
@@ -17,13 +18,13 @@
 }
 
 .form-group {
-  margin-bottom: 16px;
+  margin-bottom: 24px;
 }
 
 .form-group label {
   display: block;
   margin-bottom: 8px;
-  color: #cbd5e1;
+  color: var(--text-gray);
   font-weight: 600;
   font-size: 14px;
 }
@@ -32,56 +33,60 @@
 .form-group textarea,
 .form-group select {
   width: 100%;
-  padding: 10px 12px;
-  border: 1px solid #334155;
-  border-radius: 6px;
-  background: #2D2D2D;
-  color: whitesmoke;
+  padding: 12px;
+  border: 1px solid var(--border-color);
+  border-radius: 8px;
+  background: #ffffff;
+  color: var(--text-white);
   font-size: 14px;
   font-family: inherit;
   box-sizing: border-box;
+  transition: all 0.2s ease;
 }
 
 .form-group input[type="date"]::-webkit-calendar-picker-indicator {
-  filter: invert(1);
   cursor: pointer;
+  opacity: 0.6;
 }
 
 .form-actions {
   display: flex;
-  gap: 12px;
-  margin-top: 20px;
+  gap: 16px;
+  margin-top: 32px;
 }
 
 .primary-btn {
-  background: #3b82f6;
+  background: var(--accent-color);
   color: white;
-  padding: 10px 18px;
+  padding: 12px 24px;
   border: none;
-  border-radius: 6px;
+  border-radius: 8px;
   font-weight: 600;
   cursor: pointer;
-  transition: background 0.2s;
+  transition: all 0.2s ease;
+  box-shadow: 0 4px 6px -1px rgba(13, 71, 161, 0.2);
 }
 
 .primary-btn:hover {
-  background: #2563eb;
+  background: #1565c0;
+  transform: translateY(-1px);
+  box-shadow: 0 10px 15px -3px rgba(13, 71, 161, 0.3);
 }
 
 .secondary-btn {
-  background: #1E1E1E;
-  border: 1px solid #334155;
-  color: whitesmoke;
-  padding: 10px 18px;
-  border-radius: 6px;
+  background: #ffffff;
+  border: 1px solid var(--border-color);
+  color: var(--text-white);
+  padding: 12px 24px;
+  border-radius: 8px;
   font-weight: 600;
   cursor: pointer;
   transition: all 0.2s;
 }
 
 .secondary-btn:hover {
-  background: #2D2D2D;
-  border-color: #3b82f6;
+  background: var(--secondary-bg);
+  border-color: var(--text-gray);
 }
 
 /* Focus states */
@@ -90,45 +95,22 @@
 .form-group select:focus {
   outline: none;
   border-color: var(--accent-color);
+  box-shadow: 0 0 0 3px rgba(13, 71, 161, 0.1);
 }
 
 /* Small screen fixes */
 @media (max-width: 480px) {
   .dashboard-view.apply-leave-view {
-    padding: 12px;
+    padding: 20px;
   }
 
-  .form-container {
-    padding: 0;
-  }
-
-  .form-group label {
-    font-size: 13px;
-    margin-bottom: 6px;
-  }
-
-  .form-group input,
-  .form-group textarea,
-  .form-group select {
-    font-size: 14px;
-    padding: 10px;
-  }
-
-  /* Stack actions vertically and make buttons full width so submit is visible */
   .form-actions {
     flex-direction: column;
-    gap: 10px;
+    gap: 12px;
   }
 
   .form-actions .primary-btn,
   .form-actions .secondary-btn {
     width: 100%;
-    padding: 12px 14px;
-    box-sizing: border-box;
-  }
-
-  /* Reduce spacing inside card to keep everything visible */
-  .card {
-    padding: 12px;
   }
 }

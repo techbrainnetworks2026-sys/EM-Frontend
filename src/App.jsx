@@ -4,7 +4,7 @@ import SignUp from './components/employee/pages/auth/SignUp.jsx';
 import SignIn from './components/employee/pages/auth/SignIn.jsx';
 import ForgotPassword from './components/employee/pages/auth/ForgotPassword.jsx';
 import ResetPassword from './components/employee/pages/auth/ResetPassword.jsx';
-import AddEmplyee from './components/manager/AddEmplyee.jsx';
+import AddEmployee from './components/manager/AddEmployee.jsx';
 import AddRole from './components/manager/AddRole.jsx';
 import LeaveManagement from './components/manager/LeaveManagement.jsx';
 import AddTask from './components/manager/AddTask.jsx';
@@ -28,7 +28,7 @@ function App() {
                 <Route path='/employee/dashboard' element={<EmployeeDashboard />} />
                 <Route path="/manager" element={<ManagerLayout />}>
                     <Route path='dashboard' element={<Dashboard />} />
-                    <Route path='addemployee' element={<AddEmplyee />} />
+                    <Route path='addemployee' element={<AddEmployee />} />
                     <Route path='addRole' element={<AddRole />} />
                     <Route path='leave-management' element={<LeaveManagement />} />
                     <Route path='task-assign' element={<AddTask />} />

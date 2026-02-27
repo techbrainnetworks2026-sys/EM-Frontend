@@ -1,219 +1,203 @@
 /* --- ProfileView.css --- */
 
-/* Local container padding so the card doesn't touch screen edges */
-.dashboard-view-profile-view-container {
-    padding: 20px;
-    height: 0vh;
-}
+/* ============================= */
+/* Base Layout */
+/* ============================= */
 
-/* Ensure consistent sizing model inside this component */
-.dashboard-view-profile-view-container *,
-.dashboard-view-profile-view-container *::before,
-.dashboard-view-profile-view-container *::after {
-    box-sizing: border-box;
+.dashboard-view-profile-view-container {
+    padding: 30px;
 }
 
 .profile-card {
-    margin: 40px auto;
-    max-width: 900px;
+    margin: 0 auto;
+    max-width: 1000px;
     width: 100%;
-    background: #1E1E1E;
-    padding: 30px;
-    border-radius: 12px;
-    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
-    border: 1px solid #334155;
-    color: whitesmoke;
-    position: relative;
+    background: var(--primary-bg);
+    padding: 40px;
+    border-radius: 20px;
+    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05),
+        0 2px 4px -1px rgba(0, 0, 0, 0.03);
+    border: 1px solid var(--border-color);
+    color: black;
+    transition: all 0.3s ease;
 }
+
+/* ============================= */
+/* Header Section */
+/* ============================= */
 
 .profile-header-section {
     display: flex;
-    gap: 30px;
     align-items: center;
-    margin-bottom: 10px;
-    padding-bottom: 10px;
-    border-bottom: 1px solid #334155;
+    gap: 40px;
+    margin-bottom: 32px;
+    padding-bottom: 32px;
+    border-bottom: 1px solid var(--border-color);
 }
 
+/* 🔥 Important: wrapper for proper alignment */
 .profile-image-section {
     position: relative;
+    display: flex;
+    justify-content: center;
+    align-items: center;
 }
 
 .profile-image-large {
-    width: 140px;
-    height: 140px;
+    width: 154px;
+    height: 154px;
     border-radius: 50%;
     overflow: hidden;
-    background: #1e293b;
+    background: var(--secondary-bg);
     display: flex;
     align-items: center;
     justify-content: center;
-    border: 4px solid #334155;
-    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.3);
+    border: 6px solid #ffffff;
+    box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
 }
 
 .profile-image-large img {
     width: 100%;
     height: 100%;
     object-fit: cover;
-    display: block;
-    border-radius: 50%;
 }
 
-.avatar-placeholder.big {
-    font-size: 70px;
-    color: #94a3b8;
-}
-
+/* Upload button fixed properly */
 .upload-container {
     position: absolute;
-    bottom: -10px;
-    left: 50%;
-    transform: translateX(-50%);
-    width: max-content;
+    bottom: 8px;
+    right: 8px;
 }
 
 .upload-btn {
-    background: #3b82f6;
+    background: var(--accent-color);
     color: white;
-    padding: 6px 12px;
-    border-radius: 20px;
-    font-size: 11px;
-    font-weight: 600;
+    width: 38px;
+    height: 38px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
     cursor: pointer;
-    box-shadow: 0 2px 8px rgba(59, 130, 246, 0.4);
-    transition: all 0.2s;
-    display: inline-block;
-    white-space: nowrap;
+    border: 3px solid #ffffff;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.15);
+    transition: 0.2s ease;
 }
 
 .upload-btn:hover {
-    transform: scale(1.05);
-    background: #2563eb;
+    transform: scale(1.1);
 }
 
-.hidden-input {
-    display: none;
-}
+/* ============================= */
+/* Main Info */
+/* ============================= */
 
 .profile-main-info h2 {
+    font-size: 32px;
+    font-weight: 700;
     margin: 0;
-    font-size: 28px;
-    color: whitesmoke;
 }
 
 .designation-text {
-    color: #94a3b8;
-    font-size: 16px;
-    margin: 5px 0 0 0;
+    font-size: 18px;
+    font-weight: 500;
+    margin-top: 8px;
 }
+
+/* ============================= */
+/* Form Grid */
+/* ============================= */
 
 .profile-form-grid {
     display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+    grid-template-columns: repeat(2, 1fr);
     gap: 20px;
 }
 
 .form-group {
     display: flex;
     flex-direction: column;
-    gap: 8px;
+    gap: 10px;
 }
 
 .form-group label {
-    font-size: 14px;
-    font-weight: 600;
-    color: #94a3b8;
+    font-size: 13px;
+    font-weight: 700;
     text-transform: uppercase;
-    letter-spacing: 0.5px;
+    letter-spacing: 0.05em;
 }
 
 .form-group input,
 .form-group select,
 .form-group textarea {
-    background: #0f172a;
-    border: 1px solid #334155;
-    border-radius: 8px;
+    background: #ffffff;
+    border: 1px solid var(--border-color);
+    border-radius: 10px;
     padding: 12px 16px;
-    color: whitesmoke;
     font-size: 15px;
-    transition: all 0.2s;
     outline: none;
-    width: 100%;
+    transition: 0.2s ease;
 }
 
 .form-group input:focus,
 .form-group select:focus,
 .form-group textarea:focus {
-    border-color: #3b82f6;
-    box-shadow: 0 0 0 2px rgba(59, 130, 246, 0.2);
-}
-
-.form-group input:disabled,
-.form-group select:disabled,
-.form-group textarea:disabled {
-    opacity: 0.7;
-    cursor: not-allowed;
-    background: #1e293b;
+    border-color: var(--accent-color);
+    box-shadow: 0 0 0 4px rgba(13, 71, 161, 0.1);
 }
 
 .full-width {
     grid-column: 1 / -1;
 }
 
+/* ============================= */
+/* Buttons */
+/* ============================= */
+
 .profile-actions {
     display: flex;
     justify-content: flex-end;
-    gap: 15px;
+    gap: 16px;
+    margin-top: 40px;
+    padding-top: 32px;
 }
 
 .primary-btn,
 .secondary-btn {
-    padding: 12px 24px;
-    border-radius: 8px;
+    padding: 12px 32px;
     font-weight: 600;
-    font-size: 15px;
+    border-radius: 10px;
     cursor: pointer;
-    transition: all 0.2s;
-    border: none;
+    transition: 0.2s ease;
 }
 
 .primary-btn {
-    background: #3b82f6;
+    background: var(--accent-color);
     color: white;
 }
 
 .primary-btn:hover {
-    background: #2563eb;
-    transform: translateY(-1px);
+    transform: translateY(-2px);
 }
 
 .secondary-btn {
-    background: #1e293b;
-    color: whitesmoke;
-    border: 1px solid #334155;
+    background: #ffffff;
+    border: 1px solid var(--border-color);
 }
 
 .secondary-btn:hover {
-    background: #334155;
+    background: #f5f5f5;
 }
 
-.mt-10 {
-    margin-top: 10px;
-}
+/* ============================= */
+/* Cropper Modal */
+/* ============================= */
 
-.mt-20 {
-    margin-top: 20px;
-}
-
-/* --- Cropper Modal --- */
 .cropper-modal-overlay {
     position: fixed;
-    top: 0;
-    left: 0;
-    right: 0;
-    bottom: 0;
-    background: rgba(0, 0, 0, 0.85);
+    inset: 0;
+    background: rgba(15, 23, 42, 0.75);
+    backdrop-filter: blur(4px);
     display: flex;
     justify-content: center;
     align-items: center;
@@ -221,71 +205,46 @@
 }
 
 .cropper-modal-content {
-    background: #1e293b;
+    background: #fff;
     width: 90%;
-    max-width: 500px;
-    border-radius: 16px;
+    max-width: 540px;
+    border-radius: 20px;
     overflow: hidden;
-    box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
-    border: 1px solid #334155;
-}
-
-.cropper-container {
-    position: relative;
-    width: 100%;
-    height: min(60vh, 500px);
-    background: #000;
 }
 
 .cropper-controls {
     padding: 24px;
-    background: #1e293b;
-    border-top: 1px solid #334155;
 }
 
-/* make modal content scroll internally if it exceeds viewport height */
-.cropper-modal-overlay {
-    overflow: auto;
-}
+/* ============================= */
+/* RESPONSIVE DESIGN */
+/* ============================= */
 
-.cropper-modal-content {
-    max-height: calc(100vh - 40px);
-    overflow: auto;
-}
-
-.zoom-range {
-    width: 100%;
-    margin-bottom: 20px;
-    cursor: pointer;
-    accent-color: #3b82f6;
-}
-
-.cropper-actions {
-    display: flex;
-    justify-content: flex-end;
-    gap: 12px;
-}
-
-/* Responsive profile tweaks */
-/* For wide layouts where a sidebar is present, allow offsetting the card */
-@media (max-width: 1200px) {
-    .dashboard-view-profile-view-container {
-    height: 0vh;
-}
+/* Tablet */
+@media (max-width: 1024px) {
     .profile-card {
-        
-        max-width: 800px;
+        padding: 30px;
+    }
+
+    .profile-header-section {
+        gap: 25px;
     }
 }
 
+/* Mobile */
 @media (max-width: 768px) {
+
+    .dashboard-view-profile-view-container {
+        padding: 15px;
+    }
+
     .profile-card {
-        margin-top: 20px;
-        padding: 22px;
+        padding: 20px;
     }
 
     .profile-header-section {
         flex-direction: column;
+        align-items: center;
         text-align: center;
         gap: 20px;
     }
@@ -293,89 +252,34 @@
     .profile-image-large {
         width: 120px;
         height: 120px;
-        margin: 0 auto;
+    }
+
+    .upload-container {
+        bottom: 5px;
+        right: 5px;
+    }
+
+    .profile-main-info h2 {
+        font-size: 22px;
+    }
+
+    .designation-text {
+        font-size: 14px;
     }
 
     .profile-form-grid {
         grid-template-columns: 1fr;
-        gap: 16px;
+        gap: 15px;
     }
 
     .profile-actions {
-        justify-content: center;
-        margin-top: 8px;
-    }
-}
-
-@media (max-width: 480px) {
-    .profile-card {
-        padding: 16px;
-    }
-
-    .profile-main-info h2 {
-        font-size: 20px;
-    }
-
-    .designation-text {
-        font-size: 13px;
-    }
-
-    .form-group input,
-    .form-group select,
-    .form-group textarea {
-        padding: 10px 12px;
-        font-size: 14px;
+        flex-direction: column;
+        gap: 12px;
+        margin-top: 20px;
     }
 
     .primary-btn,
     .secondary-btn {
         width: 100%;
-    }
-
-    .cropper-container {
-        height: 300px;
-    }
-
-    .upload-container {
-        position: relative;
-        margin-top: 10px;
-        display: flex;
-        justify-content: center;
-        bottom: auto;
-        left: auto;
-        transform: none;
-    }
-}
-
-/* Message notification styles */
-.message {
-    padding: 12px 16px;
-    margin: 16px 0;
-    border-radius: 6px;
-    font-size: 14px;
-    font-weight: 500;
-    animation: slideIn 0.3s ease-out;
-}
-
-.message.success {
-    background-color: #10b981;
-    color: white;
-    border: 1px solid #059669;
-}
-
-.message.error {
-    background-color: #ef4444;
-    color: white;
-    border: 1px solid #dc2626;
-}
-
-@keyframes slideIn {
-    from {
-        transform: translateY(-20px);
-        opacity: 0;
-    }
-    to {
-        transform: translateY(0);
-        opacity: 1;
     }
 }

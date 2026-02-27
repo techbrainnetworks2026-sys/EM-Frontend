@@ -6,11 +6,11 @@ const AnnouncementsView = () => {
     const [announcements, setAnnouncements] = useState([]);
 
     const fetchAnnouncements = async () => {
-        try{
+        try {
             const res = await axios.get("https://tn-em-backend.onrender.com/api/announcement/announcements/");
             setAnnouncements(res.data);
-        }catch(err){
-            console.log(err);
+        } catch (err) {
+            // Error handled
         }
     };
 

@@ -7,7 +7,7 @@ import VisibilityOffIcon from '@mui/icons-material/VisibilityOff';
 
 const Profile = () => {
 
-    const {userData} = useAppContext();
+    const { userData } = useAppContext();
     const [approvedUsers, setApprovedUsers] = useState([]);
     const [pendingUsers, setPendingUsers] = useState([]);
     const [leaveRequests, setLeaveRequests] = useState([]);
@@ -31,39 +31,39 @@ const Profile = () => {
     });
 
     const fetchApprovedUsers = async () => {
-        try{
+        try {
             const res = await api.get("accounts/manager/approved-users/");
             setApprovedUsers(res.data);
-        }catch(err){
+        } catch (err) {
             console.log(err);
         }
     };
 
     const fetchPendingUsers = async () => {
-        try{
+        try {
             const res = await api.get("accounts/manager/pending-users/");
             setPendingUsers(res.data);
-        }catch(err){
+        } catch (err) {
             console.log(err);
         }
     };
 
 
     const fetchPendingLeaves = async () => {
-        try{
+        try {
             const res = await api.get("leave/manager/pending-leaves/");
             setLeaveRequests(res.data);
-        }catch(err){
-            console.log(err);
+        } catch (err) {
+            // Error handled
         }
     };
 
     const fetchPendingTasks = async () => {
-        try{
+        try {
             const res = await api.get("task/tasks/");
             setPendingTasks(res.data);
-        }catch(err){
-            console.log(err);
+        } catch (err) {
+            // Error handled
         }
     };
 
@@ -75,7 +75,7 @@ const Profile = () => {
     }, []);
 
     useEffect(() => {
-        if(userData){
+        if (userData) {
             setProfileForm({
                 username: userData.username,
                 email: userData.email,
@@ -108,10 +108,10 @@ const Profile = () => {
 
     return (
         <div>
-            <Box sx={{ display : "flex", justifyContent : "center", padding : "10px"}}>
-                <Typography variant='h5' sx={{ fontWeight : 600, fontFamily : 'work sans'}}> My Profile </Typography>
+            <Box sx={{ display: "flex", justifyContent: "center", padding: "10px" }}>
+                <Typography variant='h5' sx={{ fontWeight: 600, fontFamily: 'work sans' }}> My Profile </Typography>
             </Box>
-            <Box sx={{ background: "linear-gradient(135deg, #0d47a1, #1e1e1e)", borderRadius: "16px", padding: "24px", display: "flex", alignItems: "center", gap: 3, mb: 4, }}>
+            <Box sx={{ background: "linear-gradient(135deg, #0d47a1, #1565c0)", borderRadius: "16px", padding: "24px", display: "flex", alignItems: "center", gap: 3, mb: 4, }}>
                 <Avatar sx={{ width: 80, height: 80, bgcolor: "white", color: "#0d47a1", fontSize: "32px", fontWeight: 600, }}>
                     {userData?.username ? userData.username.charAt(0).toUpperCase() : "M"}
                 </Avatar>
@@ -133,12 +133,12 @@ const Profile = () => {
                 </Button>
             </Box>
 
-            <Box sx={{ background: "#1e1e1e", borderRadius: "16px", padding: "24px", mb: 4 }}>
+            <Box sx={{ background: "#ffffff", borderRadius: "16px", padding: "24px", mb: 4, boxShadow: "0 4px 12px rgba(0,0,0,0.05)", border: "1px solid #e2e8f0" }}>
                 <Box sx={{ display: "flex", justifyContent: "space-between", alignItems: "center", mb: 2 }}>
                     <Typography sx={{ fontWeight: 600, color: "#5c6bc0", fontSize: "18px" }}>
                         Personal Information
                     </Typography>
-                    <IconButton 
+                    <IconButton
                         onClick={() => setShowPersonalInfo(!showPersonalInfo)}
                         sx={{ color: "#5c6bc0" }}
                         size="small"
@@ -149,29 +149,25 @@ const Profile = () => {
 
                 {showPersonalInfo && (
                     <Grid container spacing={2}>
-                        <Grid item size={{xs: 12, sm: 6, md: 6}}>
-                            <Typography sx={{ color: "white" }}>Username</Typography>
-                            <Typography sx={{ opacity: 0.7, color: "white" }}>{userData?.username}</Typography>
+                        <Grid item size={{ xs: 12, sm: 6, md: 6 }}>
+                            <Typography sx={{ color: "#1e293b", fontWeight: 600 }}>Username</Typography>
+                            <Typography sx={{ opacity: 0.7, color: "#334155" }}>{userData?.username}</Typography>
                         </Grid>
-
-                        <Grid item size={{xs: 12, sm: 6, md: 6}}>
-                            <Typography sx={{ color: "white" }}>Email</Typography>
-                            <Typography sx={{ opacity: 0.7, color: "white" }}>{userData?.email}</Typography>
+                        <Grid item size={{ xs: 12, sm: 6, md: 6 }}>
+                            <Typography sx={{ color: "#1e293b", fontWeight: 600 }}>Email</Typography>
+                            <Typography sx={{ opacity: 0.7, color: "#334155" }}>{userData?.email}</Typography>
                         </Grid>
-
-                        <Grid item size={{xs: 12, sm: 6, md: 6}}>
-                            <Typography sx={{ color: "white" }}>Phone</Typography>
-                            <Typography sx={{ opacity: 0.7, color: "white" }}>{userData?.mobile_number}</Typography>
+                        <Grid item size={{ xs: 12, sm: 6, md: 6 }}>
+                            <Typography sx={{ color: "#1e293b", fontWeight: 600 }}>Phone</Typography>
+                            <Typography sx={{ opacity: 0.7, color: "#334155" }}>{userData?.mobile_number}</Typography>
                         </Grid>
-
-                        <Grid item size={{xs: 12, sm: 6, md: 6}}>
-                            <Typography sx={{ color: "white" }}>Department</Typography>
-                            <Typography sx={{ opacity: 0.7, color: "white" }}>{userData?.department}</Typography>
+                        <Grid item size={{ xs: 12, sm: 6, md: 6 }}>
+                            <Typography sx={{ color: "#1e293b", fontWeight: 600 }}>Department</Typography>
+                            <Typography sx={{ opacity: 0.7, color: "#334155" }}>{userData?.department}</Typography>
                         </Grid>
-
-                        <Grid item size={{xs: 12, sm: 6, md: 6}}>
-                            <Typography sx={{ color: "white" }}>Joined On</Typography>
-                            <Typography sx={{ opacity: 0.7, color: "white" }}>12 Jan 2022</Typography>
+                        <Grid item size={{ xs: 12, sm: 6, md: 6 }}>
+                            <Typography sx={{ color: "#1e293b", fontWeight: 600 }}>Joined On</Typography>
+                            <Typography sx={{ opacity: 0.7, color: "#334155" }}>12 Jan 2022</Typography>
                         </Grid>
                     </Grid>
                 )}
@@ -184,14 +180,27 @@ const Profile = () => {
                     { label: "Pending Leaves", value: leaveRequestsCount },
                     { label: "Pending Tasks", value: pendingTasksCount },
                 ].map((item, index) => (
-                    <Grid item size={{xs: 12, sm: 6, md: 3}} key={index}>
-                        <Box 
+                    <Grid item size={{ xs: 12, sm: 6, md: 3 }} key={index}>
+                        <Box
                             onClick={() => setActiveTab(index)}
-                            sx={{ background: activeTab === index ? "#0d47a1" : "#1e1e1e", borderRadius: "14px", padding: "16px", textAlign: "center", transition: "0.2s", cursor: "pointer", border: activeTab === index ? "2px solid #5c6bc0" : "none", "&:hover": { transform: "translateY(-4px)", background: activeTab === index ? "#0d47a1" : "#2a2a2a" }, }} >
-                            <Typography sx={{ fontSize: "14px", opacity: 0.7, color: "white" }}>
+                            sx={{
+                                background: activeTab === index ? "#0d47a1" : "#ffffff",
+                                borderRadius: "14px",
+                                padding: "16px",
+                                textAlign: "center",
+                                transition: "0.2s",
+                                cursor: "pointer",
+                                border: activeTab === index ? "2px solid #5c6bc0" : "1px solid #e2e8f0",
+                                boxShadow: "0 4px 12px rgba(0,0,0,0.05)",
+                                "&:hover": {
+                                    transform: "translateY(-4px)",
+                                    background: activeTab === index ? "#0d47a1" : "#f8fafc"
+                                },
+                            }} >
+                            <Typography sx={{ fontSize: "14px", opacity: 0.7, color: activeTab === index ? "white" : "#64748b" }}>
                                 {item.label}
                             </Typography>
-                            <Typography sx={{ fontSize: "22px", fontWeight: 600, color: "white" }}>
+                            <Typography sx={{ fontSize: "22px", fontWeight: 600, color: activeTab === index ? "white" : "#1e293b" }}>
                                 {item.value}
                             </Typography>
                         </Box>
@@ -201,7 +210,7 @@ const Profile = () => {
 
             {/* Tab Content Section */}
             {activeTab !== null && (
-                <Box sx={{ background: "#1e1e1e", borderRadius: "16px", padding: "24px", mt: 4 }}>
+                <Box sx={{ background: "#ffffff", borderRadius: "16px", padding: "24px", mt: 4, boxShadow: "0 4px 12px rgba(0,0,0,0.05)", border: "1px solid #e2e8f0" }}>
                     {/* Approved Employees List */}
                     {activeTab === 0 && (
                         <Box>
@@ -209,7 +218,7 @@ const Profile = () => {
                                 Approved Employees List
                             </Typography>
                             {approvedUsers.length > 0 ? (
-                                <TableContainer component={Paper} sx={{ background: "#252525" }}>
+                                <TableContainer component={Paper} sx={{ background: "#ffffff", border: "1px solid #e2e8f0", borderRadius: "8px" }}>
                                     <Table>
                                         <TableHead sx={{ backgroundColor: "#0d47a1" }}>
                                             <TableRow>
@@ -221,11 +230,11 @@ const Profile = () => {
                                         </TableHead>
                                         <TableBody>
                                             {approvedUsers.map((user, index) => (
-                                                <TableRow key={index} sx={{ borderBottom: "1px solid #333", "&:hover": { background: "#333" } }}>
-                                                    <TableCell sx={{ color: "white" }}>{user.first_name && user.last_name ? `${user.first_name} ${user.last_name}` : user.username}</TableCell>
-                                                    <TableCell sx={{ color: "#5c6bc0" }}>{user.email}</TableCell>
-                                                    <TableCell sx={{ color: "white" }}>{user.designation || "N/A"}</TableCell>
-                                                    <TableCell sx={{ color: "white" }}>{user.department || "N/A"}</TableCell>
+                                                <TableRow key={index} sx={{ borderBottom: "1px solid #f1f5f9", "&:hover": { background: "#f8fafc" } }}>
+                                                    <TableCell sx={{ color: "#334155" }}>{user.first_name && user.last_name ? `${user.first_name} ${user.last_name}` : user.username}</TableCell>
+                                                    <TableCell sx={{ color: "#0d47a1" }}>{user.email}</TableCell>
+                                                    <TableCell sx={{ color: "#334155" }}>{user.designation || "N/A"}</TableCell>
+                                                    <TableCell sx={{ color: "#334155" }}>{user.department || "N/A"}</TableCell>
                                                 </TableRow>
                                             ))}
                                         </TableBody>
@@ -281,7 +290,7 @@ const Profile = () => {
                                 Pending Leaves
                             </Typography>
                             {leaveRequests.length > 0 ? (
-                                <TableContainer component={Paper} sx={{ background: "#252525" }}>
+                                <TableContainer component={Paper} sx={{ background: "#ffffff", border: "1px solid #e2e8f0", borderRadius: "8px" }}>
                                     <Table>
                                         <TableHead sx={{ backgroundColor: "#0d47a1" }}>
                                             <TableRow>
@@ -294,13 +303,13 @@ const Profile = () => {
                                         </TableHead>
                                         <TableBody>
                                             {leaveRequests.map((leave, index) => (
-                                                <TableRow key={index} sx={{ borderBottom: "1px solid #333", "&:hover": { background: "#333" } }}>
-                                                    <TableCell sx={{ color: "white" }}>{leave.user?.first_name && leave.user?.last_name ? `${leave.user.first_name} ${leave.user.last_name}` : leave.user?.username}</TableCell>
-                                                    <TableCell sx={{ color: "white" }}>{leave.start_date}</TableCell>
-                                                    <TableCell sx={{ color: "white" }}>{leave.end_date}</TableCell>
-                                                    <TableCell sx={{ color: "white" }}>{leave.reason || "N/A"}</TableCell>
+                                                <TableRow key={index} sx={{ borderBottom: "1px solid #f1f5f9", "&:hover": { background: "#f8fafc" } }}>
+                                                    <TableCell sx={{ color: "#334155" }}>{leave.user?.first_name && leave.user?.last_name ? `${leave.user.first_name} ${leave.user.last_name}` : leave.user?.username}</TableCell>
+                                                    <TableCell sx={{ color: "#334155" }}>{leave.start_date}</TableCell>
+                                                    <TableCell sx={{ color: "#334155" }}>{leave.end_date}</TableCell>
+                                                    <TableCell sx={{ color: "#334155" }}>{leave.reason || "N/A"}</TableCell>
                                                     <TableCell>
-                                                        <Chip label="PENDING" size="small" sx={{ backgroundColor: "#ff6b6b", color: "white", fontWeight: 600 }} />
+                                                        <Chip label="PENDING" size="small" sx={{ backgroundColor: "#ffc107", color: "#000", fontWeight: 600 }} />
                                                     </TableCell>
                                                 </TableRow>
                                             ))}
@@ -320,7 +329,7 @@ const Profile = () => {
                                 Pending Tasks
                             </Typography>
                             {pendingTasks.length > 0 ? (
-                                <TableContainer component={Paper} sx={{ background: "#252525" }}>
+                                <TableContainer component={Paper} sx={{ background: "#ffffff", border: "1px solid #e2e8f0", borderRadius: "8px" }}>
                                     <Table>
                                         <TableHead sx={{ backgroundColor: "#0d47a1" }}>
                                             <TableRow>
@@ -333,11 +342,11 @@ const Profile = () => {
                                         </TableHead>
                                         <TableBody>
                                             {pendingTasks.filter(task => task.status === "PENDING").map((task, index) => (
-                                                <TableRow key={index} sx={{ borderBottom: "1px solid #333", "&:hover": { background: "#333" } }}>
-                                                    <TableCell sx={{ color: "white" }}>{task.title}</TableCell>
-                                                    <TableCell sx={{ color: "white" }}>{task.assigned_to?.first_name} {task.assigned_to?.last_name}</TableCell>
-                                                    <TableCell sx={{ color: "white" }}>{task.start_date}</TableCell>
-                                                    <TableCell sx={{ color: "white" }}>{task.end_date}</TableCell>
+                                                <TableRow key={index} sx={{ borderBottom: "1px solid #f1f5f9", "&:hover": { background: "#f8fafc" } }}>
+                                                    <TableCell sx={{ color: "#334155" }}>{task.title}</TableCell>
+                                                    <TableCell sx={{ color: "#334155" }}>{task.assigned_to?.first_name} {task.assigned_to?.last_name}</TableCell>
+                                                    <TableCell sx={{ color: "#334155" }}>{task.start_date}</TableCell>
+                                                    <TableCell sx={{ color: "#334155" }}>{task.end_date}</TableCell>
                                                     <TableCell>
                                                         <Chip label="PENDING" size="small" sx={{ backgroundColor: "#ffa726", color: "white", fontWeight: 600 }} />
                                                     </TableCell>
@@ -367,7 +376,7 @@ const Profile = () => {
                         onChange={handleProfileChange}
                         fullWidth
                     />
-                    
+
                     <TextField
                         margin="dense"
                         label="Email"
@@ -385,7 +394,7 @@ const Profile = () => {
                         onChange={handleProfileChange}
                         fullWidth
                     />
-                    
+
 
                     <TextField
                         margin="dense"
@@ -395,7 +404,7 @@ const Profile = () => {
                         onChange={handleProfileChange}
                         fullWidth
                     />
-                    
+
                     <TextField
                         margin="dense"
                         label="Designation"
@@ -407,9 +416,9 @@ const Profile = () => {
                 </DialogContent>
 
                 <DialogActions>
-                    <Button onClick={() => setOpenEdit(false)} sx={{textTransform: "none"}}>Cancel</Button>
+                    <Button onClick={() => setOpenEdit(false)} sx={{ textTransform: "none" }}>Cancel</Button>
                     {/* onClick={updateProfile} */}
-                    <Button variant="contained" sx={{textTransform: "none"}}>
+                    <Button variant="contained" sx={{ textTransform: "none" }}>
                         Save Changes
                     </Button>
                 </DialogActions>
@@ -443,9 +452,9 @@ const Profile = () => {
                 </DialogContent>
 
                 <DialogActions>
-                    <Button onClick={() => setOpen(false)} sx={{textTransform: "none"}}>Cancel</Button>
+                    <Button onClick={() => setOpen(false)} sx={{ textTransform: "none" }}>Cancel</Button>
                     {/* onClick={updateProfile} */}
-                    <Button variant="contained" sx={{textTransform: "none"}}>
+                    <Button variant="contained" sx={{ textTransform: "none" }}>
                         Change Password
                     </Button>
                 </DialogActions>
@@ -458,19 +467,18 @@ const Profile = () => {
 
 export default Profile
 
-
-{/* PASSWORD SECTION */}
-
-        // <Box mt={3}>
-        //     <Typography variant="h6">Change Password</Typography>
-
-        //     
-
-        //     <Button
-        //         sx={{ mt:2 }}
-        //         variant="contained"
-        //         // onClick={changePassword}
-        //     >
-        //         Change Password
-        //     </Button>
-        // </Box>
+const ProfileDetail = ({ label, value, icon }) => (
+    <Grid item xs={12} sm={6}>
+        <Box sx={{ display: "flex", alignItems: "center", gap: 2, p: 2, borderRadius: "8px", background: "#f8fafc", border: "1px solid #e2e8f0" }}>
+            {icon}
+            <Box>
+                <Typography variant="caption" sx={{ color: "#64748b", textTransform: "uppercase", fontSize: "10px", fontWeight: "bold" }}>
+                    {label}
+                </Typography>
+                <Typography variant="body1" sx={{ color: "#1e293b", fontWeight: 500 }}>
+                    {value || "Not specified"}
+                </Typography>
+            </Box>
+        </Box>
+    </Grid>
+);

@@ -6,8 +6,8 @@ import { Snackbar } from '@mui/material';
 import MuiAlert from "@mui/material/Alert";
 
 const ApplyLeave = () => {
-    
-    const {userData} = useAppContext();
+
+    const { userData } = useAppContext();
     const [type, setType] = useState("");
     const [reason, setReason] = useState("");
     const [fromDate, setFromDate] = useState("");
@@ -18,8 +18,8 @@ const ApplyLeave = () => {
 
     const handleSubmit = async (e) => {
         e.preventDefault();
-        try{
-            const res = await api.post("leave/apply/", {leave_type : type, reason: reason, start_date: fromDate, end_date: endDate});
+        try {
+            const res = await api.post("leave/apply/", { leave_type: type, reason: reason, start_date: fromDate, end_date: endDate });
             setSOpen(true);
             setMessage("Leave application submitted successfully.");
             setSeverity("success");
@@ -27,8 +27,7 @@ const ApplyLeave = () => {
             setReason("");
             setFromDate("");
             setToDate("");
-        }catch(err){
-            console.log(err.response.data);
+        } catch (err) {
             setSOpen(true);
             setMessage("Failed to submit leave application. Please try again.");
             setSeverity("error");
@@ -115,13 +114,13 @@ const ApplyLeave = () => {
                 anchorOrigin={{ vertical: "top", horizontal: "right" }}
             >
                 <MuiAlert
-                elevation={6}
-                variant="filled"
-                onClose={handleClose}
-                severity={severity}
-                sx={{ width: "100%" }}
+                    elevation={6}
+                    variant="filled"
+                    onClose={handleClose}
+                    severity={severity}
+                    sx={{ width: "100%" }}
                 >
-                {message}
+                    {message}
                 </MuiAlert>
             </Snackbar>
         </div>

@@ -9,7 +9,7 @@ import CampaignIcon from "@mui/icons-material/Campaign";
 import EditIcon from "@mui/icons-material/Edit";
 import MuiAlert from "@mui/material/Alert";
 
-function AddRole(){
+function AddRole() {
 
     const [open, setOpen] = useState(false);
     const [selectedDesignation, setSelectedDesignation] = useState(null);
@@ -25,14 +25,14 @@ function AddRole(){
     const [snackOpen, setSnackOpen] = useState(false);
     const [snackMessage, setSnackMessage] = useState("");
     const [snackSeverity, setSnackSeverity] = useState("success");
-    
+
     const handleClose = () => {
         setOpen(false);
         setNewDesignationName("");
         setEditingDesignation(null);
         setEditingName("");
     };
-    
+
     const handleEmployeesClose = () => {
         setEmployeesOpen(false);
         setSelectedDesignation(null);
@@ -65,28 +65,27 @@ function AddRole(){
         try {
             const response = await api.get('/accounts/manager/approved-users/');
             const approvedEmployees = response.data;
-            
+
             // Get unique designations from employees
             const uniqueDesignations = [...new Set(approvedEmployees.map(emp => emp.designation))].filter(d => d && d.trim());
-            
+
             // Count employees by designation
             const counts = {};
             uniqueDesignations.forEach(designation => {
                 const count = approvedEmployees.filter(emp => emp.designation === designation).length;
                 counts[designation] = count;
             });
-            
+
             // Create designation objects with config data
             const designationList = uniqueDesignations.map(designation => ({
                 name: designation,
                 icon: designationConfig[designation]?.icon || <CodeIcon />,
                 color: designationConfig[designation]?.color || "#90caf9",
             }));
-            
+
             setDesignations(designationList);
             setDesignationCounts(counts);
         } catch (error) {
-            console.error('Error fetching designations:', error);
             setDesignations([]);
         } finally {
             setDesignationsLoading(false);
@@ -120,12 +119,12 @@ function AddRole(){
                 showSnack("Designation name cannot be empty", "error");
                 return;
             }
-            setDesignations(prev => prev.map(d => 
-                d.name === editingDesignation 
+            setDesignations(prev => prev.map(d =>
+                d.name === editingDesignation
                     ? { ...d, name: editingName.trim() }
                     : d
             ));
-            
+
             // Update counts
             const oldCount = designationCounts[editingDesignation];
             if (oldCount !== undefined) {
@@ -136,7 +135,7 @@ function AddRole(){
                     return updated;
                 });
             }
-            
+
             showSnack("Designation updated successfully");
             handleClose();
         } else {
@@ -145,24 +144,24 @@ function AddRole(){
                 showSnack("Designation name cannot be empty", "error");
                 return;
             }
-            
+
             const nameToAdd = newDesignationName.trim();
-            
+
             // Check if designation already exists
             if (designations.some(d => d.name === nameToAdd)) {
                 showSnack("This designation already exists", "error");
                 return;
             }
-            
+
             const newDesignation = {
                 name: nameToAdd,
                 icon: designationConfig[nameToAdd]?.icon || <CodeIcon />,
                 color: designationConfig[nameToAdd]?.color || "#90caf9",
             };
-            
+
             setDesignations(prev => [...prev, newDesignation]);
             setDesignationCounts(prev => ({ ...prev, [nameToAdd]: 0 }));
-            
+
             showSnack("New designation added successfully");
             handleClose();
         }
@@ -173,19 +172,19 @@ function AddRole(){
         setEditingName(designation.name);
         setOpen(true);
     };
- 
+
 
     return (
         <div>
             <Typography variant='h5' component='p' sx={{
-                fontFamily : "work sans",
-                fontWeight : "600",
-                color : "#080808"
+                fontFamily: "work sans",
+                fontWeight: "600",
+                color: "#080808"
             }}> Techbrain Designation List </Typography>
-            <Box sx={{ display : "flex", justifyContent : "flex-end", margin : "auto", width : "100%"}}>
-                <Button onClick={() => setOpen(true)} sx={{ textTransform : "none", background : "#00838f", color : "whitesmoke"}}> + Add Designation </Button>
+            <Box sx={{ display: "flex", justifyContent: "flex-end", margin: "auto", width: "100%" }}>
+                <Button onClick={() => setOpen(true)} sx={{ textTransform: "none", background: "#00838f", color: "#ffffff" }}> + Add Designation </Button>
             </Box>
-            <div style={{ marginTop : "10px" }}>
+            <div style={{ marginTop: "10px" }}>
                 {designationsLoading ? (
                     <Box sx={{ display: "flex", justifyContent: "center", alignItems: "center", padding: "40px" }}>
                         <CircularProgress />
@@ -196,46 +195,48 @@ function AddRole(){
                     </Typography>
                 ) : (
                     <Box sx={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(250px, 1fr))", gap: "20px" }}>
-                    {designations.map((designation, index) => (
-                        <Box 
-                            key={index} 
-                            onClick={() => handleDesignationClick(designation.name)}
-                            sx={{ background: "#1e1e1e", padding: "20px",
-                            borderRadius: "14px",
-                            boxShadow: "0 4px 12px rgba(0,0,0,0.4)",
-                            display: "flex",
-                            flexDirection: "column",
-                            gap: "14px",
-                            transition: "0.2s ease",
-                            position: "relative",
-                            cursor: "pointer",
-                            "&:hover": { 
-                                transform: "translateY(-5px)",
-                                boxShadow: "0 6px 16px rgba(0,0,0,0.6)"
-                            },
-                        }}>
-                            <IconButton 
-                                onClick={(e) => {
-                                    e.stopPropagation();
-                                    handleEditDesignation(designation);
-                                }}
-                                sx={{ position: "absolute", top: 10, right: 10, color: "#90caf9", background: "rgba(0,0,0,0.3)" }}
-                                size="small"
-                            >
-                                <EditIcon fontSize="small" />
-                            </IconButton>
-                            
-                            <Box sx={{ width: 48, height: 48, borderRadius: "10px", backgroundColor: designation.color, display: "flex", alignItems: "center", justifyContent: "center", color: "#000",}}>
-                                {designation.icon ? designation.icon : <CodeIcon />} 
+                        {designations.map((designation, index) => (
+                            <Box
+                                key={index}
+                                onClick={() => handleDesignationClick(designation.name)}
+                                sx={{
+                                    background: "#ffffff", padding: "20px",
+                                    borderRadius: "14px",
+                                    boxShadow: "0 4px 12px rgba(0,0,0,0.05)",
+                                    display: "flex",
+                                    flexDirection: "column",
+                                    gap: "14px",
+                                    transition: "0.2s ease",
+                                    position: "relative",
+                                    cursor: "pointer",
+                                    border: "1px solid #e2e8f0",
+                                    "&:hover": {
+                                        transform: "translateY(-5px)",
+                                        boxShadow: "0 8px 20px rgba(0,0,0,0.1)"
+                                    },
+                                }}>
+                                <IconButton
+                                    onClick={(e) => {
+                                        e.stopPropagation();
+                                        handleEditDesignation(designation);
+                                    }}
+                                    sx={{ position: "absolute", top: 10, right: 10, color: "#90caf9", background: "rgba(0,0,0,0.3)" }}
+                                    size="small"
+                                >
+                                    <EditIcon fontSize="small" />
+                                </IconButton>
+
+                                <Box sx={{ width: 48, height: 48, borderRadius: "10px", backgroundColor: designation.color, display: "flex", alignItems: "center", justifyContent: "center", color: "#000", }}>
+                                    {designation.icon ? designation.icon : <CodeIcon />}
+                                </Box>
+                                <Typography sx={{ fontSize: "18px", fontWeight: 600, color: "#1e293b", }} >
+                                    {designation.name}
+                                </Typography>
+                                <Typography sx={{ opacity: 0.7, color: "#64748b" }}>
+                                    {designationCounts[designation.name] || 0} Employees
+                                </Typography>
                             </Box>
-                            <Typography sx={{ fontSize: "18px", fontWeight: 600, color: "whitesmoke",}} >
-                                {designation.name}
-                            </Typography>
-                            <Typography sx={{ opacity: 0.7, color : "gray" }}>
-                                {designationCounts[designation.name] || 0} Employees
-                            </Typography>
-                        </Box>
-                    ))}
+                        ))}
                     </Box>
                 )}
             </div>
@@ -244,17 +245,17 @@ function AddRole(){
                 onClose={handleClose}
                 fullWidth
                 maxWidth="md"
-                >
+            >
                 <DialogTitle sx={{ fontWeight: 600 }}>
                     {editingDesignation ? "Edit Designation" : "Add New Designation"}
                 </DialogTitle>
 
                 <DialogContent dividers>
                     <Grid container spacing={2}>
-                        <Grid item size={{xs: 12, sm: 12, md: 12}}>
-                            <TextField 
-                                label="Designation Name" 
-                                fullWidth 
+                        <Grid item size={{ xs: 12, sm: 12, md: 12 }}>
+                            <TextField
+                                label="Designation Name"
+                                fullWidth
                                 required
                                 value={editingDesignation ? editingName : newDesignationName}
                                 onChange={(e) => editingDesignation ? setEditingName(e.target.value) : setNewDesignationName(e.target.value)}
@@ -268,8 +269,8 @@ function AddRole(){
                     <Button onClick={handleClose} color="inherit">
                         Cancel
                     </Button>
-                    <Button 
-                        variant="contained" 
+                    <Button
+                        variant="contained"
                         onClick={handleSaveDesignation}
                         sx={{ textTransform: "none", fontWeight: 600 }}
                     >

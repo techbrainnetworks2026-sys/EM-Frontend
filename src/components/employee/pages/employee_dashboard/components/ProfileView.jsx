@@ -93,9 +93,9 @@ const ProfileView = () => {
     }, [imageToCrop]);
 
     const handleProfileChange = (e) => {
-        setUserData({ 
-            ...userData, 
-            [e.target.name]: e.target.value 
+        setUserData({
+            ...userData,
+            [e.target.name]: e.target.value
         });
     };
 
@@ -105,7 +105,7 @@ const ProfileView = () => {
             setMessage('');
 
             const formData = new FormData();
-            
+
             // Only add fields that are actually editable
             if (userData.blood_group) {
                 formData.append('blood_group', userData.blood_group);
@@ -113,25 +113,17 @@ const ProfileView = () => {
             if (userData.mobile_number) {
                 formData.append('mobile_number', userData.mobile_number);
             }
-            
+
             // Add cropped image if available
             if (croppedImage) {
                 formData.append('profile_picture', croppedImage, 'profile_picture.jpg');
             }
 
-            // Debug: Log what we're sending
-            console.log('Sending profile update with:');
-            for (let [key, value] of formData.entries()) {
-                if (key === 'profile_picture') {
-                    console.log(`  ${key}: File (${value.size} bytes)`);
-                } else {
-                    console.log(`  ${key}: ${value}`);
-                }
-            }
+            // FormData prepared
+
 
             const response = await api.patch('/accounts/profile/update/', formData);
 
-            console.log('Profile update response:', response.data);
 
             // Update userData with response
             if (response.data && response.data.user) {
@@ -148,16 +140,16 @@ const ProfileView = () => {
             console.error('Error saving profile:', error);
             console.error('Error response:', error.response?.data);
             console.error('Error status:', error.response?.status);
-            
+
             // Get detailed error message
-            const errorMessage = error.response?.data?.error 
+            const errorMessage = error.response?.data?.error
                 || error.response?.data?.detail
                 || error.response?.data?.message
                 || (error.response?.data && Object.entries(error.response.data)
                     .map(([key, value]) => `${key}: ${value}`)
                     .join(', '))
                 || 'Error saving profile. Please try again.';
-            
+
             setMessage(errorMessage);
         } finally {
             setLoading(false);

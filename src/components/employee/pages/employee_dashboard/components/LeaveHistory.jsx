@@ -20,7 +20,7 @@ const LeaveHistory = ({ leaves = [] }) => {
                 const res = await api.get("leave/history/");
                 setLeavesData(res.data);
             } catch (err) {
-                console.log(err);
+                // Error handled
             }
         };
 

@@ -6,7 +6,7 @@ import axios from "axios";
 
 const AppContext = createContext();
 
-export const AppContextProvider = ({children}) => {
+export const AppContextProvider = ({ children }) => {
 
     const [sidebarOpen, setSidebarOpen] = useState(true);
     const theme = useTheme();
@@ -14,32 +14,34 @@ export const AppContextProvider = ({children}) => {
     const [userData, setUserData] = useState(null);
     const navigate = useNavigate();
 
-    const Register = async (username,email,password,role,department,designation,blood_group,mobile_number) => {
+    const Register = async (username, email, password, role, department, designation, blood_group, mobile_number) => {
         try {
-            const res = await axios.post("https://tn-em-backend.onrender.com/api/accounts/register/",  {username,email,password,role,department,designation,blood_group,mobile_number});
+            const res = await api.post("accounts/register/", { username, email, password, role, department, designation, blood_group, mobile_number });
             return res.data;
-        }catch(err){
+        } catch (err) {
             throw err;
         }
     }
 
     const Login = async (email, password) => {
-        try{
-            const res = await axios.post("https://tn-em-backend.onrender.com/api/accounts/login/", {email, password});
+        try {
+            const res = await api.post("accounts/login/", { email, password });
             localStorage.setItem("token", res.data.token);
             setUserData(res.data);
             return res.data;
-        }catch(err){
+        } catch (err) {
             throw err;
         }
     }
 
     useEffect(() => {
         const fetchUserDetails = async () => {
-            try{
-                const res =  await api.get("accounts/me/");
+            const token = localStorage.getItem("token");
+            if (!token) return;
+            try {
+                const res = await api.get("accounts/me/");
                 setUserData(res.data);
-            }catch(err){
+            } catch (err) {
                 console.log(err);
             }
         }
@@ -56,6 +58,7 @@ export const AppContextProvider = ({children}) => {
 
 
 
+
     const value = {
         sidebarOpen,
         setSidebarOpen,
@@ -67,7 +70,7 @@ export const AppContextProvider = ({children}) => {
         setUserData,
     }
 
-    return(
+    return (
         <AppContext.Provider value={value}>
             {children}
         </AppContext.Provider>

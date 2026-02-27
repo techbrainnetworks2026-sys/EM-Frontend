@@ -1,19 +1,21 @@
 /* AttendanceView component styles */
 .dashboard-view.attendance-view {
-  background: #fff;
-  padding: 20px;
-  border-radius: 12px;
-  border: 1px solid #e2e8f0;
+  background: var(--primary-bg);
+  padding: 32px;
+  border-radius: 16px;
+  border: 1px solid var(--border-color);
   height: 82vh;
   display: flex;
   flex-direction: column;
-  color: #1e1e1e;
+  color: var(--text-white);
   overflow: hidden;
+  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05);
 }
 
 h2.Monthly-Attendance {
-  color: #1e1e1e;
+  color: var(--text-white);
   margin: 0;
+  font-weight: 700;
 }
 
 .view-header {
@@ -348,6 +350,7 @@ h2.Monthly-Attendance {
     flex-direction: column;
     gap: 8px;
   }
+
   .day-times {
     font-size: 9px;
   }
@@ -370,6 +373,7 @@ h2.Monthly-Attendance {
 .calendar-grid::-webkit-scrollbar-thumb:hover {
   background: #94a3b8;
 }
+
 @media (max-width: 430px) {
   .calendar-grid {
     grid-template-columns: repeat(3, 1fr);
@@ -379,6 +383,7 @@ h2.Monthly-Attendance {
     flex-direction: column;
     gap: 8px;
   }
+
   .day-times {
     font-size: 9px;
   }

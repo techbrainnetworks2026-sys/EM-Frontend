@@ -8,14 +8,14 @@ import MuiAlert from "@mui/material/Alert";
 
 const EmployeeSummary = () => {
 
-    const {id} = useParams();
+    const { id } = useParams();
     const [selectedEmployeeSummary, setSelectedEmployeeSummary] = useState([]);
     const [open, setOpen] = useState(false);
     const [title, setTitle] = useState("");
     const [description, setDescription] = useState("");
     const [dueDate, setDueDate] = useState("");
     const [priority, setPriority] = useState("");
-    const [sopen, setSOpen] = useState(false); 
+    const [sopen, setSOpen] = useState(false);
     const [message, setMessage] = useState("");
     const [severity, setSeverity] = useState("success");
 
@@ -23,13 +23,13 @@ const EmployeeSummary = () => {
     const handleClose = () => setOpen(false);
 
     const fetchEmployeeSummary = async () => {
-        try{
+        try {
             const res = await api.get('task/tasks/');
             const employeeTasks = res.data.filter(
                 task => task.assigned_to_details.id === Number(id)
             );
             setSelectedEmployeeSummary(employeeTasks);
-        }catch(err){
+        } catch (err) {
             console.log(err);
         }
     }
@@ -39,21 +39,21 @@ const EmployeeSummary = () => {
     }, [id]);
 
     if (!selectedEmployeeSummary) {
-        return <div>Loading...</div> ;
+        return <div>Loading...</div>;
     }
 
     const inProgressCount = selectedEmployeeSummary.filter(
         (task) => task.status === "PENDING"
     ).length;
-    
+
 
     const inCompletedCount = selectedEmployeeSummary.filter(
         (task) => task.status === "COMPLETED"
     ).length;
-    
+
     const SummaryCard = ({ title, value, color }) => (
         <Box sx={{ background: "#1e1e1e", borderRadius: "16px", padding: "20px", textAlign: "center", border: `1px solid ${color}30`, }}>
-            <Typography sx={{ opacity: 0.7, mb: 0.5, color : "whitesmoke" }}>{title}</Typography>
+            <Typography sx={{ opacity: 0.7, mb: 0.5, color: "whitesmoke" }}>{title}</Typography>
             <Typography sx={{ fontSize: "26px", fontWeight: 600, color }}>
                 {value}
             </Typography>
@@ -62,26 +62,40 @@ const EmployeeSummary = () => {
 
     const employee = selectedEmployeeSummary[0]?.assigned_to_details;
 
-    const handleAddTask = async(e) => {
+    const handleAddTask = async (e) => {
         e.preventDefault();
-        try{
+        try {
             const res = await api.post('task/tasks/', {
-                title : title,
+                title: title,
                 description: description,
-                assigned_to : id,
-                end_date : dueDate,
-                priority : priority
+                assigned_to: id,
+                start_date: dueDate,
+                priority: priority
             });
-            setMessage("Task updated Successfully!");
+            setMessage("Task assigned successfully!");
             setSOpen(true);
             setSeverity("success");
 
             await fetchEmployeeSummary();
-        }catch(err){
+            setOpen(false); // Close dialog
+        } catch (err) {
             console.log(err);
-            setMessage(err.response?.data?.message);
+            setMessage(err.response?.data?.message || "Failed to add task");
             setSOpen(true);
             setSeverity("error");
+        }
+    }
+
+    const handleCompleteTask = async (taskId) => {
+        try {
+            await api.patch(`task/tasks/${taskId}/`, { status: 'COMPLETED' });
+            setMessage("Task marked as completed!");
+            setSOpen(true);
+            setSeverity("success");
+            await fetchEmployeeSummary();
+        } catch (err) {
+            console.log(err);
+            alert("Failed to update task status");
         }
     }
 
@@ -108,7 +122,7 @@ const EmployeeSummary = () => {
                 <Typography variant="h5" sx={{ fontFamily: "work sans", fontWeight: 600 }}>
                     Employee Task Overview
                 </Typography>
-                <Typography sx={{ opacity: 0.6, mt: 0.5, color : "#333" }}>
+                <Typography sx={{ opacity: 0.6, mt: 0.5, color: "#333" }}>
                     Track workload and task progress
                 </Typography>
             </Box>
@@ -139,15 +153,15 @@ const EmployeeSummary = () => {
                         <SummaryCard title="Completed" value={inCompletedCount} color="#66bb6a" />
                     </Grid>
                 </Grid>
-                
-                
+
+
                 <Box sx={{ mt: 4 }}>
-                    <Box sx={{ display : "flex", justifyContent : "space-between"}}>
+                    <Box sx={{ display: "flex", justifyContent: "space-between" }}>
                         <Typography sx={{ fontWeight: 600, mb: 2, color: "#333" }}>
                             Assigned Tasks
                         </Typography>
 
-                        <Button variant='contained' onClick={() => setOpen(true)} sx={{ textTransform : "none", background : "#00838f", color : "whitesmoke"}}> + Assign New Task</Button>
+                        <Button variant='contained' onClick={() => setOpen(true)} sx={{ textTransform: "none", background: "#00838f", color: "whitesmoke" }}> + Assign New Task</Button>
                     </Box>
 
                     {selectedEmployeeSummary.map((task) => (
@@ -156,7 +170,7 @@ const EmployeeSummary = () => {
                                 display: "flex",
                                 alignItems: "stretch",
                                 mb: 2,
-                                mt : 2,
+                                mt: 2,
                                 borderRadius: "16px",
                                 overflow: "hidden",
                                 background: "#1e1e1e",
@@ -165,8 +179,8 @@ const EmployeeSummary = () => {
                                     transform: "translateY(-2px)",
                                     boxShadow: "0 8px 24px rgba(0,0,0,0.45)",
                                 },
-                        }}>
-      
+                            }}>
+
                             <Box sx={{ width: "6px", backgroundColor: task.status === "Completed" ? "#66bb6a" : task.status === "In-Progress" ? "#ffd600" : "#ef5350", }} />
 
                             <Box sx={{ p: 2, flex: 1 }}>
@@ -177,7 +191,7 @@ const EmployeeSummary = () => {
                                     </Typography>
 
                                     <Chip label={task.priority} size="small"
-                                        sx={{ 
+                                        sx={{
                                             backgroundColor: task.priority === "High" ? "#ef5350" : task.priority === "Medium" ? "#ffb74d" : "#81c784",
                                             color: "#000",
                                             fontWeight: 600,
@@ -189,7 +203,7 @@ const EmployeeSummary = () => {
                                     {task.description}
                                 </Typography>
 
-                                <Box sx={{ display: "flex", justifyContent: "space-between", alignItems: "center", mt: 2,}}>
+                                <Box sx={{ display: "flex", justifyContent: "space-between", alignItems: "center", mt: 2, }}>
                                     <Chip label={task.status} size="small"
                                         sx={{
                                             backgroundColor: "#333",
@@ -199,47 +213,20 @@ const EmployeeSummary = () => {
                                     />
 
                                     <Typography sx={{ fontSize: "13px", opacity: 0.6, color: "whitesmoke", }} >
-                                        Due · {formatDate(task.end_date)}
+                                        {task.status === "COMPLETED" ? `Completed` : `Due · ${formatDate(task.start_date)}`}
                                     </Typography>
                                 </Box>
 
-                                <Box sx={{mt : 2}}>
+                                <Box sx={{ mt: 2 }}>
                                     <Typography sx={{ fontWeight: 600, color: "whitesmoke" }}> Comments </Typography>
 
-                                    {/* <Box sx={{ padding : "10px", background : "#333", borderRadius : "5px", mt : 1}}>
-                                        {task.comments.length == 0 ? (
-                                            <Box sx={{ display : "flex", justifyContent : "center", padding : "5px"}}>
-                                                <Typography sx={{ color : "whitesmoke"}}> No Progress Yet </Typography>
-                                            </Box>
-                                            ):( 
-                                            <Box sx={{ display: "flex", flexDirection: "column", gap: 1 }}>
-                                                {task.comments.map((comment, index) => (
-                                                    <Box key={index}
-                                                        sx={{
-                                                            alignSelf: comment.author === "employee" ? "flex-end" : "flex-start",
-                                                            background: comment.author === "employee" ? "#424242" : "#0d47a1",
-                                                            padding: "8px 12px",
-                                                            borderRadius: "8px",
-                                                            maxWidth: "80%",
-                                                        }}
-                                                    >
-                                                        <Typography sx={{ fontSize: "14px", color: "whitesmoke" }}>
-                                                            {comment.description}
-                                                        </Typography>
+                                    {/* ... existing comments code ... */}
 
-                                                        <Typography sx={{ fontSize: "11px", opacity: 0.6, color : "whitesmoke" }}>
-                                                            {comment.postedOn}
-                                                        </Typography>
-                                                    </Box>
-                                                ))}
-                                            </Box>
-                                        )}
-                                    </Box> */}
-
-                                    {task.status == 'PENDING' && <Box sx={{mt : 2}}>
-                                        <Typography sx={{ color : "whitesmoke"}}> Write Your Thoughts ! </Typography>
-                                        <Box sx={{ display : "flex", justifyContent : "space-between",alignItems : "flex-end", mt : 1, padding : "10px"}}>
-                                            <TextField multiline rows={1} placeholder="Write your feedback..." sx={{ width : "50%",
+                                    {task.status == 'PENDING' && <Box sx={{ mt: 2 }}>
+                                        <Typography sx={{ color: "whitesmoke" }}> Write Your Thoughts ! </Typography>
+                                        <Box sx={{ display: "flex", justifyContent: "space-between", alignItems: "flex-end", mt: 1, padding: "10px" }}>
+                                            <TextField multiline rows={1} placeholder="Write your feedback..." sx={{
+                                                width: "50%",
                                                 "& .MuiInputBase-input": {
                                                     color: "white",
                                                 },
@@ -259,14 +246,14 @@ const EmployeeSummary = () => {
                                                     },
                                                 },
                                             }} />
-                                            <Button variant='contained' sx={{ width : "100px", height : "30px"}}> Post </Button>
+                                            <Button variant='contained' sx={{ width: "100px", height: "30px" }}> Post </Button>
                                         </Box>
                                     </Box>}
                                 </Box>
-                                
-                                {task.status == 'PENDING' && <Box sx={{ mt : 2, display : "flex", justifyContent: "space-between", alignItems: "center" }}>
-                                    <Typography sx={{ color : "whitesmoke" }}> Actions : Change Status to</Typography>
-                                    <Button variant='outlined' color="success"> Completed </Button>
+
+                                {task.status == 'PENDING' && <Box sx={{ mt: 2, display: "flex", justifyContent: "space-between", alignItems: "center" }}>
+                                    <Typography sx={{ color: "whitesmoke" }}> Actions : Change Status to</Typography>
+                                    <Button variant='outlined' color="success" onClick={() => handleCompleteTask(task.id)}> Completed </Button>
                                 </Box>}
                             </Box>
                         </Box>
@@ -280,7 +267,7 @@ const EmployeeSummary = () => {
                 onClose={handleClose}
                 fullWidth
                 maxWidth="md"
-                >
+            >
                 <DialogTitle sx={{ fontWeight: 600 }}>
                     Add New Task
                 </DialogTitle>
@@ -288,11 +275,11 @@ const EmployeeSummary = () => {
                 <DialogContent dividers>
                     <Grid container spacing={2}>
                         {/* Name */}
-                        <Grid item size={{xs: 12, sm: 6, md: 4}}>
+                        <Grid item size={{ xs: 12, sm: 6, md: 4 }}>
                             <TextField label="Title" fullWidth required value={title} onChange={(e) => setTitle(e.target.value)} />
                         </Grid>
 
-                        <Grid item size={{xs: 12, sm: 6, md: 4}}>
+                        <Grid item size={{ xs: 12, sm: 6, md: 4 }}>
                             <TextField
                                 label="Due Date"
                                 type="date"
@@ -310,7 +297,7 @@ const EmployeeSummary = () => {
                             />
                         </Grid>
 
-                        <Grid item size={{xs: 12, sm: 6, md: 4}}>
+                        <Grid item size={{ xs: 12, sm: 6, md: 4 }}>
                             <TextField select label="Priority" fullWidth required value={priority} onChange={(e) => setPriority(e.target.value)}>
                                 <MenuItem value="HIGH"> High </MenuItem>
                                 <MenuItem value="MEDIUM"> Medium </MenuItem>
@@ -320,7 +307,7 @@ const EmployeeSummary = () => {
 
 
                         {/* Address */}
-                        <Grid item size={{xs: 12, sm: 6, md: 6}}>
+                        <Grid item size={{ xs: 12, sm: 6, md: 6 }}>
                             <TextField
                                 label="Description"
                                 multiline
@@ -350,13 +337,13 @@ const EmployeeSummary = () => {
                 anchorOrigin={{ vertical: "top", horizontal: "right" }}
             >
                 <MuiAlert
-                elevation={6}
-                variant="filled"
-                onClose={handleClose}
-                severity={severity}
-                sx={{ width: "100%" }}
+                    elevation={6}
+                    variant="filled"
+                    onClose={handleClose}
+                    severity={severity}
+                    sx={{ width: "100%" }}
                 >
-                {message}
+                    {message}
                 </MuiAlert>
             </Snackbar>
         </div>

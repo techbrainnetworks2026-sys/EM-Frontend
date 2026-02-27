@@ -6,18 +6,18 @@ import { useNavigate } from 'react-router-dom';
 import { useAppContext } from '../../context/AppContext.jsx';
 import api from '../../../services/service.js';
 
-function Navbar(){
+function Navbar() {
 
-    const { sidebarOpen, setSidebarOpen } = useAppContext();
+    const { sidebarOpen, setSidebarOpen, userData } = useAppContext();
     const navigate = useNavigate();
     const [notificationCount, setNotificationCount] = useState(0);
     const [showNewNotificationAnimation, setShowNewNotificationAnimation] = useState(false);
     const initialFetchDone = React.useRef(false);
 
     const handleSidebarOpen = () => {
-        if(sidebarOpen){
+        if (sidebarOpen) {
             setSidebarOpen(false);
-        }else{
+        } else {
             setSidebarOpen(true)
         }
     }
@@ -27,7 +27,7 @@ function Navbar(){
         try {
             const response = await api.get('notifications/unread-count/');
             const newCount = response.data.unread_count || 0;
-            
+
             // Update state with animation trigger if count changed
             setNotificationCount(prevCount => {
                 if (newCount > prevCount) {
@@ -49,9 +49,9 @@ function Navbar(){
             // Schedule the first fetch asynchronously to avoid cascading renders
             Promise.resolve().then(() => fetchNotificationCount());
         }
-        
+
         // Refresh notification count every 10 seconds
-        const interval = setInterval(fetchNotificationCount, 10000);
+        const interval = setInterval(fetchNotificationCount, 60000);
         return () => clearInterval(interval);
     }, [fetchNotificationCount]);
 
@@ -68,17 +68,17 @@ function Navbar(){
 
     return (
         <div>
-            <AppBar elevation = {0} sx={{width : sidebarOpen ? "calc(100% - 300px)" : "calc(100% - 80px)", left: sidebarOpen ? "300px" : "80px", padding : "15px", background : "rgb(8, 15, 37)" }}>
-                <Box sx={{ display : "flex", flexDirection : "row", justifyContent : "space-between", alignItems : "center"}}>
+            <AppBar elevation={0} sx={{ width: sidebarOpen ? "calc(100% - 300px)" : "calc(100% - 80px)", left: sidebarOpen ? "300px" : "80px", padding: "15px", background: "rgb(8, 15, 37)" }}>
+                <Box sx={{ display: "flex", flexDirection: "row", justifyContent: "space-between", alignItems: "center" }}>
                     <Box >
                         <IconButton onClick={handleSidebarOpen}>
-                            <MenuIcon sx={{color : "white"}} />
+                            <MenuIcon sx={{ color: "white" }} />
                         </IconButton>
                     </Box>
-                    <Box sx={{display : "flex", alignItems : "center", gap : "15px"}}>
+                    <Box sx={{ display: "flex", alignItems: "center", gap: "15px" }}>
                         {/* Notification Bell */}
-                        <Box 
-                            sx={{ 
+                        <Box
+                            sx={{
                                 position: 'relative',
                                 display: 'flex',
                                 alignItems: 'center',
@@ -91,14 +91,14 @@ function Navbar(){
                             onClick={handleNotificationClick}
                             title={notificationCount > 0 ? `You have ${notificationCount} new notification(s)` : 'No new notifications'}
                         >
-                            <svg 
-                                width="24" 
-                                height="24" 
-                                viewBox="0 0 24 24" 
-                                fill="none" 
-                                stroke="currentColor" 
-                                strokeWidth="2" 
-                                strokeLinecap="round" 
+                            <svg
+                                width="24"
+                                height="24"
+                                viewBox="0 0 24 24"
+                                fill="none"
+                                stroke="currentColor"
+                                strokeWidth="2"
+                                strokeLinecap="round"
                                 strokeLinejoin="round"
                                 style={{
                                     color: notificationCount > 0 ? '#3b82f6' : 'white',
@@ -130,16 +130,20 @@ function Navbar(){
                                         animation: showNewNotificationAnimation ? 'badgeBounce 0.8s cubic-bezier(0.68, -0.55, 0.265, 1.55)' : 'badgeBounce 2s ease-in-out infinite'
                                     }}
                                 >
-                                    {notificationCount}
                                 </Box>
                             )}
                         </Box>
                         <IconButton onClick={() => navigate('/manager/profile')}>
-                            <Avatar sx={{ backgroundColor : "orangered", width : "32px", height : "32px", cursor : "pointer" }}>M</Avatar>
+                            <Avatar
+                                src={userData?.profile_picture_url}
+                                sx={{ backgroundColor: "orangered", width: "32px", height: "32px", cursor: "pointer" }}
+                            >
+                                {userData?.username ? userData.username.charAt(0).toUpperCase() : "M"}
+                            </Avatar>
                         </IconButton>
                         <Box>
                             <IconButton onClick={handleLogout}>
-                                <LogoutIcon sx={{color : "white"}} />
+                                <LogoutIcon sx={{ color: "white" }} />
                             </IconButton>
                         </Box>
                     </Box>

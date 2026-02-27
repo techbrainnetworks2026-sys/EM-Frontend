@@ -1,4 +1,4 @@
-import React, { useState, useRef, useEffect } from "react";
+import React, { useState, useRef, useEffect, useMemo } from "react";
 import "./EmployeeDashboard.css";
 import AttendanceView from "./components/AttendanceView";
 import LeaveHistory from "./components/LeaveHistory";
@@ -7,7 +7,7 @@ import TaskManager from "./components/TaskManager";
 import AnnouncementsView from "./components/AnnouncementsView";
 import { useNavigate } from "react-router-dom";
 import ProfileView from "./components/ProfileView";
-import api  from '../../../../services/service.js';
+import api from '../../../../services/service.js';
 import { useAppContext } from "../../../context/AppContext.jsx";
 
 export default function EmployeeDashboard() {
@@ -60,7 +60,7 @@ export default function EmployeeDashboard() {
       setLeaves(leaveRes.data);
       setTasks(taskRes.data);
     } catch (err) {
-      console.log(err);
+      // Error handled
     }
   };
 
@@ -69,26 +69,26 @@ export default function EmployeeDashboard() {
     try {
       const response = await api.get('notifications/unread-count/');
       const newCount = response.data.unread_count || 0;
-      
+
       // Show shake animation only when count increases
       if (newCount > notificationCount) {
         setShowNewNotificationAnimation(true);
         setTimeout(() => setShowNewNotificationAnimation(false), 600);
       }
-      
+
       setNotificationCount(newCount);
     } catch (err) {
-      console.log('Error fetching notification count:', err);
+      // Error handled
     }
   };
 
   useEffect(() => {
-    if(userData){
+    if (userData) {
       fetchDashboardData();
       fetchNotificationCount();
-      
+
       // Refresh notification count every 10 seconds
-      const interval = setInterval(fetchNotificationCount, 10000);
+      const interval = setInterval(fetchNotificationCount, 60000);
       return () => clearInterval(interval);
     }
 
@@ -98,54 +98,50 @@ export default function EmployeeDashboard() {
   const currentMonth = now.getMonth();
   const currentYear = now.getFullYear();
 
-  const presentDays = attendance.filter(a => {
-
-    if(!a.date) return false;
-
-    const d = new Date(a.date);
-
-    return (
-      d.getMonth() === currentMonth &&
-      d.getFullYear() === currentYear &&
-      ["PRESENT", "ONGOING"].includes(a.status)
-    );
-
-  }).length;
+  const presentDays = useMemo(() => {
+    return attendance.filter(a => {
+      if (!a.date) return false;
+      const d = new Date(a.date);
+      return (
+        d.getMonth() === currentMonth &&
+        d.getFullYear() === currentYear &&
+        ["PRESENT", "ONGOING"].includes(a.status)
+      );
+    }).length;
+  }, [attendance, currentMonth, currentYear]);
 
 
-  const totalLeavesTaken = leaves.reduce((total, leave) => {
-
-    if (leave.status !== "APPROVED") return total;
-
-    let start = new Date(leave.start_date);
-    let end = new Date(leave.end_date);
-
-    let count = 0;
-
-    while (start <= end) {
-
-      if (
-        start.getMonth() === currentMonth &&
-        start.getFullYear() === currentYear
-      ){
-        count++;
+  const totalLeavesTaken = useMemo(() => {
+    return leaves.reduce((total, leave) => {
+      if (leave.status !== "APPROVED") return total;
+      let start = new Date(leave.start_date);
+      let end = new Date(leave.end_date);
+      let count = 0;
+      while (start <= end) {
+        if (
+          start.getMonth() === currentMonth &&
+          start.getFullYear() === currentYear
+        ) {
+          count++;
+        }
+        start.setDate(start.getDate() + 1);
       }
-
-      start.setDate(start.getDate() + 1);
-    }
-
-    return total + count;
-
-  }, 0);
+      return total + count;
+    }, 0);
+  }, [leaves, currentMonth, currentYear]);
 
 
-  const tasksInProgress = tasks.filter(
-    t => t.status === "IN_PROGRESS" || t.status === "PENDING"
-  ).length;
+  const tasksInProgress = useMemo(() => {
+    return tasks.filter(
+      t => t.status === "IN_PROGRESS" || t.status === "PENDING"
+    ).length;
+  }, [tasks]);
 
-  const tasksCompleted = tasks.filter(
-    t => t.status === "COMPLETED"
-  ).length;
+  const tasksCompleted = useMemo(() => {
+    return tasks.filter(
+      t => t.status === "COMPLETED"
+    ).length;
+  }, [tasks]);
 
 
   useEffect(() => {
@@ -167,7 +163,7 @@ export default function EmployeeDashboard() {
         }
 
       } catch (err) {
-        console.log(err);
+        // Error handled
       }
     };
 
@@ -213,7 +209,7 @@ export default function EmployeeDashboard() {
     navigate('/');
   };
 
-  
+
 
   const handleCheckIn = async (e) => {
     e.stopPropagation();
@@ -226,7 +222,7 @@ export default function EmployeeDashboard() {
       setCheckOutTime(null);
       fetchDashboardData();
     } catch (err) {
-      console.log(err.response?.data || err);
+      // Error handled
     }
   };
 
@@ -240,7 +236,7 @@ export default function EmployeeDashboard() {
       setCheckOutTime(res.data.time);
       fetchDashboardData();
     } catch (err) {
-      console.log(err.response?.data || err);
+      // Error handled
     }
   };
 
@@ -267,17 +263,18 @@ export default function EmployeeDashboard() {
           <div className="logo">Techbrain Networks</div>
         </div>
         <div className="header-right">
-          <div 
-            className={`notification ${notificationCount > 0 ? 'has-notifications' : ''} ${showNewNotificationAnimation ? 'new-notification' : ''}`} 
+          <div
+            className={`notification ${notificationCount > 0 ? 'has-notifications' : ''} ${showNewNotificationAnimation ? 'new-notification' : ''}`}
             onClick={handleNotificationClick}
             title={notificationCount > 0 ? `You have ${notificationCount} new notification(s)` : 'No new notifications'}
           >
-            <svg className="notification-icon" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+            <svg className="notification-icon" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
               <path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"></path>
               <path d="M13.73 21a2 2 0 0 1-3.46 0"></path>
             </svg>
             {notificationCount > 0 && <span className="badge" title={`${notificationCount} new`}>{notificationCount}</span>}
           </div>
+
           <div className="profile-area" ref={profileRef}>
             <button
               className="profile-toggle"
@@ -286,8 +283,8 @@ export default function EmployeeDashboard() {
               title="Click to open profile menu"
             >
               <div className="header-avatar">
-                {userData?.profilePicture ? (
-                  <img src={userData.profilePicture} alt="Profile" />
+                {userData?.profile_picture_url ? (
+                  <img src={userData.profile_picture_url} alt="Profile" />
                 ) : (
                   <span className="avatar-placeholder">👤</span>
                 )}
@@ -384,7 +381,7 @@ export default function EmployeeDashboard() {
 
               {/* Widget 4 */}
               <div className="card highlight-card" onClick={() => setActive('applyLeave')}>
-                <p className="apply-Leave">Apply Leave</p>
+                <h4 className="apply-Leave">Apply Leave</h4>
               </div>
             </div>
           </div>
