@@ -112,7 +112,7 @@ thead {
     display: block;
     margin-bottom: 16px;
     padding: 16px;
-    border: 1px solid var(--border-color);
+  
     border-radius: 12px;
     background: var(--primary-bg);
   }

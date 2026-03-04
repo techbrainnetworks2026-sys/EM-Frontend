@@ -5,7 +5,7 @@
 /* ============================= */
 
 .dashboard-view-profile-view-container {
-    padding: 30px;
+    padding: 10px;  
 }
 
 .profile-card {
@@ -82,10 +82,17 @@
     border: 3px solid #ffffff;
     box-shadow: 0 4px 6px rgba(0, 0, 0, 0.15);
     transition: 0.2s ease;
+    font-size: 16px;
+    line-height: 1;
+    padding: 0;
 }
 
 .upload-btn:hover {
     transform: scale(1.1);
+}
+
+.hidden-input {
+    display: none;
 }
 
 /* ============================= */
@@ -158,8 +165,8 @@
     display: flex;
     justify-content: flex-end;
     gap: 16px;
-    margin-top: 40px;
-    padding-top: 32px;
+    margin-top: 10px;
+    padding-top: 10px;
 }
 
 .primary-btn,
@@ -268,7 +275,7 @@
     }
 
     .profile-form-grid {
-        grid-template-columns: 1fr;
+        grid-template-columns:  repeat(2, 1fr);
         gap: 15px;
     }
 
@@ -281,5 +288,16 @@
     .primary-btn,
     .secondary-btn {
         width: 100%;
+    }
+}
+@media (max-width: 425px) {
+    
+.profile-form-grid {
+    grid-template-columns:   1fr;
+    gap: 1px;
+}
+    .profile-actions {
+        flex-direction: column;
+     
     }
 }

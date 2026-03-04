@@ -278,6 +278,68 @@ class NotificationService {
         console.log('Message from service worker:', event.data);
     };
 
+
+    /**
+     * Connect to the notification WebSocket
+     */
+    connectWebSocket(userId, onMessageReceived) {
+        if (this.socket && this.socket.readyState === WebSocket.OPEN) {
+            return;
+        }
+
+        const protocol = window.location.protocol === 'https:' ? 'wss:' : 'ws:';
+        const host = 'localhost:8000'; // Hardcoded for now, ideally from config
+        const socketUrl = `${protocol}//${host}/ws/notifications/`;
+
+        this.socket = new WebSocket(socketUrl);
+
+        this.socket.onopen = () => {
+            console.log('Notification WebSocket connected');
+        };
+
+        this.socket.onmessage = (event) => {
+            const data = JSON.parse(event.data);
+            console.log('Notification data received:', data);
+            if (onMessageReceived) {
+                onMessageReceived(data);
+            }
+        };
+
+        this.socket.onclose = (event) => {
+            console.log('Notification WebSocket closed:', event);
+            // Reconnect logic
+            setTimeout(() => this.connectWebSocket(userId, onMessageReceived), 5000);
+        };
+
+        this.socket.onerror = (error) => {
+            console.error('Notification WebSocket error:', error);
+        };
+    }
+
+    /**
+     * Disconnect the notification WebSocket
+     */
+    disconnectWebSocket() {
+        if (this.socket) {
+            this.socket.close();
+            this.socket = null;
+        }
+    }
+
+    /**
+     * Mark all notifications as read
+     */
+    async markAsRead() {
+        try {
+            const response = await api.post('/notifications/mark-as-read/');
+            console.log('Notifications marked as read:', response.data);
+            return response.data;
+        } catch (error) {
+            console.error('Failed to mark notifications as read:', error);
+            throw error;
+        }
+    }
+
     /**
      * Test push notification (development only)
      */

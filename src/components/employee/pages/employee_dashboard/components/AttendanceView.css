@@ -4,7 +4,7 @@
   padding: 32px;
   border-radius: 16px;
   border: 1px solid var(--border-color);
-  height: 82vh;
+  height: 85vh;
   display: flex;
   flex-direction: column;
   color: var(--text-white);
@@ -124,6 +124,16 @@ h2.Monthly-Attendance {
 .calendar-day.status-holiday {
   border-top: 4px solid #8b5cf6;
   background: #f5f3ff;
+}
+
+.calendar-day.status-half-day {
+  border-top: 4px solid #f59e0b;
+  background: #fffbeb;
+}
+
+.calendar-day.status-permission {
+  border-top: 4px solid #3b82f6;
+  background: #eff6ff;
 }
 
 .day-header {
@@ -256,6 +266,14 @@ h2.Monthly-Attendance {
   color: #7c3aed;
 }
 
+.detail-value.status-half-day {
+  color: #d97706;
+}
+
+.detail-value.status-permission {
+  color: #2563eb;
+}
+
 /* Button Styles */
 .secondary-btn.small {
   font-size: 13px;
@@ -343,7 +361,7 @@ h2.Monthly-Attendance {
 
 @media (max-width: 480px) {
   .calendar-grid {
-    grid-template-columns: repeat(4, 1fr);
+    grid-template-columns: repeat(3, 1fr);
   }
 
   .attendance-summary {

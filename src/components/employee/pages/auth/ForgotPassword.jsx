@@ -4,7 +4,6 @@ import axios from 'axios';
 import './ForgotPassword.css';
 import { Snackbar } from '@mui/material';
 import MuiAlert from "@mui/material/Alert";
-import logo from '../../../../../public/tech-logo.png';
 
 const ForgotPassword = () => {
     const navigate = useNavigate();
@@ -92,7 +91,7 @@ const ForgotPassword = () => {
     return (
         <>
             <div className="auth-container">
-                <img className='tech-logo' src={logo} alt="tech-logo" />
+                <img className='tech-logo' src="/tech-logo.png" alt="tech-logo" />
                 <div className="auth-card">
                     <div className="auth-header">
                         <h1>Forgot Password</h1>

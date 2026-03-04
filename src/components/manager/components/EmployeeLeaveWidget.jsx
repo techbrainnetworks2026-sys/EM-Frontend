@@ -177,8 +177,8 @@ function EmployeeAttendanceCalendar({ employeeId, employeeName, onBack }) {
         (a) => normalizeStatus(a.status) === 'PRESENT'
     ).length;
     const totalLeave = daysArray.filter((day) => {
-        const dateStr = `${year}-${(month + 1).toString().padStart(2, '0')}-${day.toString().padStart(2, '0')}`;
-        return isLeaveDay(dateStr);
+        const s = getStatus(day);
+        return s === 'LEAVE' || s === 'ABSENT';
     }).length;
 
     const handleDayClick = (day) => {
@@ -217,8 +217,82 @@ function EmployeeAttendanceCalendar({ employeeId, employeeName, onBack }) {
 
     // ── Export all days of current month as CSV ───────────────
     const exportCSV = () => {
+        generateCSV(daysArray, `${employeeName}_attendance_${MONTHS[month]}_${year}.csv`);
+    };
+
+    const exportYearlyCSV = () => {
+        const allDaysOfYear = [];
+        for (let m = 0; m < 12; m++) {
+            const daysInM = new Date(year, m + 1, 0).getDate();
+            for (let d = 1; d <= daysInM; d++) {
+                allDaysOfYear.push({ day: d, month: m });
+            }
+        }
+
         const rows = [['Date', 'Day', 'Status', 'Check-In', 'Check-Out', 'Notes']];
-        daysArray.forEach((day) => {
+        allDaysOfYear.forEach(({ day, month: m }) => {
+            const dateStr = `${year}-${(m + 1).toString().padStart(2, '0')}-${day.toString().padStart(2, '0')}`;
+
+            // Re-implement getStatus logic for arbitrary month
+            const getStatusForValue = (d, mon, yr) => {
+                const dStr = `${yr}-${(mon + 1).toString().padStart(2, '0')}-${d.toString().padStart(2, '0')}`;
+                const holiday = HOLIDAYS.find((h) => h.date === dStr);
+                if (holiday) return 'HOLIDAY';
+
+                const isLeave = leaves.some((leave) => {
+                    if (leave.status !== 'APPROVED') return false;
+                    const start = new Date(leave.start_date);
+                    const end = new Date(leave.end_date);
+                    const current = new Date(dStr);
+                    return current >= start && current <= end;
+                });
+                if (isLeave) return 'LEAVE';
+
+                const record = attendance.find((a) => a.date === dStr);
+                if (record) return normalizeStatus(record.status);
+
+                const dt = new Date(yr, mon, d);
+                if (dt.getDay() === 0) return 'WEEKEND';
+                if (dt > new Date()) return '-';
+                return 'ABSENT';
+            };
+
+            const status = getStatusForValue(day, m, year);
+            const dayName = new Date(year, m, day).toLocaleDateString('en-US', { weekday: 'short' });
+            let checkIn = '-', checkOut = '-', notes = '';
+
+            if (status === 'PRESENT') {
+                const rec = attendance.find((a) => a.date === dateStr);
+                checkIn = rec?.check_in ? formatTime(rec.check_in) : '-';
+                checkOut = rec?.check_out ? formatTime(rec.check_out) : '-';
+            } else if (status === 'LEAVE') {
+                const lr = leaves.find((l) => l.start_date <= dateStr && l.end_date >= dateStr);
+                notes = lr?.reason || 'Leave';
+            } else if (status === 'HOLIDAY') {
+                const h = HOLIDAYS.find((h) => h.date === dateStr);
+                notes = h?.name || 'Holiday';
+            } else if (status === 'WEEKEND') {
+                notes = 'Weekend';
+            } else if (status === '-') {
+                notes = 'Future';
+            }
+
+            rows.push([dateStr, dayName, status, checkIn, checkOut, notes]);
+        });
+
+        const csvContent = rows.map((r) => r.join(',')).join('\n');
+        const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
+        const url = URL.createObjectURL(blob);
+        const link = document.createElement('a');
+        link.href = url;
+        link.download = `${employeeName}_attendance_yearly_${year}.csv`;
+        link.click();
+        URL.revokeObjectURL(url);
+    };
+
+    const generateCSV = (days, filename) => {
+        const rows = [['Date', 'Day', 'Status', 'Check-In', 'Check-Out', 'Notes']];
+        days.forEach((day) => {
             const dateStr = `${year}-${(month + 1).toString().padStart(2, '0')}-${day.toString().padStart(2, '0')}`;
             const status = getStatus(day);
             const dayName = new Date(year, month, day).toLocaleDateString('en-US', { weekday: 'short' });
@@ -248,7 +322,7 @@ function EmployeeAttendanceCalendar({ employeeId, employeeName, onBack }) {
         const url = URL.createObjectURL(blob);
         const link = document.createElement('a');
         link.href = url;
-        link.download = `${employeeName}_attendance_${MONTHS[month]}_${year}.csv`;
+        link.download = filename;
         link.click();
         URL.revokeObjectURL(url);
     };
@@ -256,37 +330,55 @@ function EmployeeAttendanceCalendar({ employeeId, employeeName, onBack }) {
     return (
         <Box>
             {/* Header */}
-            <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, mb: 2, flexWrap: 'wrap'  }}>
-                <IconButton size="small" onClick={onBack} sx={{ color: '#90caf9' }}>
-                    <ArrowBackIcon />
+            <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, mb: 2, flexWrap: 'wrap' }}>
+                <IconButton size="small" onClick={onBack} sx={{ color: '#0d47a1', background: '#f1f5f9', mr: 1 }}>
+                    <ArrowBackIcon fontSize="small" />
                 </IconButton>
                 <Avatar sx={{ bgcolor: '#0d47a1', width: 36, height: 36, fontWeight: 700, fontSize: 16 }}>
                     {employeeName?.charAt(0)?.toUpperCase()}
                 </Avatar>
                 <Box sx={{ flex: 1 }}>
-                    <Typography sx={{ fontWeight: 700,  color: 'black', fontSize: '16px' }}>
+                    <Typography sx={{ fontWeight: 700, color: 'black', fontSize: '16px' }}>
                         {employeeName}
                     </Typography>
                     <Typography sx={{ fontSize: '12px', opacity: 0.8, color: 'black' }}>
                         Monthly Attendance
                     </Typography>
                 </Box>
-                <Button
-                    size="small"
-                    onClick={exportCSV}
-                    sx={{
-                        textTransform: 'none',
-                        fontWeight: 600,
-                        fontSize: '12px',
-                        border: '2px solid #4e7259ff',
-                        color: '#000000ff',
-                        borderRadius: '8px',
-                        px: 2,
-                        '&:hover': { backgroundColor: '#55a2ebff', color: '#000' },
-                    }}
-                >
-                    ⬇ Export CSV
-                </Button>
+                <Box sx={{ display: 'flex', gap: '8px' }}>
+                    <Button
+                        size="small"
+                        onClick={exportCSV}
+                        sx={{
+                            textTransform: 'none',
+                            fontWeight: 600,
+                            fontSize: '11px',
+                            border: '1px solid #4e7259ff',
+                            color: '#000000ff',
+                            borderRadius: '8px',
+                            px: 1,
+                            '&:hover': { backgroundColor: '#55a2ebff', color: '#000' },
+                        }}
+                    >
+                        Monthly CSV
+                    </Button>
+                    <Button
+                        size="small"
+                        onClick={exportYearlyCSV}
+                        sx={{
+                            textTransform: 'none',
+                            fontWeight: 600,
+                            fontSize: '11px',
+                            border: '1px solid #4e7259ff',
+                            color: '#000000ff',
+                            borderRadius: '8px',
+                            px: 1,
+                            '&:hover': { backgroundColor: '#55a2ebff', color: '#000' },
+                        }}
+                    >
+                        Yearly CSV
+                    </Button>
+                </Box>
             </Box>
 
             {/* Month / Year Controls */}
@@ -306,7 +398,7 @@ function EmployeeAttendanceCalendar({ employeeId, employeeName, onBack }) {
                     onChange={(e) => setCurrentDate(new Date(parseInt(e.target.value), month, 1))}
                     style={{
                         padding: '6px 10px', borderRadius: '6px', border: '1px solid #444',
-                       background: 'whitesmoke', color: 'black', fontSize: '13px', cursor: 'pointer',
+                        background: 'whitesmoke', color: 'black', fontSize: '13px', cursor: 'pointer',
                     }}
                 >
                     {YEARS.map((y) => <option key={y} value={y}>{y}</option>)}
@@ -383,17 +475,22 @@ function EmployeeAttendanceCalendar({ employeeId, employeeName, onBack }) {
             {/* Day Detail Mini Modal */}
             {selectedDay && (
                 <Box sx={{
-                    mt: 2, background: '#121212', borderRadius: '10px', p: 2,
-                    border: '1px solid #333', position: 'relative',
+                    mt: 3,
+                    background: '#f8fafc',
+                    borderRadius: '12px',
+                    p: 2.5,
+                    border: '1px solid #e2e8f0',
+                    position: 'relative',
+                    boxShadow: 'inset 0 2px 4px 0 rgba(0,0,0,0.06)'
                 }}>
                     <IconButton
                         size="small"
                         onClick={() => setSelectedDay(null)}
-                        sx={{ position: 'absolute', top: 6, right: 6, color: '#94a3b8' }}
+                        sx={{ position: 'absolute', top: 12, right: 12, color: '#64748b' }}
                     >
                         <CloseIcon fontSize="small" />
                     </IconButton>
-                    <Typography sx={{ fontWeight: 700, color: 'whitesmoke', mb: 1 }}>
+                    <Typography sx={{ fontWeight: 700, color: '#1e293b', mb: 2, fontSize: '15px' }}>
                         Attendance Details
                     </Typography>
                     {[
@@ -405,9 +502,9 @@ function EmployeeAttendanceCalendar({ employeeId, employeeName, onBack }) {
                             { label: 'Check-Out', value: formatTime(selectedDay.times.checkOut) },
                         ] : []),
                     ].map((row) => (
-                        <Box key={row.label} sx={{ display: 'flex', justifyContent: 'space-between', py: 0.5, borderBottom: '1px solid #2a2a2a' }}>
-                            <Typography sx={{ fontSize: '13px', color: '#94a3b8', fontWeight: 500 }}>{row.label}</Typography>
-                            <Typography sx={{ fontSize: '13px', color: 'whitesmoke', fontWeight: 600 }}>{row.value}</Typography>
+                        <Box key={row.label} sx={{ display: 'flex', justifyContent: 'space-between', py: 1.2, borderBottom: '1px solid #e2e8f0' }}>
+                            <Typography sx={{ fontSize: '13px', color: '#64748b', fontWeight: 500 }}>{row.label}</Typography>
+                            <Typography sx={{ fontSize: '13px', color: '#1e293b', fontWeight: 600 }}>{row.value}</Typography>
                         </Box>
                     ))}
                 </Box>
@@ -451,7 +548,7 @@ function EmployeeLeaveList({ leaveRequests, onSelectEmployee }) {
                             background: 'white',
                             cursor: 'pointer',
                             transition: 'background 0.2s, transform 0.15s',
-                            '&:hover': { background: '#cbd4e0ff',transform: 'translateX(4px)' },
+                            '&:hover': { background: '#cbd4e0ff', transform: 'translateX(4px)' },
                         }}
                         onClick={() => onSelectEmployee({ id: row.employee_id, name: row.employee_name })}
                     >
@@ -509,10 +606,19 @@ const EmployeeLeaveWidget = () => {
 
     const totalLeaveCount = leaveRequests.length;
 
+    const dialogPaperProps = {
+        sx: {
+            background: '#ffffff',
+            borderRadius: '16px',
+            boxShadow: '0 25px 50px -12px rgba(0, 0, 0, 0.25)',
+            border: '1px solid #e2e8f0'
+        }
+    };
+
     return (
         <>
             {/* ── Widget Card ── */}
-            <div className="widget-4" style={{ cursor: 'pointer',boxShadow:"0 4px 6px rgba(0, 0, 0, 0.1)" }} onClick={() => setOpen(true)}>
+            <div className="widget-4" style={{ cursor: 'pointer', boxShadow: "0 4px 6px rgba(0, 0, 0, 0.1)" }} onClick={() => setOpen(true)}>
                 <Box sx={{ display: 'flex', flexDirection: 'row', alignItems: 'center', columnGap: '20px' }}>
                     <Box sx={{
                         width: '60px', height: '60px', background: '#80deea',
@@ -552,26 +658,30 @@ const EmployeeLeaveWidget = () => {
                 onClose={handleClose}
                 fullWidth
                 maxWidth="md"
-                PaperProps={{ sx: { background: '#121212', borderRadius: '14px' } }}
+                PaperProps={dialogPaperProps}
             >
                 <DialogTitle sx={{
-                    fontWeight: 700, color: 'whitesmoke',
-                    background: 'linear-gradient(135deg, #0d47a1, #1e1e1e)',
-                    display: 'flex', justifyContent: 'space-between', alignItems: 'center',
+                    fontWeight: 700,
+                    color: '#1e293b',
+                    borderBottom: '1px solid #e2e8f0',
+                    display: 'flex',
+                    justifyContent: 'space-between',
+                    alignItems: 'center',
+                    py: 2.5
                 }}>
                     {selectedEmployee
                         ? `Attendance — ${selectedEmployee.name}`
                         : '📋 Employee Leave Details'}
-                    <IconButton size="small" onClick={handleClose} sx={{ color: 'whitesmoke' }}>
+                    <IconButton size="small" onClick={handleClose} sx={{ color: '#64748b' }}>
                         <CloseIcon />
                     </IconButton>
                 </DialogTitle>
 
-                <DialogContent dividers sx={{ background: 'white', borderColor: '#2a2a2a' }}>
+                <DialogContent dividers sx={{ background: '#ffffff', borderColor: '#e2e8f0', py: 3 }}>
                     {selectedEmployee ? (
-                        <EmployeeAttendanceCalendar 
+                        <EmployeeAttendanceCalendar
                             employeeId={selectedEmployee.id}
-                            employeeName={selectedEmployee.name }
+                            employeeName={selectedEmployee.name}
                             onBack={() => setSelectedEmployee(null)}
                         />
                     ) : (
@@ -582,13 +692,30 @@ const EmployeeLeaveWidget = () => {
                     )}
                 </DialogContent>
 
-                <DialogActions sx={{ background: 'white', borderTop: '1px solid #2a2a2a' }}>
+                <DialogActions sx={{ background: '#f8fafc', borderTop: '1px solid #e2e8f0', p: 2 }}>
                     {selectedEmployee && (
-                        <Button onClick={() => setSelectedEmployee(null)} sx={{ color: '#008cffff', textTransform: 'none' }}>
+                        <Button
+                            variant="outlined"
+                            onClick={() => setSelectedEmployee(null)}
+                            sx={{
+                                color: '#0d47a1',
+                                textTransform: 'none',
+                                fontWeight: 600,
+                                borderRadius: '8px',
+                                borderColor: '#e2e8f0'
+                            }}
+                        >
                             ← Back to List
                         </Button>
                     )}
-                    <Button onClick={handleClose} sx={{ color: '#ef5350', textTransform: 'none' }}>
+                    <Button
+                        onClick={handleClose}
+                        sx={{
+                            color: '#e53935',
+                            textTransform: 'none',
+                            fontWeight: 600
+                        }}
+                    >
                         Close
                     </Button>
                 </DialogActions>

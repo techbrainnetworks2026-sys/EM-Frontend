@@ -14,9 +14,9 @@ export const AppContextProvider = ({ children }) => {
     const [userData, setUserData] = useState(null);
     const navigate = useNavigate();
 
-    const Register = async (username, email, password, role, department, designation, blood_group, mobile_number) => {
+    const Register = async (username, email, password, role, department, designation, blood_group, mobile_number, date_of_birth) => {
         try {
-            const res = await api.post("accounts/register/", { username, email, password, role, department, designation, blood_group, mobile_number });
+            const res = await api.post("accounts/register/", { username, email, password, role, department, designation, blood_group, mobile_number, date_of_birth });
             return res.data;
         } catch (err) {
             throw err;

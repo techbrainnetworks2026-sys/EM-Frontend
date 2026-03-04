@@ -1,9 +1,13 @@
 import { Avatar, Box, Button, Chip, Dialog, DialogActions, DialogContent, DialogTitle, Divider, Grid, IconButton, MenuItem, Paper, Snackbar, Table, TableBody, TableCell, TableContainer, TableHead, TableRow, TextField, Typography } from '@mui/material'
 import React, { useEffect, useState } from 'react';
-import VisibilityIcon from '@mui/icons-material/Visibility';
-import { Details } from '@mui/icons-material';
-import PersonIcon from '@mui/icons-material/Person';
+import CloseIcon from '@mui/icons-material/Close';
 import EmailIcon from '@mui/icons-material/Email';
+import PhoneIcon from '@mui/icons-material/Phone';
+import BloodtypeIcon from '@mui/icons-material/Bloodtype';
+import BadgeIcon from '@mui/icons-material/Badge';
+import BusinessIcon from '@mui/icons-material/Business';
+import WorkIcon from '@mui/icons-material/Work';
+import VisibilityIcon from '@mui/icons-material/Visibility';
 import { useAppContext } from '../context/AppContext.jsx';
 import api from '../../services/service.js';
 import MuiAlert from "@mui/material/Alert";
@@ -29,6 +33,7 @@ const AddEmployee = () => {
     const [pass, setPass] = useState("");
     const [cpass, setCPass] = useState("");
     const [role, setRole] = useState("");
+    const [searchTerm, setSearchTerm] = useState("");
 
     // Error states for validation
     const [errors, setErrors] = useState({
@@ -186,7 +191,7 @@ const AddEmployee = () => {
 
     const handleApproveUser = async (userId) => {
         try {
-            const res = await api.post(`accounts / manager / approve - user / ${userId}/`);
+            const res = await api.post(`accounts/manager/approve-user/${userId}/`);
             setRows(prev => prev.map(user => user.id === userId ? { ...user, is_approved: true } : user));
             setMessage(res.data.message);
             setSeverity("success");
@@ -244,7 +249,7 @@ const AddEmployee = () => {
         }
 
         try {
-            const res = await Register(name, email, pass, role, dept, design, bloodgrp, mobile);
+            const res = await Register(name, email, pass, role, dept, design, bloodgrp, mobile, dob);
             setMessage("Employee registered successfully! Awaiting approval.");
             setSeverity('success');
             setSOpen(true);
@@ -303,8 +308,19 @@ const AddEmployee = () => {
                 fontWeight: "600",
                 color: "#080808"
             }}> Techbrain Employees List </Typography>
-            <Box sx={{ display: "flex", justifyContent: "flex-end", margin: "auto", width: "100%" }}>
-                <Button onClick={() => setOpen(true)} sx={{ textTransform: "none", background: "#00838f", color: "whitesmoke" }}> + Add Employee </Button>
+            <Box sx={{ display: "flex", justifyContent: "space-between", alignItems: "center", mt: 2, gap: 2, flexWrap: "wrap" }}>
+                <TextField
+                    size="small"
+                    placeholder="Search employee by name..."
+                    value={searchTerm}
+                    onChange={(e) => setSearchTerm(e.target.value)}
+                    sx={{
+                        width: { xs: "100%", sm: "300px" },
+                        background: "white",
+                        borderRadius: "8px",
+                    }}
+                />
+                <Button onClick={() => setOpen(true)} sx={{ textTransform: "none", background: "#00838f", color: "whitesmoke", height: "fit-content" }}> + Add Employee </Button>
             </Box>
             <Box sx={{ marginTop: "20px" }}>
                 {/* <Box>
@@ -341,7 +357,10 @@ const AddEmployee = () => {
 
                         <TableBody>
                             {!isMobile ?
-                                arows.filter((pending) => pending.is_approved === true).map((row, index) => (
+                                arows.filter((pending) =>
+                                    (pending?.is_approved === true) &&
+                                    (pending?.username || "").toLowerCase().includes((searchTerm || "").toLowerCase())
+                                ).map((row, index) => (
                                     <TableRow key={index} hover>
                                         <TableCell sx={{ color: "#334155" }}>
                                             <div style={{ display: "flex", alignItems: "left", justifyContent: "left", columnGap: "10px" }}>
@@ -375,43 +394,62 @@ const AddEmployee = () => {
                                         </TableCell>
                                     </TableRow>
                                 ))
-                                : rows.filter((pending) => pending.is_approved === true).map((row, index) => (
-                                    <TableRow key={index} sx={{ background: "#333" }}>
-                                        <TableCell colSpan={4} sx={{ borderBottom: "none" }}>
-                                            <Box sx={{ background: "#1e1e1e", borderRadius: "12px", padding: "12px", mb: 1, display: "flex", flexDirection: "column", gap: 1 }}>
-                                                <Box sx={{ display: "flex", alignItems: "center", gap: 1 }}>
-                                                    <Avatar sx={{ width: 36, height: 36, bgcolor: "#0d47a1" }}>
-                                                        {row.username.charAt(0).toUpperCase()}
-                                                    </Avatar>
-
-                                                    <Typography sx={{ fontWeight: 600, color: "whitesmoke" }}>
-                                                        {row.username}
-                                                    </Typography>
+                                : arows.filter((pending) =>
+                                    (pending?.is_approved === true) &&
+                                    (pending?.username || "").toLowerCase().includes((searchTerm || "").toLowerCase())
+                                ).map((row, index) => (
+                                    <TableRow key={index}>
+                                        <TableCell colSpan={5} sx={{ borderBottom: "none", padding: "8px" }}>
+                                            <Box sx={{
+                                                background: "#ffffff",
+                                                borderRadius: "12px",
+                                                padding: "16px",
+                                                mb: 1,
+                                                display: "flex",
+                                                flexDirection: "column",
+                                                gap: 1.5,
+                                                border: "1px solid #e2e8f0",
+                                                boxShadow: "0 2px 4px rgba(0,0,0,0.05)"
+                                            }}>
+                                                <Box sx={{ display: "flex", alignItems: "center", justifyContent: "space-between" }}>
+                                                    <Box sx={{ display: "flex", alignItems: "center", gap: 1.5 }}>
+                                                        <Avatar sx={{ width: 40, height: 40, bgcolor: "#0d47a1" }}>
+                                                            {row.username.charAt(0).toUpperCase()}
+                                                        </Avatar>
+                                                        <Box>
+                                                            <Typography sx={{ fontWeight: 600, color: "#1e293b" }}>
+                                                                {row.username}
+                                                            </Typography>
+                                                            <Typography sx={{ fontSize: "12px", color: "#64748b" }}>
+                                                                {row.designation}
+                                                            </Typography>
+                                                        </Box>
+                                                    </Box>
+                                                    <IconButton sx={{ color: "#0d47a1", background: "#f1f5f9" }} onClick={() => handleUOpen(row)}>
+                                                        <VisibilityIcon fontSize="small" />
+                                                    </IconButton>
                                                 </Box>
 
-                                                <Typography sx={{ fontSize: "14px", opacity: 0.7, color: "whitesmoke", display: "flex", alignItems: "center", columnGap: "7px" }}>
-                                                    <EmailIcon /> {row.email}
-                                                </Typography>
+                                                <Divider sx={{ opacity: 0.6 }} />
 
-                                                <Typography sx={{ fontSize: "14px", opacity: 0.7, color: "whitesmoke", display: "flex", alignItems: "center", columnGap: "7px" }}>
-                                                    <PersonIcon /> {row.designation}
-                                                </Typography>
+                                                <Box sx={{ display: "flex", flexDirection: "column", gap: 1 }}>
+                                                    <Typography sx={{ fontSize: "13px", color: "#475569", display: "flex", alignItems: "center", columnGap: "8px" }}>
+                                                        <EmailIcon sx={{ fontSize: 18, color: "#64748b" }} /> {row.email}
+                                                    </Typography>
 
-                                                <Chip label={"APPROVED"}
-                                                    size="small"
-                                                    sx={{
-                                                        mt: 1,
-                                                        backgroundColor: "#2e7d32",
-                                                        color: "white",
-                                                        fontWeight: 600,
-                                                        textTransform: "capitalize",
-                                                    }}
-                                                />
-
-                                                <Box sx={{ textAlign: "right" }}>
-                                                    <IconButton sx={{ color: "#90caf9" }} onClick={() => handleUOpen(row)}>
-                                                        <VisibilityIcon />
-                                                    </IconButton>
+                                                    <Box sx={{ display: "flex", justifyContent: "space-between", alignItems: "center", mt: 0.5 }}>
+                                                        <Chip
+                                                            label="APPROVED"
+                                                            size="small"
+                                                            sx={{
+                                                                backgroundColor: "#e8f5e9",
+                                                                color: "#2e7d32",
+                                                                fontWeight: 700,
+                                                                fontSize: "11px",
+                                                                border: "1px solid #c8e6c9"
+                                                            }}
+                                                        />
+                                                    </Box>
                                                 </Box>
                                             </Box>
                                         </TableCell>
@@ -426,15 +464,26 @@ const AddEmployee = () => {
                 onClose={handleClose}
                 fullWidth
                 maxWidth="md"
+                PaperProps={{
+                    sx: {
+                        borderRadius: "16px",
+                        boxShadow: "0 25px 50px -12px rgba(0, 0, 0, 0.25)",
+                    }
+                }}
             >
-                <DialogTitle sx={{ fontWeight: 600 }}>
+                <DialogTitle sx={{
+                    fontWeight: 700,
+                    color: "#1e293b",
+                    borderBottom: "1px solid #e2e8f0",
+                    py: 2.5
+                }}>
                     Add New Employee
                 </DialogTitle>
 
-                <DialogContent dividers>
+                <DialogContent sx={{ py: 3 }}>
                     <Grid container spacing={2}>
                         {/* Name */}
-                        <Grid item size={{ xs: 12, sm: 6, md: 4 }}>
+                        <Grid item xs={12} sm={6} md={4}>
                             <TextField
                                 label="Full Name"
                                 fullWidth
@@ -447,7 +496,7 @@ const AddEmployee = () => {
                         </Grid>
 
                         {/* Email */}
-                        <Grid item size={{ xs: 12, sm: 6, md: 4 }}>
+                        <Grid item xs={12} sm={6} md={4}>
                             <TextField
                                 label="Email"
                                 type="email"
@@ -461,7 +510,7 @@ const AddEmployee = () => {
                         </Grid>
 
                         {/* Mobile */}
-                        <Grid item size={{ xs: 12, sm: 6, md: 4 }}>
+                        <Grid item xs={12} sm={6} md={4}>
                             <TextField
                                 label="Mobile Number"
                                 fullWidth
@@ -475,7 +524,7 @@ const AddEmployee = () => {
                         </Grid>
 
                         {/* DOB */}
-                        <Grid item size={{ xs: 12, sm: 6, md: 4 }}>
+                        <Grid item xs={12} sm={6} md={4}>
                             <TextField
                                 label="Date of Birth"
                                 type="date"
@@ -486,16 +535,10 @@ const AddEmployee = () => {
                                 onChange={handleDobChange}
                                 error={!!errors.dob}
                                 helperText={errors.dob}
-                                sx={{
-                                    "& input::-webkit-calendar-picker-indicator": {
-                                        filter: "invert(0)"
-                                    }
-                                }}
                             />
                         </Grid>
 
-                        {/* Blood Group */}
-                        <Grid item size={{ xs: 12, sm: 6, md: 4 }}>
+                        <Grid item xs={12} sm={6}>
                             <TextField
                                 select
                                 label="Blood Group"
@@ -514,8 +557,7 @@ const AddEmployee = () => {
                             </TextField>
                         </Grid>
 
-                        {/* Designation */}
-                        <Grid item size={{ xs: 12, sm: 6, md: 4 }}>
+                        <Grid item xs={12} sm={6}>
                             <TextField
                                 select
                                 label="Designation"
@@ -534,8 +576,7 @@ const AddEmployee = () => {
                             </TextField>
                         </Grid>
 
-                        {/* Department */}
-                        <Grid item size={{ xs: 12, sm: 6, md: 4 }}>
+                        <Grid item xs={12} sm={6} md={4}>
                             <TextField
                                 label="Department"
                                 fullWidth
@@ -547,8 +588,7 @@ const AddEmployee = () => {
                             />
                         </Grid>
 
-                        {/* Type */}
-                        <Grid item size={{ xs: 12, sm: 6, md: 4 }}>
+                        <Grid item xs={12} sm={6} md={4}>
                             <TextField
                                 select
                                 label="Role"
@@ -564,8 +604,7 @@ const AddEmployee = () => {
                             </TextField>
                         </Grid>
 
-                        {/* Password */}
-                        <Grid item size={{ xs: 12, sm: 6, md: 4 }}>
+                        <Grid item xs={12} sm={6} md={4}>
                             <TextField
                                 label="Password"
                                 type='password'
@@ -578,8 +617,7 @@ const AddEmployee = () => {
                             />
                         </Grid>
 
-                        {/* Confirm Password */}
-                        <Grid item size={{ xs: 12, sm: 6, md: 4 }}>
+                        <Grid item xs={12} sm={6} md={4}>
                             <TextField
                                 label="Confirm Password"
                                 type='password'
@@ -595,11 +633,22 @@ const AddEmployee = () => {
                     </Grid>
                 </DialogContent>
 
-                <DialogActions sx={{ padding: "16px" }}>
-                    <Button onClick={handleClose} color="error">
+                <DialogActions sx={{ padding: "16px 24px", background: "#f8fafc", borderTop: "1px solid #e2e8f0" }}>
+                    <Button onClick={handleClose} sx={{ color: "#e53935", textTransform: "none", fontWeight: 600 }}>
                         Cancel
                     </Button>
-                    <Button variant="contained" onClick={handleAddEmployee} sx={{ textTransform: "none", fontWeight: 600 }}>
+                    <Button
+                        variant="contained"
+                        onClick={handleAddEmployee}
+                        sx={{
+                            textTransform: "none",
+                            fontWeight: 600,
+                            background: "#0d47a1",
+                            borderRadius: "8px",
+                            boxShadow: "none",
+                            "&:hover": { background: "#0a3d8b", boxShadow: "none" }
+                        }}
+                    >
                         Save Employee
                     </Button>
                 </DialogActions>
@@ -609,75 +658,129 @@ const AddEmployee = () => {
                 open={uopen}
                 onClose={handleUClose}
                 fullWidth
-                maxWidth="md"
+                maxWidth="sm"
+                PaperProps={{
+                    sx: {
+                        borderRadius: "20px",
+                        boxShadow: "0 25px 50px -12px rgba(0, 0, 0, 0.3)",
+                        overflow: "hidden"
+                    }
+                }}
             >
-                <DialogTitle sx={{ fontWeight: 600 }}>
-                    Employee Details
-                </DialogTitle>
+                {/* Gradient Header */}
+                <Box sx={{
+                    background: "linear-gradient(135deg, #0d47a1 0%, #1976d2 100%)",
+                    px: 3, pt: 3, pb: 4, position: "relative"
+                }}>
+                    <IconButton
+                        size="small"
+                        onClick={handleUClose}
+                        sx={{
+                            position: "absolute", top: 12, right: 12,
+                            color: "rgba(255,255,255,0.7)",
+                            "&:hover": { color: "white", bgcolor: "rgba(255,255,255,0.15)" }
+                        }}
+                    >
+                        <CloseIcon fontSize="small" />
+                    </IconButton>
 
-                <DialogContent dividers>
                     {selectedUser && (
-                        <>
-                            <Box sx={{ display: "flex", alignItems: "center", gap: 2, mb: 3, }}>
-                                <Avatar sx={{ width: 56, height: 56, bgcolor: "#0d47a1" }}>
-                                    {selectedUser.username.charAt(0)}
-                                </Avatar>
-                                <Box>
-                                    <Typography sx={{ fontWeight: 600, fontSize: "18px", color: "#333" }}>
-                                        {selectedUser.username}
-                                    </Typography>
-                                    <Typography sx={{ opacity: 0.7, color: "#333" }}>
-                                        {selectedUser.role}
-                                    </Typography>
-                                </Box>
+                        <Box sx={{ display: "flex", alignItems: "center", gap: 2.5 }}>
+                            <Avatar sx={{
+                                width: 76, height: 76,
+                                bgcolor: "rgba(255,255,255,0.2)",
+                                border: "3px solid rgba(255,255,255,0.5)",
+                                fontSize: "30px", fontWeight: 800, color: "white"
+                            }}>
+                                {(selectedUser.username || "U").charAt(0).toUpperCase()}
+                            </Avatar>
+                            <Box>
+                                <Typography sx={{ fontWeight: 800, fontSize: "22px", color: "white", lineHeight: 1.3 }}>
+                                    {selectedUser.username || "Unknown"}
+                                </Typography>
+                                <Typography sx={{ color: "rgba(255,255,255,0.75)", fontSize: "14px", mt: 0.3 }}>
+                                    {selectedUser.designation || "Employee"}
+                                </Typography>
+                                <Chip
+                                    label={selectedUser.is_approved ? "✓ Approved" : "⏳ Pending Approval"}
+                                    size="small"
+                                    sx={{
+                                        mt: 1,
+                                        bgcolor: selectedUser.is_approved ? "rgba(76,175,80,0.25)" : "rgba(255,152,0,0.25)",
+                                        color: selectedUser.is_approved ? "#a5d6a7" : "#ffcc80",
+                                        border: selectedUser.is_approved ? "1px solid rgba(76,175,80,0.5)" : "1px solid rgba(255,152,0,0.5)",
+                                        fontWeight: 700, fontSize: "11px"
+                                    }}
+                                />
                             </Box>
+                        </Box>
+                    )}
+                </Box>
 
-                            <Divider sx={{ mb: 2 }} />
-
-                            <Grid container spacing={2}>
-                                <Detail label="Email" value={selectedUser.email} />
-                                <Detail label="Mobile" value={selectedUser.mobile_number} />
-                                {/* <Detail label="Date of Birth" value={selectedUser.dob} /> */}
-                                <Detail label="Blood Group" value={selectedUser.blood_group} />
-                                <Detail label="Role" value={selectedUser.role} />
-                                <Detail label="Status" value={selectedUser.is_approved ? "Approved" : "Pending"} />
-                                <Detail label="Department" value={selectedUser.department} />
-                                <Detail label="Designation" value={selectedUser.designation} />
-
-
-                                {/* <Grid item xs={12}>
-                            <Typography sx={{ fontSize: "13px", opacity: 0.6 }}>
-                                Address
-                            </Typography>
-                            <Typography sx={{ fontWeight: 500 }}>
-                                {selectedUser.address}
-                            </Typography>
-                        </Grid> */}
-                            </Grid>
-                        </>
+                {/* Info Cards */}
+                <DialogContent sx={{ p: 2.5, bgcolor: "#f8fafc" }}>
+                    {selectedUser && (
+                        <Grid container spacing={1.5}>
+                            {[
+                                { icon: <EmailIcon sx={{ fontSize: 17, color: "#3b82f6" }} />, label: "Email", value: selectedUser.email, fullWidth: true },
+                                { icon: <PhoneIcon sx={{ fontSize: 17, color: "#10b981" }} />, label: "Mobile Number", value: selectedUser.mobile_number },
+                                { icon: <BloodtypeIcon sx={{ fontSize: 17, color: "#ef4444" }} />, label: "Blood Group", value: selectedUser.blood_group },
+                                { icon: <BadgeIcon sx={{ fontSize: 17, color: "#8b5cf6" }} />, label: "Role", value: selectedUser.role },
+                                { icon: <BusinessIcon sx={{ fontSize: 17, color: "#f59e0b" }} />, label: "Department", value: selectedUser.department },
+                                { icon: <WorkIcon sx={{ fontSize: 17, color: "#0d47a1" }} />, label: "Designation", value: selectedUser.designation },
+                            ].map((item, i) => (
+                                <Grid item xs={12} sm={item.fullWidth ? 12 : 6} key={i}>
+                                    <Box sx={{
+                                        bgcolor: "white",
+                                        borderRadius: "12px",
+                                        p: 1.8,
+                                        border: "1px solid #e2e8f0",
+                                        display: "flex",
+                                        alignItems: "center",
+                                        gap: 1.5
+                                    }}>
+                                        <Box sx={{ bgcolor: "#f1f5f9", borderRadius: "8px", p: 0.8, display: "flex", flexShrink: 0 }}>
+                                            {item.icon}
+                                        </Box>
+                                        <Box sx={{ flex: 1, minWidth: 0 }}>
+                                            <Typography sx={{ fontSize: "11px", fontWeight: 700, color: "#94a3b8", textTransform: "uppercase", letterSpacing: "0.5px", mb: 0.2 }}>
+                                                {item.label}
+                                            </Typography>
+                                            <Typography sx={{ fontWeight: 600, color: "#1e293b", fontSize: "14px", wordBreak: "break-word" }}>
+                                                {item.value || "—"}
+                                            </Typography>
+                                        </Box>
+                                    </Box>
+                                </Grid>
+                            ))}
+                        </Grid>
                     )}
                 </DialogContent>
 
-                <DialogActions sx={{ padding: "16px", display: "flex", justifyContent: "space-between", alignItems: "center" }}>
-                    {selectedUser?.is_approved == false ? (
-                        <>
-                            <Button onClick={handleUClose} color="error">
-                                Cancel
-                            </Button>
-                            <Box sx={{ display: "flex", columnGap: "12px" }}>
-                                <Button variant="contained" onClick={() => handleApproveUser(selectedUser.id)} sx={{ textTransform: "none", fontWeight: 600 }}>
-                                    Add Employee
-                                </Button>
-                            </Box>
-                        </>
-                    ) : (
-                        <Button onClick={handleUClose} color="error">
-                            Cancel
+                <DialogActions sx={{ px: 3, py: 2, background: "white", borderTop: "1px solid #e2e8f0", gap: 1 }}>
+                    <Button onClick={handleUClose} sx={{ color: "#64748b", textTransform: "none", fontWeight: 600, borderRadius: "8px" }}>
+                        Close
+                    </Button>
+                    {!selectedUser?.is_approved && (
+                        <Button
+                            variant="contained"
+                            onClick={() => handleApproveUser(selectedUser.id)}
+                            sx={{
+                                textTransform: "none",
+                                fontWeight: 700,
+                                background: "linear-gradient(135deg, #2e7d32, #388e3c)",
+                                borderRadius: "10px",
+                                boxShadow: "0 4px 6px -1px rgba(46,125,50,0.3)",
+                                px: 3,
+                                "&:hover": { background: "linear-gradient(135deg, #1b5e20, #2e7d32)" }
+                            }}
+                        >
+                            ✓ Approve Employee
                         </Button>
                     )}
-
                 </DialogActions>
             </Dialog>
+
             <Snackbar
                 open={sopen}
                 autoHideDuration={2000}
@@ -701,12 +804,12 @@ const AddEmployee = () => {
 export default AddEmployee
 
 const Detail = ({ label, value }) => (
-    <Grid item size={6}>
-        <Typography sx={{ fontSize: "13px", opacity: 0.6, color: "#333" }}>
+    <Grid item xs={6}>
+        <Typography sx={{ fontSize: "12px", color: "#64748b", fontWeight: 600, textTransform: "uppercase", mb: 0.5 }}>
             {label}
         </Typography>
-        <Typography sx={{ fontWeight: 500, color: "#333" }}>
-            {value}
+        <Typography sx={{ fontWeight: 600, color: "#1e293b", fontSize: "14px" }}>
+            {value || "--"}
         </Typography>
     </Grid>
 );

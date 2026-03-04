@@ -21,6 +21,17 @@
   margin-bottom: 24px;
 }
 
+.form-row {
+  display: flex;
+  gap: 16px;
+  margin-bottom: 24px;
+}
+
+.form-row .form-group {
+  flex: 1;
+  margin-bottom: 0;
+}
+
 .form-group label {
   display: block;
   margin-bottom: 8px;
@@ -37,7 +48,7 @@
   border: 1px solid var(--border-color);
   border-radius: 8px;
   background: #ffffff;
-  color: var(--text-white);
+  color: #1e293b;
   font-size: 14px;
   font-family: inherit;
   box-sizing: border-box;
@@ -46,7 +57,33 @@
 
 .form-group input[type="date"]::-webkit-calendar-picker-indicator {
   cursor: pointer;
-  opacity: 0.6;
+  opacity: 1;
+  filter: none;
+}
+
+.date-for-leave,
+.form-group input[type="date"],
+.form-group input[type="time"] {
+  color: #000000 !important;
+  -webkit-text-fill-color: #000000 !important;
+}
+
+.date-for-leave::-webkit-datetime-edit,
+.date-for-leave::-webkit-datetime-edit-fields-wrapper,
+.date-for-leave::-webkit-datetime-edit-text,
+.date-for-leave::-webkit-datetime-edit-month-field,
+.date-for-leave::-webkit-datetime-edit-day-field,
+.date-for-leave::-webkit-datetime-edit-year-field,
+.date-for-leave::-webkit-inner-spin-button,
+.date-for-leave::-webkit-calendar-picker-indicator {
+  color: #000000 !important;
+  opacity: 1 !important;
+  -webkit-text-fill-color: #000000 !important;
+}
+
+.date-for-leave:focus {
+  border-color: #000000;
+  box-shadow: 0 0 0 2px rgba(0, 0, 0, 0.1);
 }
 
 .form-actions {
@@ -76,7 +113,7 @@
 .secondary-btn {
   background: #ffffff;
   border: 1px solid var(--border-color);
-  color: var(--text-white);
+  color: #1e293b;
   padding: 12px 24px;
   border-radius: 8px;
   font-weight: 600;

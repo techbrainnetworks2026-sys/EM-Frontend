@@ -9,13 +9,16 @@ import { useNavigate } from "react-router-dom";
 import ProfileView from "./components/ProfileView";
 import api from '../../../../services/service.js';
 import { useAppContext } from "../../../context/AppContext.jsx";
+import notificationService from "../../../../services/notificationService.js";
 
 export default function EmployeeDashboard() {
 
   const { userData } = useAppContext();
   const navigate = useNavigate();
   const [attendance, setAttendance] = useState([]);
-  const [active, setActive] = useState("dashboard");
+  const [active, setActive] = useState(() => {
+    return sessionStorage.getItem("employee_active_view") || "dashboard";
+  });
   const [showProfile, setShowProfile] = useState(false);
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const [notificationCount, setNotificationCount] = useState(0); // Dynamic count
@@ -31,7 +34,50 @@ export default function EmployeeDashboard() {
   const [isCheckedIn, setIsCheckedIn] = useState(false);
   const [checkInTime, setCheckInTime] = useState(null);
   const [checkOutTime, setCheckOutTime] = useState(null);
+  const [elapsedTime, setElapsedTime] = useState(null);
 
+
+  // Persist active view to sessionStorage
+  useEffect(() => {
+    sessionStorage.setItem("employee_active_view", active);
+  }, [active]);
+
+  // Live elapsed time timer while checked in
+  useEffect(() => {
+    if (isCheckedIn && checkInTime) {
+      const calcElapsed = () => {
+        const now = new Date();
+        const [h, m, s] = checkInTime.split(':').map(Number);
+        const checkIn = new Date();
+        checkIn.setHours(h, m, s, 0);
+        const diffMs = now - checkIn;
+        if (diffMs < 0) return;
+        const totalSec = Math.floor(diffMs / 1000);
+        const hrs = Math.floor(totalSec / 3600);
+        const mins = Math.floor((totalSec % 3600) / 60);
+        const secs = totalSec % 60;
+        setElapsedTime(`${hrs}h ${mins}m ${secs}s`);
+      };
+      calcElapsed();
+      const interval = setInterval(calcElapsed, 1000);
+      return () => clearInterval(interval);
+    }
+  }, [isCheckedIn, checkInTime]);
+
+  // Calculate total worked hours between check-in and check-out
+  const getWorkedHours = () => {
+    if (!checkInTime || !checkOutTime) return null;
+    const [h1, m1, s1] = checkInTime.split(':').map(Number);
+    const [h2, m2, s2] = checkOutTime.split(':').map(Number);
+    const inMs = (h1 * 3600 + m1 * 60 + (s1 || 0)) * 1000;
+    const outMs = (h2 * 3600 + m2 * 60 + (s2 || 0)) * 1000;
+    const diffMs = outMs - inMs;
+    if (diffMs <= 0) return '0h 0m';
+    const totalMin = Math.floor(diffMs / 60000);
+    const hrs = Math.floor(totalMin / 60);
+    const mins = totalMin % 60;
+    return `${hrs}h ${mins}m`;
+  };
 
   // Close profile dropdown when clicking outside
   useEffect(() => {
@@ -87,9 +133,30 @@ export default function EmployeeDashboard() {
       fetchDashboardData();
       fetchNotificationCount();
 
-      // Refresh notification count every 10 seconds
-      const interval = setInterval(fetchNotificationCount, 60000);
-      return () => clearInterval(interval);
+      // Connect to WebSocket for real-time updates
+      notificationService.connectWebSocket(userData.id, (data) => {
+        if (data.type === 'notification_count') {
+          setNotificationCount(data.unread_count);
+
+          // Show shake animation if there's a new notification
+          if (data.new_notification) {
+            setShowNewNotificationAnimation(true);
+            setTimeout(() => setShowNewNotificationAnimation(false), 600);
+
+            // Trigger a browser notification if supported (optional, handled by sw if background)
+            if (Notification.permission === 'granted' && document.visibilityState === 'visible') {
+              new Notification(data.new_notification.title, {
+                body: data.new_notification.message,
+                icon: '/icon.png'
+              });
+            }
+          }
+        }
+      });
+
+      return () => {
+        notificationService.disconnectWebSocket();
+      };
     }
 
   }, [userData]);
@@ -98,37 +165,72 @@ export default function EmployeeDashboard() {
   const currentMonth = now.getMonth();
   const currentYear = now.getFullYear();
 
+  const getLeaveStatusForDate = (dateStr) => {
+    const leave = leaves.find(l => {
+      if (l.status.toUpperCase() !== "APPROVED") return false;
+      return dateStr >= l.start_date && dateStr <= l.end_date;
+    });
+    if (!leave) return null;
+    return leave.duration_type;
+  };
+
   const presentDays = useMemo(() => {
-    return attendance.filter(a => {
-      if (!a.date) return false;
-      const d = new Date(a.date);
-      return (
-        d.getMonth() === currentMonth &&
-        d.getFullYear() === currentYear &&
-        ["PRESENT", "ONGOING"].includes(a.status)
-      );
-    }).length;
-  }, [attendance, currentMonth, currentYear]);
+    // Generate all days in current month up to today
+    const daysInMonth = new Date(currentYear, currentMonth + 1, 0).getDate();
+    const today = now.getDate();
+    let count = 0;
+
+    for (let day = 1; day <= daysInMonth; day++) {
+      const date = new Date(currentYear, currentMonth, day);
+      if (date > now) continue;
+      const dateStr = `${currentYear}-${(currentMonth + 1).toString().padStart(2, '0')}-${day.toString().padStart(2, '0')}`;
+
+      const hasAttendance = attendance.some(a => a.date === dateStr && ["PRESENT", "ONGOING"].includes(a.status));
+      const leaveType = getLeaveStatusForDate(dateStr);
+
+      if (hasAttendance || leaveType === 'HOURLY' || leaveType === 'HALF_DAY') {
+        count++;
+      }
+    }
+    return count;
+  }, [attendance, leaves, currentMonth, currentYear, now]);
 
 
   const totalLeavesTaken = useMemo(() => {
-    return leaves.reduce((total, leave) => {
-      if (leave.status !== "APPROVED") return total;
-      let start = new Date(leave.start_date);
-      let end = new Date(leave.end_date);
-      let count = 0;
-      while (start <= end) {
-        if (
-          start.getMonth() === currentMonth &&
-          start.getFullYear() === currentYear
-        ) {
-          count++;
+    let count = 0;
+
+    // 1. Count full day approved leaves for the current year
+    leaves.forEach(leave => {
+      if (leave.status.toUpperCase() === "APPROVED" && leave.duration_type === 'FULL_DAY') {
+        let start = new Date(leave.start_date);
+        let end = new Date(leave.end_date);
+        while (start <= end) {
+          if (start.getFullYear() === currentYear) {
+            count++;
+          }
+          start.setDate(start.getDate() + 1);
         }
-        start.setDate(start.getDate() + 1);
       }
-      return total + count;
-    }, 0);
-  }, [leaves, currentMonth, currentYear]);
+    });
+
+    // 2. Count absent days in the current year
+    const startOfYear = new Date(currentYear, 0, 1);
+    let curr = new Date(startOfYear);
+    const today = new Date();
+
+    while (curr <= today) {
+      const dateStr = `${curr.getFullYear()}-${(curr.getMonth() + 1).toString().padStart(2, '0')}-${curr.getDate().toString().padStart(2, '0')}`;
+
+      const isAbsent = attendance.some(a => a.date === dateStr && a.status === "ABSENT");
+      if (isAbsent) {
+        count++;
+      }
+
+      curr.setDate(curr.getDate() + 1);
+    }
+
+    return count;
+  }, [leaves, attendance, currentYear]);
 
 
   const tasksInProgress = useMemo(() => {
@@ -198,10 +300,15 @@ export default function EmployeeDashboard() {
     setTasks([...tasks, { ...newTask, id: tasks.length + 1 }]);
   };
 
-  const handleNotificationClick = () => {
-    setNotificationCount(0);
-    setShowNewNotificationAnimation(false);
-    setActive("announcements");
+  const handleNotificationClick = async () => {
+    try {
+      await notificationService.markAsRead();
+      setNotificationCount(0);
+      setShowNewNotificationAnimation(false);
+      setActive("announcements");
+    } catch (err) {
+      console.error("Failed to mark notifications as read", err);
+    }
   };
 
   const handleLogout = () => {
@@ -346,6 +453,7 @@ export default function EmployeeDashboard() {
                 ) : isCheckedIn ? (
                   <div className="status-content">
                     <div className="check-time">In: {formatTime(checkInTime)}</div>
+                    {elapsedTime && <div className="hours-worked">⏱️ {elapsedTime}</div>}
                     <div className="working-badges">🕒 Working</div>
                     <button className="checkout-btn" onClick={handleCheckOut}>Check Out</button>
                   </div>
@@ -353,6 +461,7 @@ export default function EmployeeDashboard() {
                   <div className="status-content">
                     <div className="check-time">In: {formatTime(checkInTime)}</div>
                     <div className="check-time">Out: {formatTime(checkOutTime)}</div>
+                    {getWorkedHours() && <div className="hours-worked">⏱️ Worked: {getWorkedHours()}</div>}
                     <div className="completed-badge">✅ Day Completed</div>
                   </div>
                 )}

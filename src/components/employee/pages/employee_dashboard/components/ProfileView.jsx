@@ -113,6 +113,15 @@ const ProfileView = () => {
             if (userData.mobile_number) {
                 formData.append('mobile_number', userData.mobile_number);
             }
+            if (userData.department) {
+                formData.append('department', userData.department);
+            }
+            if (userData.designation) {
+                formData.append('designation', userData.designation);
+            }
+            if (userData.date_of_birth) {
+                formData.append('date_of_birth', userData.date_of_birth);
+            }
 
             // Add cropped image if available
             if (croppedImage) {
@@ -135,7 +144,7 @@ const ProfileView = () => {
             setCroppedImage(null);
             setMessage('Profile saved successfully!');
             setEditProfile(false);
-            setTimeout(() => setMessage(''), 3000);
+            setTimeout(() => setMessage(''), 1000);
         } catch (error) {
             console.error('Error saving profile:', error);
             console.error('Error response:', error.response?.data);
@@ -214,8 +223,8 @@ const ProfileView = () => {
                         </div>
                         {editProfile && (
                             <div className="upload-container">
-                                <label htmlFor="pfp-upload" className="upload-btn">
-                                    📷 Upload Photo
+                                <label htmlFor="pfp-upload" className="upload-btn" title="Upload Photo">
+                                    📷
                                 </label>
                                 <input
                                     id="pfp-upload"
@@ -234,10 +243,10 @@ const ProfileView = () => {
                 </div>
 
                 <div className="profile-form-grid">
-                    <div className="form-group">
+                    {/* <div className="form-group">
                         <label>Name</label>
                         <input name="username" value={userData.username || ''} disabled={!editProfile} onChange={handleProfileChange} />
-                    </div>
+                    </div> */}
 
                     <div className="form-group">
                         <label>Email</label>
@@ -264,13 +273,17 @@ const ProfileView = () => {
                         <input name="mobile_number" value={userData.mobile_number || ''} disabled={!editProfile} onChange={handleProfileChange} />
                     </div>
                     <div className="form-group">
+                        <label>Date of Birth</label>
+                        <input type="date" name="date_of_birth" value={userData.date_of_birth || ''} disabled={!editProfile} onChange={handleProfileChange} />
+                    </div>
+                    <div className="form-group">
                         <label>Department</label>
-                        <input value={userData.department || ''} disabled />
+                        <input name="department" value={userData.department || ''} disabled={!editProfile} onChange={handleProfileChange} />
                     </div>
 
                     <div className="form-group">
                         <label>Designation</label>
-                        <input value={userData.designation || ''} disabled />
+                        <input name="designation" value={userData.designation || ''} disabled={!editProfile} onChange={handleProfileChange} />
                     </div>
                 </div>
 

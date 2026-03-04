@@ -5,7 +5,6 @@ import { Snackbar } from '@mui/material';
 import MuiAlert from "@mui/material/Alert";
 import { useAppContext } from '../../../context/AppContext.jsx';
 import { validateEmail, validateRequired } from '../../utils/validation';
-import logo from '../../../../../public/tech-logo.png';
 
 const SignIn = () => {
     const [email, setEmail] = useState('');
@@ -45,9 +44,9 @@ const SignIn = () => {
                 setMessage("User Logged in Successfully!")
                 setSeverity('success');
                 if (res.role === 'MANAGER') {
-                    setTimeout(() => navigate("/manager/dashboard"), 2000);
+                    setTimeout(() => navigate("/manager/dashboard"), 1000);
                 } else {
-                    setTimeout(() => navigate("/employee/dashboard"), 2000);
+                    setTimeout(() => navigate("/employee/dashboard"), 1000);
                 }
             } catch (err) {
                 if (err.response?.data?.error) {
@@ -72,7 +71,7 @@ const SignIn = () => {
     return (
         <>
             <div className="signin-container">
-                <img className='tech-logo' style={{ width: '600px', height: '600px' }} src={logo} alt="tech-logo" />
+                <img className='tech-logo' style={{ width: '600px', height: '600px' }} src="/tech-logo.png" alt="tech-logo" />
                 <div className="signin-card">
                     <div className="signin-header">
                         <h1>Sign in</h1>

@@ -5,7 +5,6 @@ import { useAppContext } from '../../../context/AppContext.jsx';
 import { Snackbar } from '@mui/material';
 import MuiAlert from "@mui/material/Alert";
 import { validateEmail, validateMobile, validatePassword, validateRequired } from '../../utils/validation.js';
-import logo from '../../../../../public/tech-logo.png';
 
 const SignUp = () => {
     const { Register } = useAppContext();
@@ -22,6 +21,7 @@ const SignUp = () => {
     const [pass, setPass] = useState("")
     const [cpass, setCPass] = useState("")
     const [role, setRole] = useState("")
+    const [dob, setDob] = useState("")
     const [errors, setErrors] = useState({});
 
     const handleClose = (event, reason) => {
@@ -54,6 +54,9 @@ const SignUp = () => {
         const roleError = validateRequired("Role", role);
         if (roleError) { tempErrors.role = roleError; isValid = false; }
 
+        const dobError = validateRequired("Date of Birth", dob);
+        if (dobError) { tempErrors.dob = dobError; isValid = false; }
+
         const passError = validatePassword(pass);
         if (passError) { tempErrors.pass = passError; isValid = false; }
 
@@ -75,7 +78,7 @@ const SignUp = () => {
         e.preventDefault();
         if (validate()) {
             try {
-                const res = await Register(name, email, pass, role, dept, design, bloodgrp, mobile,);
+                const res = await Register(name, email, pass, role, dept, design, bloodgrp, mobile, dob);
                 setOpen(true);
                 setMessage("User Data sent to Manager Approval, Successfully!")
                 setSeverity('success');
@@ -98,7 +101,7 @@ const SignUp = () => {
     return (
         <>
             <div className="signup-container">
-                <img className='tech-logo' src={logo} alt="techlogo" /> 
+                <img className='tech-logo' src="/tech-logo.png" alt="techlogo" />
                 <div className="signup-card">
                     <div className="signup-header">
                         <h1>Create Account</h1>
@@ -154,17 +157,20 @@ const SignUp = () => {
                                 />
                                 {errors.mobile && <span className="error-message">{errors.mobile}</span>}
                             </div>
-                            {/* <div className="signup-form-group">
-                            <label>Date of Birth</label>
-                            <input
-                                type="date"
-                                name="dob"
-                                value={formData.dob}
-                                onChange={handleChange}
-                                className={errors.dob ? 'input-error' : ''}
-                            />
-                            {errors.dob && <span className="error-message">{errors.dob}</span>}
-                        </div> */}
+                            <div className="signup-form-group">
+                                <label>Date of Birth</label>
+                                <input
+                                    type="date"
+                                    name="dob"
+                                    value={dob}
+                                    onChange={(e) => {
+                                        setDob(e.target.value);
+                                        if (errors.dob) setErrors({ ...errors, dob: null });
+                                    }}
+                                    className={errors.dob ? 'input-error' : ''}
+                                />
+                                {errors.dob && <span className="error-message">{errors.dob}</span>}
+                            </div>
                         </div>
 
                         <div className="signup-form-row">

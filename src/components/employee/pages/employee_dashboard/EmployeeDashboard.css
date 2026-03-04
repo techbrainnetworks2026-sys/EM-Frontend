@@ -17,7 +17,6 @@
 }
 
 input[type="date"]::-webkit-calendar-picker-indicator {
-  filter: invert(1);
   cursor: pointer;
 }
 
@@ -124,6 +123,7 @@ body {
       height: 56px;
       padding: 0 12px;
     }
+
     .header-left {
       display: flex;
       align-items: center;
@@ -847,7 +847,7 @@ body {
 .status-text {
   font-size: 18px;
   font-weight: 600;
-  color: whitesmoke;
+  color: black;
   margin-bottom: 12px;
 }
 
@@ -856,6 +856,18 @@ body {
   font-weight: 700;
   color: #08c027;
   margin-bottom: 5px;
+}
+
+.hours-worked {
+  font-size: 16px;
+  font-weight: 700;
+  color: #1d4ed8;
+  background: #eff6ff;
+  padding: 6px 14px;
+  border-radius: 20px;
+  display: inline-block;
+  margin: 8px 0;
+  letter-spacing: 0.03em;
 }
 
 .checkin-btn {
@@ -1033,24 +1045,42 @@ body {
 
 /* Card adjustments for 320px - 662px */
 @media (min-width: 320px) and (max-width: 662px) {
- .dashboard-home h2 {
-  color: black;
-  margin-bottom: 10px;
+  .dashboard-home h2 {
+    color: black;
+    margin-bottom: 10px;
+  }
+
+  h2.welcome-user {
+    margin-top: -10px;
+  }
+
+  .dashboard-home h2 {
+    color: black;
+    margin-bottom: 10px;
+  }
+
+  .checkin-card {
+    padding: 15px;
+  }
+
+  .check-time {
+    font-size: 18px;
+    font-weight: 700;
+    color: #08c027;
+    margin-bottom: 5px;
+  }
+  .card-value {
+  font-size: 25px;
+ 
 }
-h2.welcome-user{
-  margin-top: -10px;
-}
-.dashboard-home h2 {
-  color: black;
-  margin-bottom: 10px;
-}
-.checkin-card {
-padding: 15px;
-}
-  
+
   .cards {
     grid-template-columns: 1fr;
-    gap: 8px;
-    
+    gap: 5px;
+
+    margin: 0px;
+
+
+
   }
 }

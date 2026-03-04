@@ -5,6 +5,7 @@ import LogoutIcon from '@mui/icons-material/Logout';
 import { useNavigate } from 'react-router-dom';
 import { useAppContext } from '../../context/AppContext.jsx';
 import api from '../../../services/service.js';
+import notificationService from '../../../services/notificationService.js';
 
 function Navbar() {
 
@@ -41,24 +42,38 @@ function Navbar() {
         }
     }, []);
 
-    // Fetch notification count on mount and set interval
+    // Fetch notification count on mount and register WebSocket
     useEffect(() => {
-        // Only fetch on first mount, not on every dependency change
-        if (!initialFetchDone.current) {
-            initialFetchDone.current = true;
-            // Schedule the first fetch asynchronously to avoid cascading renders
-            Promise.resolve().then(() => fetchNotificationCount());
+        if (userData) {
+            fetchNotificationCount();
+
+            // Connect to WebSocket for real-time updates
+            notificationService.connectWebSocket(userData.id, (data) => {
+                if (data.type === 'notification_count') {
+                    setNotificationCount(data.unread_count);
+
+                    if (data.new_notification) {
+                        setShowNewNotificationAnimation(true);
+                        setTimeout(() => setShowNewNotificationAnimation(false), 600);
+                    }
+                }
+            });
         }
 
-        // Refresh notification count every 10 seconds
-        const interval = setInterval(fetchNotificationCount, 60000);
-        return () => clearInterval(interval);
-    }, [fetchNotificationCount]);
+        return () => {
+            notificationService.disconnectWebSocket();
+        };
+    }, [userData, fetchNotificationCount]);
 
-    const handleNotificationClick = () => {
-        setNotificationCount(0);
-        setShowNewNotificationAnimation(false);
-        navigate('/manager/announcement');
+    const handleNotificationClick = async () => {
+        try {
+            await notificationService.markAsRead();
+            setNotificationCount(0);
+            setShowNewNotificationAnimation(false);
+            navigate('/manager/announcement');
+        } catch (err) {
+            console.error("Failed to mark notifications as read", err);
+        }
     };
 
     const handleLogout = () => {

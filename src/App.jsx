@@ -15,8 +15,22 @@ import Profile from './components/manager/Profile.jsx';
 import Dashboard from './components/manager/Dashboard.jsx';
 import ManagerLayout from './components/manager/ManagerHome.jsx';
 import EmployeeDashboard from './components/employee/pages/employee_dashboard/EmployeeDashboard.jsx';
+import { useEffect } from 'react';
+import notificationService from './services/notificationService.js';
 
 function App() {
+    useEffect(() => {
+        // Initialize notification service (service worker, etc.)
+        notificationService.init();
+
+        // Request permission after a small delay or user interaction
+        // For now, we'll try to request on load if not already prompted
+        const timer = setTimeout(() => {
+            notificationService.requestPermission();
+        }, 5000);
+
+        return () => clearTimeout(timer);
+    }, []);
 
 
     return (

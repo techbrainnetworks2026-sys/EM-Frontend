@@ -1,6 +1,5 @@
 import React, { useEffect, useState } from 'react'
 import { useParams } from 'react-router-dom';
-import { employeesTask } from '../../assets/assets.js';
 import { Accordion, AccordionDetails, AccordionSummary, Avatar, Box, Button, Chip, Dialog, DialogActions, DialogContent, DialogTitle, Grid, MenuItem, Snackbar, TextField, Typography } from '@mui/material';
 import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
 import api from '../../services/service.js';
@@ -26,7 +25,7 @@ const EmployeeSummary = () => {
         try {
             const res = await api.get('task/tasks/');
             const employeeTasks = res.data.filter(
-                task => task.assigned_to_details.id === Number(id)
+                task => task.assigned_to_details?.id === Number(id)
             );
             setSelectedEmployeeSummary(employeeTasks);
         } catch (err) {
@@ -52,9 +51,19 @@ const EmployeeSummary = () => {
     ).length;
 
     const SummaryCard = ({ title, value, color }) => (
-        <Box sx={{ background: "#1e1e1e", borderRadius: "16px", padding: "20px", textAlign: "center", border: `1px solid ${color}30`, }}>
-            <Typography sx={{ opacity: 0.7, mb: 0.5, color: "whitesmoke" }}>{title}</Typography>
-            <Typography sx={{ fontSize: "26px", fontWeight: 600, color }}>
+        <Box sx={{
+            background: "#ffffff",
+            borderRadius: "16px",
+            padding: "24px",
+            textAlign: "center",
+            border: "1px solid #e2e8f0",
+            boxShadow: "0 4px 6px -1px rgba(0, 0, 0, 0.05)",
+            position: "relative",
+            overflow: "hidden"
+        }}>
+            <Box sx={{ position: "absolute", top: 0, left: 0, width: "100%", height: "4px", bgcolor: color }} />
+            <Typography sx={{ fontSize: "12px", fontWeight: 700, color: "#64748b", textTransform: "uppercase", letterSpacing: "0.5px", mb: 1 }}>{title}</Typography>
+            <Typography sx={{ fontSize: "32px", fontWeight: 800, color: "#1e293b" }}>
                 {value}
             </Typography>
         </Box>
@@ -127,18 +136,29 @@ const EmployeeSummary = () => {
                 </Typography>
             </Box>
             <div>
-                <Box sx={{ display: "flex", alignItems: "center", gap: 2, mb: 4, padding: "16px", borderRadius: "14px", background: "linear-gradient(135deg, #0d47a1, #1e1e1e)", }}>
-                    <Avatar sx={{ bgcolor: "#ffffff", color: "#0d47a1", width: 52, height: 52, fontWeight: 600, }}>
-                        {employee?.username.charAt(0).toUpperCase()}
+                <Box sx={{
+                    display: "flex",
+                    alignItems: "center",
+                    gap: 3,
+                    mb: 4,
+                    padding: "24px",
+                    borderRadius: "16px",
+                    background: "linear-gradient(135deg, #0d47a1 0%, #1e3a8a 100%)",
+                    boxShadow: "0 10px 15px -3px rgba(13, 71, 161, 0.2)"
+                }}>
+                    <Avatar sx={{ bgcolor: "rgba(255,255,255,0.2)", color: "white", width: 64, height: 64, fontWeight: 700, fontSize: "24px", border: "3px solid rgba(255,255,255,0.1)" }}>
+                        {(employee?.username || "U").charAt(0).toUpperCase()}
                     </Avatar>
 
                     <Box>
-                        <Typography sx={{ fontSize: "18px", fontWeight: 600, color: "white" }}>
-                            {employee?.username}
+                        <Typography sx={{ fontSize: "22px", fontWeight: 800, color: "white" }}>
+                            {employee?.username || "Employee"}
                         </Typography>
-                        <Typography sx={{ opacity: 0.8, color: "white" }}>
-                            {employee?.designation}
-                        </Typography>
+                        <Chip
+                            label={employee?.designation || "Team Member"}
+                            size="small"
+                            sx={{ mt: 0.5, bgcolor: "rgba(255,255,255,0.15)", color: "white", fontWeight: 600, border: "1px solid rgba(255,255,255,0.1)" }}
+                        />
                     </Box>
                 </Box>
 
@@ -156,105 +176,136 @@ const EmployeeSummary = () => {
 
 
                 <Box sx={{ mt: 4 }}>
-                    <Box sx={{ display: "flex", justifyContent: "space-between" }}>
-                        <Typography sx={{ fontWeight: 600, mb: 2, color: "#333" }}>
+                    <Box sx={{ display: "flex", justifyContent: "space-between", alignItems: "center", mb: 3 }}>
+                        <Typography sx={{ fontWeight: 700, color: "#1e293b", fontSize: "20px" }}>
                             Assigned Tasks
                         </Typography>
 
-                        <Button variant='contained' onClick={() => setOpen(true)} sx={{ textTransform: "none", background: "#00838f", color: "whitesmoke" }}> + Assign New Task</Button>
+                        <Button
+                            variant='contained'
+                            onClick={() => setOpen(true)}
+                            sx={{
+                                textTransform: "none",
+                                background: "#0d47a1",
+                                color: "white",
+                                fontWeight: 700,
+                                borderRadius: "10px",
+                                px: 3,
+                                boxShadow: "0 4px 6px -1px rgba(13, 71, 161, 0.3)",
+                                "&:hover": { background: "#1e3a8a" }
+                            }}
+                        >
+                            + Assign Task
+                        </Button>
                     </Box>
 
                     {selectedEmployeeSummary.map((task) => (
-                        <Box key={task.taskId}
+                        <Box key={task.id}
                             sx={{
                                 display: "flex",
                                 alignItems: "stretch",
                                 mb: 2,
-                                mt: 2,
                                 borderRadius: "16px",
                                 overflow: "hidden",
-                                background: "#1e1e1e",
-                                transition: "0.25s ease",
+                                background: "#ffffff",
+                                border: "1px solid #e2e8f0",
+                                transition: "all 0.3s ease",
                                 "&:hover": {
-                                    transform: "translateY(-2px)",
-                                    boxShadow: "0 8px 24px rgba(0,0,0,0.45)",
+                                    transform: "translateY(-4px)",
+                                    boxShadow: "0 12px 20px -5px rgba(0,0,0,0.1)",
+                                    borderColor: task.priority === "HIGH" ? "#fecaca" : "#e2e8f0"
                                 },
                             }}>
 
-                            <Box sx={{ width: "6px", backgroundColor: task.status === "Completed" ? "#66bb6a" : task.status === "In-Progress" ? "#ffd600" : "#ef5350", }} />
+                            <Box sx={{ width: "6px", backgroundColor: task.status === "COMPLETED" ? "#10b981" : task.priority === "HIGH" ? "#ef4444" : "#f59e0b", }} />
 
-                            <Box sx={{ p: 2, flex: 1 }}>
+                            <Box sx={{ p: 2.5, flex: 1 }}>
 
-                                <Box sx={{ display: "flex", justifyContent: "space-between" }}>
-                                    <Typography sx={{ fontWeight: 600, color: "whitesmoke" }}>
-                                        {task.title}
-                                    </Typography>
+                                <Box sx={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start", mb: 1.5 }}>
+                                    <Box>
+                                        <Typography sx={{ fontWeight: 700, color: "#1e293b", fontSize: "16px" }}>
+                                            {task.title}
+                                        </Typography>
+                                        <Typography sx={{ mt: 0.5, fontSize: "14px", color: "#64748b", lineHeight: 1.5 }} >
+                                            {task.description}
+                                        </Typography>
+                                    </Box>
 
                                     <Chip label={task.priority} size="small"
                                         sx={{
-                                            backgroundColor: task.priority === "High" ? "#ef5350" : task.priority === "Medium" ? "#ffb74d" : "#81c784",
-                                            color: "#000",
-                                            fontWeight: 600,
+                                            backgroundColor: task.priority === "HIGH" ? "#fee2e2" : task.priority === "MEDIUM" ? "#fef3c7" : "#f0fdf4",
+                                            color: task.priority === "HIGH" ? "#ef4444" : task.priority === "MEDIUM" ? "#92400e" : "#16a34a",
+                                            fontWeight: 800,
+                                            fontSize: "10px",
+                                            border: "1px solid currentColor"
                                         }}
                                     />
                                 </Box>
 
-                                <Typography sx={{ mt: 0.5, fontSize: "14px", opacity: 0.75, color: "whitesmoke", }} >
-                                    {task.description}
-                                </Typography>
+                                <Box sx={{ display: "flex", justifyContent: "space-between", alignItems: "center", mt: 2, pt: 2, borderTop: "1px solid #f1f5f9" }}>
+                                    <Box sx={{ display: "flex", gap: 2 }}>
+                                        <Chip label={task.status} size="small"
+                                            sx={{
+                                                backgroundColor: task.status === "COMPLETED" ? "#ecfdf5" : "#f1f5f9",
+                                                color: task.status === "COMPLETED" ? "#10b981" : "#475569",
+                                                fontWeight: 700,
+                                                fontSize: "11px"
+                                            }}
+                                        />
+                                        <Typography sx={{ fontSize: "13px", fontWeight: 600, color: "#94a3b8", display: "flex", alignItems: "center" }} >
+                                            {task.status === "COMPLETED" ? `Completed` : `Due · ${formatDate(task.start_date)}`}
+                                        </Typography>
+                                    </Box>
 
-                                <Box sx={{ display: "flex", justifyContent: "space-between", alignItems: "center", mt: 2, }}>
-                                    <Chip label={task.status} size="small"
-                                        sx={{
-                                            backgroundColor: "#333",
-                                            color: "#fff",
-                                            fontWeight: 500,
-                                        }}
-                                    />
-
-                                    <Typography sx={{ fontSize: "13px", opacity: 0.6, color: "whitesmoke", }} >
-                                        {task.status === "COMPLETED" ? `Completed` : `Due · ${formatDate(task.start_date)}`}
-                                    </Typography>
+                                    {task.status === 'PENDING' && (
+                                        <Button
+                                            size="small"
+                                            variant='outlined'
+                                            color="success"
+                                            onClick={() => handleCompleteTask(task.id)}
+                                            sx={{
+                                                textTransform: "none",
+                                                fontWeight: 700,
+                                                borderRadius: "8px",
+                                                fontSize: "13px"
+                                            }}
+                                        >
+                                            Mark Completed
+                                        </Button>
+                                    )}
                                 </Box>
 
-                                <Box sx={{ mt: 2 }}>
-                                    <Typography sx={{ fontWeight: 600, color: "whitesmoke" }}> Comments </Typography>
-
-                                    {/* ... existing comments code ... */}
-
-                                    {task.status == 'PENDING' && <Box sx={{ mt: 2 }}>
-                                        <Typography sx={{ color: "whitesmoke" }}> Write Your Thoughts ! </Typography>
-                                        <Box sx={{ display: "flex", justifyContent: "space-between", alignItems: "flex-end", mt: 1, padding: "10px" }}>
-                                            <TextField multiline rows={1} placeholder="Write your feedback..." sx={{
-                                                width: "50%",
-                                                "& .MuiInputBase-input": {
-                                                    color: "white",
-                                                },
-                                                "& .MuiInputBase-input::placeholder": {
-                                                    color: "rgba(255,255,255,0.7)",
-                                                    opacity: 1,
-                                                },
-                                                "& .MuiOutlinedInput-root": {
-                                                    "& fieldset": {
-                                                        borderColor: "white",
-                                                    },
-                                                    "&:hover fieldset": {
-                                                        borderColor: "white",
-                                                    },
-                                                    "&.Mui-focused fieldset": {
-                                                        borderColor: "white",
-                                                    },
-                                                },
-                                            }} />
-                                            <Button variant='contained' sx={{ width: "100px", height: "30px" }}> Post </Button>
+                                {task.status === 'PENDING' && (
+                                    <Box sx={{ mt: 2.5, p: 2, bgcolor: "#f8fafc", borderRadius: "12px" }}>
+                                        <Typography sx={{ fontSize: "12px", fontWeight: 700, color: "#64748b", textTransform: "uppercase", mb: 1 }}>
+                                            Quick Feedback
+                                        </Typography>
+                                        <Box sx={{ display: "flex", gap: 1.5 }}>
+                                            <TextField
+                                                size="small"
+                                                placeholder="Write your feedback..."
+                                                variant="outlined"
+                                                sx={{
+                                                    flex: 1,
+                                                    "& .MuiOutlinedInput-root": { backgroundColor: "white", borderRadius: "8px" }
+                                                }}
+                                            />
+                                            <Button
+                                                variant='contained'
+                                                size="small"
+                                                sx={{
+                                                    minWidth: "80px",
+                                                    borderRadius: "8px",
+                                                    background: "#1e293b",
+                                                    textTransform: "none",
+                                                    fontWeight: 600
+                                                }}
+                                            >
+                                                Post
+                                            </Button>
                                         </Box>
-                                    </Box>}
-                                </Box>
-
-                                {task.status == 'PENDING' && <Box sx={{ mt: 2, display: "flex", justifyContent: "space-between", alignItems: "center" }}>
-                                    <Typography sx={{ color: "whitesmoke" }}> Actions : Change Status to</Typography>
-                                    <Button variant='outlined' color="success" onClick={() => handleCompleteTask(task.id)}> Completed </Button>
-                                </Box>}
+                                    </Box>
+                                )}
                             </Box>
                         </Box>
                     ))}
@@ -266,20 +317,22 @@ const EmployeeSummary = () => {
                 open={open}
                 onClose={handleClose}
                 fullWidth
-                maxWidth="md"
+                maxWidth="sm"
+                PaperProps={{
+                    sx: { borderRadius: "16px", boxShadow: "0 25px 50px -12px rgba(0, 0, 0, 0.25)" }
+                }}
             >
-                <DialogTitle sx={{ fontWeight: 600 }}>
-                    Add New Task
+                <DialogTitle sx={{ fontWeight: 800, color: "#1e293b", pt: 3, px: 3 }}>
+                    Assign New Task
                 </DialogTitle>
 
-                <DialogContent dividers>
-                    <Grid container spacing={2}>
-                        {/* Name */}
-                        <Grid item size={{ xs: 12, sm: 6, md: 4 }}>
-                            <TextField label="Title" fullWidth required value={title} onChange={(e) => setTitle(e.target.value)} />
+                <DialogContent sx={{ px: 3, py: 2 }}>
+                    <Grid container spacing={2.5} sx={{ mt: 0.5 }}>
+                        <Grid item xs={12}>
+                            <TextField label="Task Title" fullWidth required value={title} onChange={(e) => setTitle(e.target.value)} />
                         </Grid>
 
-                        <Grid item size={{ xs: 12, sm: 6, md: 4 }}>
+                        <Grid item xs={12} sm={6}>
                             <TextField
                                 label="Due Date"
                                 type="date"
@@ -289,44 +342,49 @@ const EmployeeSummary = () => {
                                 inputProps={{ min: today }}
                                 value={dueDate}
                                 onChange={(e) => setDueDate(e.target.value)}
-                                sx={{
-                                    "& input::-webkit-calendar-picker-indicator": {
-                                        filter: "invert(0)"
-                                    }
-                                }}
                             />
                         </Grid>
 
-                        <Grid item size={{ xs: 12, sm: 6, md: 4 }}>
-                            <TextField select label="Priority" fullWidth required value={priority} onChange={(e) => setPriority(e.target.value)}>
-                                <MenuItem value="HIGH"> High </MenuItem>
-                                <MenuItem value="MEDIUM"> Medium </MenuItem>
-                                <MenuItem value="LOW"> Low </MenuItem>
+                        <Grid item xs={12} sm={6}>
+                            <TextField select label="Priority Level" fullWidth required value={priority} onChange={(e) => setPriority(e.target.value)}>
+                                <MenuItem value="HIGH"> High Priority</MenuItem>
+                                <MenuItem value="MEDIUM"> Medium Priority </MenuItem>
+                                <MenuItem value="LOW"> Low Priority </MenuItem>
                             </TextField>
                         </Grid>
 
-
-                        {/* Address */}
-                        <Grid item size={{ xs: 12, sm: 6, md: 6 }}>
+                        <Grid item xs={12}>
                             <TextField
-                                label="Description"
+                                label="Task Description"
                                 multiline
-                                rows={3}
+                                rows={4}
                                 fullWidth
                                 required
                                 value={description}
                                 onChange={(e) => setDescription(e.target.value)}
+                                placeholder="Clearly describe the objective of this task..."
                             />
                         </Grid>
                     </Grid>
                 </DialogContent>
 
-                <DialogActions sx={{ padding: "16px" }}>
-                    <Button onClick={handleClose} color="inherit">
-                        Cancel
+                <DialogActions sx={{ padding: "16px 24px", background: "#f8fafc", borderTop: "1px solid #e2e8f0" }}>
+                    <Button onClick={handleClose} sx={{ fontWeight: 600, color: "#64748b", textTransform: "none" }}>
+                        Discard
                     </Button>
-                    <Button variant="contained" onClick={handleAddTask} sx={{ textTransform: "none", fontWeight: 600 }}>
-                        Assign Task
+                    <Button
+                        variant="contained"
+                        onClick={handleAddTask}
+                        sx={{
+                            textTransform: "none",
+                            fontWeight: 700,
+                            background: "#0d47a1",
+                            borderRadius: "8px",
+                            px: 3,
+                            "&:hover": { background: "#1e3a8a" }
+                        }}
+                    >
+                        Assign to {employee?.username}
                     </Button>
                 </DialogActions>
             </Dialog>

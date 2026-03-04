@@ -1,4 +1,4 @@
-import { Box, Button, Chip, Paper, Table, TableBody, TableCell, TableContainer, TableFooter, TableHead, TablePagination, TableRow, Typography } from '@mui/material'
+import { Box, Button, Chip, Divider, Paper, Table, TableBody, TableCell, TableContainer, TableFooter, TableHead, TablePagination, TableRow, TextField, Typography } from '@mui/material'
 import React, { useEffect, useState } from 'react'
 import GroupsIcon from '@mui/icons-material/Groups';
 import GroupOffIcon from '@mui/icons-material/GroupOff';
@@ -16,19 +16,18 @@ function Dashboard() {
     const [page, setPage] = useState(0);
     const { isMobile } = useAppContext();
     const navigate = useNavigate();
+    const [selectedDate, setSelectedDate] = useState(new Date().toISOString().split('T')[0]);
     const [rows, setRows] = useState([]);
     const [approvedUsers, setApprovedUsers] = useState([]);
     const [pendingUsers, setPendingUsers] = useState([]);
     const [leaveRequests, setLeaveRequests] = useState([]);
+    const [searchTerm, setSearchTerm] = useState("");
 
     const rowsPerPage = 5;
-    const today = new Date();
 
-    const formattedDate = today.toLocaleDateString("en-US", { month: "short", day: "2-digit", year: "numeric" });
-
-    const fetchAtendanceData = async () => {
+    const fetchAtendanceData = async (date) => {
         try {
-            const res = await api.get("attendance/manager/today/");
+            const res = await api.get(`attendance/manager/today/?date=${date}`);
             setRows(res.data);
         } catch (err) {
             setRows([]);
@@ -66,11 +65,17 @@ function Dashboard() {
 
 
     useEffect(() => {
-        fetchAtendanceData();
         fetchApprovedUsers();
         fetchPendingLeaves();
         fetchPendingUsers();
     }, []);
+
+    useEffect(() => {
+        if (selectedDate) {
+            fetchAtendanceData(selectedDate);
+            setSearchTerm("");
+        }
+    }, [selectedDate]);
 
     const approvedUsersCount = approvedUsers.length;
     const pendingUsersCount = pendingUsers.length;
@@ -94,15 +99,15 @@ function Dashboard() {
         <div>
             <Typography variant='h5' component='p' sx={{ fontFamily: "work sans", fontWeight: "500", color: "#080808" }}>Welcome Manager!</Typography>
             <div style={{ marginTop: "20px" }} >
-                <div className='widgets'>
-                    <div className='widget-1'style={{boxShadow:"0 4px 6px rgba(0, 0, 0, 0.1)"}}>
-                        <Box sx={{ display: "flex", flexDirection: "row", alignItems: "center", columnGap: "20px" }}>
-                            <Box sx={{ width: "60px", height: "60px", background: "#ef9a9a", display: "flex", alignItems: "center", justifyContent: "center", borderRadius: "5px" }}>
-                                <GroupsIcon sx={{ fontSize: 50 }} />
+                <div className='widgets' style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))', gap: '20px' }}>
+                    <div className='widget-1' style={{ boxShadow: "0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05)", background: "#ffffff", borderRadius: "16px", padding: "20px", display: "flex", flexDirection: "column", justifyContent: "space-between", border: "1px solid #fee2e2" }}>
+                        <Box sx={{ display: "flex", flexDirection: "row", alignItems: "center", columnGap: "20px", mb: 2 }}>
+                            <Box sx={{ width: "56px", height: "56px", background: "#fee2e2", display: "flex", alignItems: "center", justifyContent: "center", borderRadius: "12px" }}>
+                                <GroupsIcon sx={{ fontSize: 32, color: "#ef4444" }} />
                             </Box>
-                            <Box sx={{ textAlign: "center" }}>
-                                <Typography sx={{ fontSize: "14px", opacity: 0.8, color: "black" }}> Total Employees </Typography>
-                                <Typography variant="h5" fontWeight="bold" sx={{ color: "black" }}> {approvedUsersCount} </Typography>
+                            <Box>
+                                <Typography sx={{ fontSize: "12px", fontWeight: 600, color: "#64748b", textTransform: "uppercase", letterSpacing: "0.5px" }}> Total Employees </Typography>
+                                <Typography variant="h4" fontWeight="800" sx={{ color: "#1e293b" }}> {approvedUsersCount} </Typography>
                             </Box>
                         </Box>
 
@@ -110,26 +115,27 @@ function Dashboard() {
                             sx={{
                                 alignSelf: "flex-end",
                                 textTransform: "none",
-                                fontWeight: 600,
+                                fontWeight: 700,
                                 borderRadius: "8px",
-                                paddingX: "14px",
-                                border: "1px solid #ef9a9a",
-                                color: "#ef9a9a",
+                                px: 2,
+                                py: 1,
+                                background: "#fee2e2",
+                                color: "#ef4444",
+                                border: "none",
                                 "&:hover": {
-                                    backgroundColor: "#ef9a9a",
-                                    color: "#000",
+                                    backgroundColor: "#fecaca",
                                 },
                             }}
                         >Manage</Button>
                     </div>
-                    <div className='widget-2'style={{boxShadow:"0 4px 6px rgba(0, 0, 0, 0.1)"}}>
-                        <Box sx={{ display: "flex", flexDirection: "row", alignItems: "center", columnGap: "20px" }}>
-                            <Box sx={{ width: "60px", height: "60px", background: "#b39ddb", display: "flex", alignItems: "center", justifyContent: "center", borderRadius: "5px" }}>
-                                <GroupOffIcon sx={{ fontSize: 40 }} />
+                    <div className='widget-2' style={{ boxShadow: "0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05)", background: "#ffffff", borderRadius: "16px", padding: "20px", display: "flex", flexDirection: "column", justifyContent: "space-between", border: "1px solid #ede9fe" }}>
+                        <Box sx={{ display: "flex", flexDirection: "row", alignItems: "center", columnGap: "20px", mb: 2 }}>
+                            <Box sx={{ width: "56px", height: "56px", background: "#ede9fe", display: "flex", alignItems: "center", justifyContent: "center", borderRadius: "12px" }}>
+                                <GroupOffIcon sx={{ fontSize: 32, color: "#8b5cf6" }} />
                             </Box>
-                            <Box sx={{ textAlign: "center" }}>
-                                <Typography sx={{ fontSize: "14px", opacity: 0.8, color: "black" }}> Employee Requests </Typography>
-                                <Typography variant="h5" fontWeight="bold" sx={{ color: "black" }}> {pendingUsersCount} </Typography>
+                            <Box>
+                                <Typography sx={{ fontSize: "12px", fontWeight: 600, color: "#64748b", textTransform: "uppercase", letterSpacing: "0.5px" }}> Employee Requests </Typography>
+                                <Typography variant="h4" fontWeight="800" sx={{ color: "#1e293b" }}> {pendingUsersCount} </Typography>
                             </Box>
                         </Box>
 
@@ -137,114 +143,143 @@ function Dashboard() {
                             sx={{
                                 alignSelf: "flex-end",
                                 textTransform: "none",
-                                fontWeight: 600,
+                                fontWeight: 700,
                                 borderRadius: "8px",
-                                paddingX: "14px",
-                                border: "1px solid #b39ddb",
-                                color: "#b39ddb",
+                                px: 2,
+                                py: 1,
+                                background: "#ede9fe",
+                                color: "#8b5cf6",
+                                border: "none",
                                 "&:hover": {
-                                    backgroundColor: "#b39ddb",
-                                    color: "#000",
+                                    backgroundColor: "#ddd6fe",
                                 },
                             }}
                         >View </Button>
                     </div>
-                    <div className='widget-3'style={{boxShadow:"0 4px 6px rgba(0, 0, 0, 0.1)"}}>
-                        <Box sx={{ display: "flex", flexDirection: "row", alignItems: "center", columnGap: "20px" }}>
-                            <Box sx={{ width: "60px", height: "60px", background: "#c5e1a5", display: "flex", alignItems: "center", justifyContent: "center", borderRadius: "5px" }}>
-                                <DescriptionIcon sx={{ fontSize: 40 }} />
+                    <div className='widget-3' style={{ boxShadow: "0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05)", background: "#ffffff", borderRadius: "16px", padding: "20px", display: "flex", flexDirection: "column", justifyContent: "space-between", border: "1px solid #ecfdf5" }}>
+                        <Box sx={{ display: "flex", flexDirection: "row", alignItems: "center", columnGap: "20px", mb: 2 }}>
+                            <Box sx={{ width: "56px", height: "56px", background: "#ecfdf5", display: "flex", alignItems: "center", justifyContent: "center", borderRadius: "12px" }}>
+                                <DescriptionIcon sx={{ fontSize: 32, color: "#10b981" }} />
                             </Box>
-                            <Box sx={{ textAlign: "center" }}>
-                                <Typography sx={{ fontSize: "14px", opacity: 0.8, color: "black" }}> Leave Requests </Typography>
-                                <Typography variant="h5" fontWeight="bold" sx={{ color: "black" }}> {leaveRequestsCount} </Typography>
+                            <Box>
+                                <Typography sx={{ fontSize: "12px", fontWeight: 600, color: "#64748b", textTransform: "uppercase", letterSpacing: "0.5px" }}> Leave Requests </Typography>
+                                <Typography variant="h4" fontWeight="800" sx={{ color: "#1e293b" }}> {leaveRequestsCount} </Typography>
                             </Box>
                         </Box>
                         <Button size="small" onClick={() => navigate('/manager/leave-management')}
                             sx={{
                                 alignSelf: "flex-end",
                                 textTransform: "none",
-                                fontWeight: 600,
+                                fontWeight: 700,
                                 borderRadius: "8px",
-                                paddingX: "14px",
-                                border: "1px solid #c5e1a5",
-                                color: "#c5e1a5",
+                                px: 2,
+                                py: 1,
+                                background: "#ecfdf5",
+                                color: "#10b981",
+                                border: "none",
                                 "&:hover": {
-                                    backgroundColor: "#c5e1a5",
-                                    color: "#000",
+                                    backgroundColor: "#d1fae5",
                                 },
                             }}
                         >View</Button>
                     </div>
                     <EmployeeLeaveWidget />
                 </div>
-                <div style={{
+                <Box sx={{
                     display: "flex",
                     justifyContent: "space-between",
                     alignItems: "center",
-                    marginTop: "20px",
-                }}
-                >
+                    mt: 3,
+                    flexWrap: "wrap",
+                    gap: 2
+                }}>
                     <Typography
                         sx={{
-                            fontFamily: "work sans",
-                            fontWeight: 500,
+                            fontWeight: 700,
                             fontSize: "20px",
-                            color: "black"
+                            color: "#1e293b"
                         }}
                     >
-                        Employees Daily Login Status
+                        Today's Attendance
                     </Typography>
 
-                    <Box
-                        sx={{
-                            border: "2px solid grey",
-                            borderRadius: "5px",
-                            display: "flex",
-                            alignItems: "center",
-                            background: "white",
-                            padding: "5px 10px",
-                            gap: "5px",
-                        }}
-                    >
-                        <CalendarMonthIcon sx={{ color: "#0d47a1" }} />
-                        <Typography sx={{ fontFamily: "work sans", fontWeight: 600, color: "#1e1e1e" }}>
-                            {formattedDate}
-                        </Typography>
+                    <Box sx={{ display: "flex", alignItems: "center", gap: 2, width: { xs: "100%", sm: "auto" } }}>
+                        <TextField
+                            size="small"
+                            placeholder="Search employee..."
+                            value={searchTerm}
+                            onChange={(e) => setSearchTerm(e.target.value)}
+                            sx={{
+                                width: { xs: "100%", sm: "240px" },
+                                background: "white",
+                                "& .MuiOutlinedInput-root": { borderRadius: "10px" }
+                            }}
+                        />
+                        <Box
+                            sx={{
+                                border: "1px solid #e2e8f0",
+                                borderRadius: "10px",
+                                display: "flex",
+                                alignItems: "center",
+                                background: "#f8fafc",
+                                padding: "6px 14px",
+                                gap: "8px",
+                                boxShadow: "0 1px 2px rgba(0,0,0,0.05)"
+                            }}
+                        >
+                            <CalendarMonthIcon sx={{ color: "#64748b", fontSize: 18 }} />
+                            <input
+                                type="date"
+                                value={selectedDate}
+                                onChange={(e) => setSelectedDate(e.target.value)}
+                                style={{
+                                    border: "none",
+                                    outline: "none",
+                                    fontFamily: "inherit",
+                                    fontWeight: 600,
+                                    color: "#1e293b",
+                                    fontSize: "13px",
+                                    cursor: "pointer",
+                                    background: "transparent",
+                                }}
+                            />
+                        </Box>
                     </Box>
-                </div>
+                </Box>
 
                 <div style={{ marginTop: "10px" }}>
                     <TableContainer component={Paper}
-                            sx={{
-                                background: "#ffffff",
-                                borderRadius: "12px",
-                                boxShadow: "0 4px 12px rgba(0,0,0,0.1)",
-                                border: "1px solid #e2e8f0"
-                            }}
-                        >
-                            <Table>
-                                {/* ... table content exists here in original snippet ... */}
+                        sx={{
+                            background: "#ffffff",
+                            borderRadius: "12px",
+                            boxShadow: "0 4px 12px rgba(0,0,0,0.1)",
+                            border: "1px solid #e2e8f0"
+                        }}
+                    >
+                        <Table>
+                            {/* ... table content exists here in original snippet ... */}
 
-                                <TableHead sx={{ display: { xs: "none", sm: "table-header-group" } }}>
-                                    <TableRow>
-                                        <TableCell sx={{ color: "#1e293b", fontWeight: 600 }}>
-                                            Employee Name
-                                        </TableCell>
-                                        <TableCell sx={{ color: "#1e293b", fontWeight: 600 }}>
-                                            Check-In Time
-                                        </TableCell>
-                                        <TableCell sx={{ color: "#1e293b", fontWeight: 600 }}>
-                                            Check-Out Time
-                                        </TableCell>
-                                        <TableCell sx={{ color: "#1e293b", fontWeight: 600 }}>
-                                            Status
-                                        </TableCell>
-                                    </TableRow>
-                                </TableHead>
+                            <TableHead sx={{ display: { xs: "none", sm: "table-header-group" } }}>
+                                <TableRow>
+                                    <TableCell sx={{ color: "#1e293b", fontWeight: 600 }}>
+                                        Employee Name
+                                    </TableCell>
+                                    <TableCell sx={{ color: "#1e293b", fontWeight: 600 }}>
+                                        Check-In Time
+                                    </TableCell>
+                                    <TableCell sx={{ color: "#1e293b", fontWeight: 600 }}>
+                                        Check-Out Time
+                                    </TableCell>
+                                    <TableCell sx={{ color: "#1e293b", fontWeight: 600 }}>
+                                        Status
+                                    </TableCell>
+                                </TableRow>
+                            </TableHead>
 
-                                {!isMobile ? (
-                                    <TableBody>
-                                        {rows?.slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage).map((row, index) => (
+                            {!isMobile ? (
+                                <TableBody>
+                                    {rows?.filter(r => (r.employee_name || "").toLowerCase().includes((searchTerm || "").toLowerCase()))
+                                        .slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage).map((row, index) => (
                                             <TableRow key={index} hover>
                                                 <TableCell sx={{ color: "#334155" }}>
                                                     {row.employee_name}
@@ -260,63 +295,93 @@ function Dashboard() {
                                                         size="small"
                                                         sx={{
                                                             backgroundColor:
-                                                                row.status === "PRESENT" ? "#66bb6a" : row?.status === "ONGOING" ? "#3f51b5" : "#ef5350",
-                                                            color: "whitesmoke",
-                                                            fontWeight: 600,
-                                                            textTransform: "capitalize",
+                                                                row.status === "PRESENT" ? "#e8f5e9" : row?.status === "ONGOING" ? "#e0e7ff" : "#ffebee",
+                                                            color: row.status === "PRESENT" ? "#2e7d32" : row?.status === "ONGOING" ? "#3730a3" : "#d32f2f",
+                                                            fontWeight: 700,
+                                                            fontSize: "11px",
+                                                            border: `1px solid ${row.status === "PRESENT" ? "#c8e6c9" : row?.status === "ONGOING" ? "#c7d2fe" : "#ffcdd2"}`,
+                                                            textTransform: "uppercase",
                                                         }}
                                                     />
                                                 </TableCell>
                                             </TableRow>
                                         ))}
-                                    </TableBody>
-                                ) : (
-                                    <TableBody>
-                                        {rows
-                                            .slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage)
-                                            .map((row, index) => (
-                                                <TableRow key={index} sx={{ background: "#333" }}>
-                                                    <TableCell colSpan={4} sx={{ borderBottom: "none" }}>
-                                                        <Box sx={{ background: "#1e1e1e", borderRadius: "12px", padding: "12px", mb: 1, }}>
-                                                            <Typography sx={{ fontWeight: 600, color: "whitesmoke" }}>
+                                </TableBody>
+                            ) : (
+                                <TableBody>
+                                    {rows?.filter(r => (r.employee_name || "").toLowerCase().includes((searchTerm || "").toLowerCase()))
+                                        .slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage)
+                                        .map((row, index) => (
+                                            <TableRow key={index}>
+                                                <TableCell colSpan={4} sx={{ borderBottom: "none", padding: "8px" }}>
+                                                    <Box sx={{
+                                                        background: "#ffffff",
+                                                        borderRadius: "12px",
+                                                        padding: "16px",
+                                                        mb: 1,
+                                                        border: "1px solid #e2e8f0",
+                                                        boxShadow: "0 2px 4px rgba(0,0,0,0.05)",
+                                                        display: "flex",
+                                                        flexDirection: "column",
+                                                        gap: 1
+                                                    }}>
+                                                        <Box sx={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
+                                                            <Typography sx={{ fontWeight: 700, color: "#1e293b", fontSize: "15px" }}>
                                                                 {row.employee_name}
                                                             </Typography>
-
-                                                            <Typography sx={{ fontSize: "14px", opacity: 0.7, color: "whitesmoke" }}>
-                                                                Check-In: {formatTime(row.check_in)}
-                                                            </Typography>
-
-                                                            <Typography sx={{ fontSize: "14px", opacity: 0.7, color: "whitesmoke" }}>
-                                                                Check-Out: {formatTime(row.check_out)}
-                                                            </Typography>
-
-                                                            <Chip label={row.status} size="small"
+                                                            <Chip
+                                                                label={row.status}
+                                                                size="small"
                                                                 sx={{
-                                                                    mt: 1,
                                                                     backgroundColor:
-                                                                        row.status === "PRESENT" ? "#66bb6a" : row?.status === "ONGOING" ? "#3f51b5" : "#ef5350",
-                                                                    color: "whitesmoke",
-                                                                    fontWeight: 600,
+                                                                        row.status === "PRESENT" ? "#e8f5e9" : row?.status === "ONGOING" ? "#e8eaf6" : "#ffebee",
+                                                                    color:
+                                                                        row.status === "PRESENT" ? "#2e7d32" : row?.status === "ONGOING" ? "#3f51b5" : "#d32f2f",
+                                                                    fontWeight: 700,
+                                                                    fontSize: "11px",
+                                                                    border: `1px solid ${row.status === "PRESENT" ? "#c8e6c9" : row?.status === "ONGOING" ? "#c5cae9" : "#ffcdd2"}`
                                                                 }}
                                                             />
                                                         </Box>
-                                                    </TableCell>
-                                                </TableRow>
-                                            ))}
-                                    </TableBody>
-                                )}
-                                <TablePagination
-                                    count={rows.length}
-                                    page={page}
-                                    onPageChange={(e, newPage) => setPage(newPage)}
-                                    rowsPerPage={rowsPerPage}
-                                    rowsPerPageOptions={[5]}
-                                    sx={{
-                                        color: "#334155"
-                                    }}
-                                />
-                            </Table>
-                        </TableContainer>
+
+                                                        <Divider sx={{ opacity: 0.5, my: 0.5 }} />
+
+                                                        <Box sx={{ display: "flex", gap: 2 }}>
+                                                            <Box sx={{ flex: 1 }}>
+                                                                <Typography sx={{ fontSize: "11px", color: "#64748b", fontWeight: 600, textTransform: "uppercase" }}>
+                                                                    Check-In
+                                                                </Typography>
+                                                                <Typography sx={{ fontSize: "14px", color: "#334155", fontWeight: 500 }}>
+                                                                    {formatTime(row.check_in)}
+                                                                </Typography>
+                                                            </Box>
+                                                            <Box sx={{ flex: 1 }}>
+                                                                <Typography sx={{ fontSize: "11px", color: "#64748b", fontWeight: 600, textTransform: "uppercase" }}>
+                                                                    Check-Out
+                                                                </Typography>
+                                                                <Typography sx={{ fontSize: "14px", color: "#334155", fontWeight: 500 }}>
+                                                                    {formatTime(row.check_out)}
+                                                                </Typography>
+                                                            </Box>
+                                                        </Box>
+                                                    </Box>
+                                                </TableCell>
+                                            </TableRow>
+                                        ))}
+                                </TableBody>
+                            )}
+                            <TablePagination
+                                count={rows?.filter(r => (r.employee_name || "").toLowerCase().includes((searchTerm || "").toLowerCase())).length || 0}
+                                page={page}
+                                onPageChange={(e, newPage) => setPage(newPage)}
+                                rowsPerPage={rowsPerPage}
+                                rowsPerPageOptions={[5]}
+                                sx={{
+                                    color: "#334155"
+                                }}
+                            />
+                        </Table>
+                    </TableContainer>
                 </div>
 
             </div>
