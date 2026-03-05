@@ -143,7 +143,7 @@ const ApplyLeave = () => {
                 <div className="form-group">
                     <label>Leave Type</label>
                     <select name="type" value={type} onChange={(e) => setType(e.target.value)}>
-                        <option value="SELECT">Select Leave Type</option>
+                        <option className='leave-options' value="SELECT">Select Leave Type</option>
                         <option value="CASUAL">Casual Leave</option>
                         <option value="SICK">Sick Leave</option>
                         <option value="EMERGENCY">Emergency Leave</option>

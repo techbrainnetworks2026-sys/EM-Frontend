@@ -99,8 +99,8 @@ body {
 .sidebar-footer {
   padding: 24px;
   color: var(--sidebar-text);
-  font-size: 11px;
-  opacity: 0.5;
+  font-size: 14px;
+  opacity: 0.9;
 }
 
 /* Main Area */

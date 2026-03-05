@@ -1,6 +1,6 @@
 /* AttendanceView component styles */
 .dashboard-view.attendance-view {
-  margin-top: -33px;
+  margin-top: -32px;
   background: var(--primary-bg);
   padding: 32px;
   border-radius: 16px;
@@ -310,7 +310,8 @@ h2.Monthly-Attendance {
   margin-top: 2px;
   font-weight: 500;
 }
-.attendance-close-btn{
+
+.attendance-close-btn {
   background: var(--primary-color);
   color: white;
   border: none;
@@ -332,7 +333,7 @@ h2.Monthly-Attendance {
 
 @media (max-width: 768px) {
   .dashboard-view.attendance-view {
-    height: 85vh;
+    margin-top: 1px;
     padding: 15px;
   }
 
@@ -341,9 +342,21 @@ h2.Monthly-Attendance {
     gap: 8px;
   }
 
+  .day-times {
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+    font-size: 12px;
+    color: #64748b;
+    background: #f1f5f9;
+    padding: 1px;
+    border-radius: 4px;
+    margin-top: auto;
+  }
+
   .calendar-day {
     min-height: 90px;
-    padding: 8px;
+    padding: 10px;
   }
 
   .attendance-summary {
