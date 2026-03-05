@@ -8,6 +8,7 @@ import EventNoteIcon from "@mui/icons-material/EventNote";
 import AssignmentIcon from "@mui/icons-material/Assignment";
 import CampaignIcon from "@mui/icons-material/Campaign";
 import { useAppContext } from '../../context/AppContext.jsx';
+import '../ManagerLayout.css';
 
 function Sidebar() {
 
@@ -15,183 +16,88 @@ function Sidebar() {
     const { sidebarOpen, setSidebarOpen } = useAppContext();
 
     return (
-        <div style={{ width: sidebarOpen ? "300px" : "80px", height: "100vh", position: "fixed", top: 0, left: 0, zIndex: 1200, border: "white", background: "rgb(8, 15, 37)" }}>
-            <div style={{ display: "flex", alignItems: "center", justifyContent: "center", height: "80px", padding: "10px", columnGap: "10px", textAlign: "center" }}>
-                {sidebarOpen &&
+        <div className={`manager-sidebar ${sidebarOpen ? 'open' : 'closed'}`} style={{ width: sidebarOpen ? "300px" : "80px" }}>
+            <div className="manager-sidebar-header">
+                {sidebarOpen ? (
                     <>
-                        <h3 style={{ fontFamily: "Work Sans", color: "whitesmoke", fontWeight: 600 }}>
-                            Techbrain Networks
-                        </h3>
-                        <p style={{ fontSize: "12px", opacity: 0.6, color: "white", fontFamily: "work sans" }}>Employee Management</p>
+                        <div className="manager-logo-icon">TN</div>
+                        <div className="manager-logo-text-container">
+                            <h3 className="manager-logo-title">Techbrain Networks</h3>
+                            <p className="manager-logo-subtitle">Employee Management</p>
+                        </div>
                     </>
-                }
+                ) : (
+                    <div className="manager-logo-icon" style={{ margin: "0 auto" }}>TN</div>
+                )}
             </div>
-            <Divider sx={{ border: "1px solid gray" }} variant='middle' />
+            <Divider className="manager-sidebar-divider" variant='middle' />
             <div>
-                <List sx={{ display: "flex", rowGap: "15px", flexDirection: "column", paddingTop: "20px" }}>
+                <List className="manager-nav-list">
                     <ListItem disablePadding>
-                        {sidebarOpen ? (
-                            <ListItemButton component={NavLink} to="/manager/dashboard" sx={{
-                                padding: "15px", justifyContent: "flex-start", paddingLeft: "24px", gap: "12px", fontSize: "20px", fontFamily: "work sans", color: "whitesmoke",
-                                "&.active": {
-                                    backgroundColor: "rgba(255,255,255,0.15)",
-                                    borderLeft: "4px solid #90caf9",
-                                },
-                                "&:hover": {
-                                    backgroundColor: "rgba(255,255,255,0.08)",
-                                    transition: "all 0.2s ease",
-                                },
-                            }} > <DashboardIcon /> Dashboard </ListItemButton>
-                        ) : (
-                            <ListItemButton component={NavLink} to="/manager/dashboard" sx={{
-                                padding: "15px", justifyContent: "flex-start", paddingLeft: "24px", gap: "12px", fontSize: "20px", fontFamily: "work sans", color: "whitesmoke",
-                                "&.active": {
-                                    backgroundColor: "rgba(255,255,255,0.15)",
-                                    borderLeft: "4px solid #90caf9",
-                                },
-                                "&:hover": {
-                                    backgroundColor: "rgba(255,255,255,0.08)",
-                                    transition: "all 0.2s ease",
-                                },
-                            }} > <DashboardIcon /></ListItemButton>
-                        )}
+                        <ListItemButton
+                            className="manager-nav-item"
+                            component={NavLink}
+                            to="/manager/dashboard"
+                            sx={{ justifyContent: sidebarOpen ? "flex-start" : "center" }}
+                        >
+                            <DashboardIcon />
+                            {sidebarOpen && "Dashboard"}
+                        </ListItemButton>
                     </ListItem>
                     <ListItem disablePadding>
-                        {sidebarOpen ? (
-                            <ListItemButton component={NavLink} to="/manager/addemployee" sx={{
-                                padding: "15px", justifyContent: "flex-start", paddingLeft: "24px", gap: "12px", fontSize: "20px", fontFamily: "work sans", color: "whitesmoke",
-                                "&.active": {
-                                    backgroundColor: "rgba(255,255,255,0.15)",
-                                    borderLeft: "4px solid #90caf9",
-                                },
-                                "&:hover": {
-                                    backgroundColor: "rgba(255,255,255,0.08)",
-                                    transition: "all 0.2s ease",
-                                },
-                            }} > <PeopleIcon /> Employees Management </ListItemButton>
-                        ) : (
-                            <ListItemButton component={NavLink} to="/manager/addemployee" sx={{
-                                padding: "15px", justifyContent: "flex-start", paddingLeft: "24px", gap: "12px", fontSize: "20px", fontFamily: "work sans", color: "whitesmoke",
-                                "&.active": {
-                                    backgroundColor: "rgba(255,255,255,0.15)",
-                                    borderLeft: "4px solid #90caf9",
-                                },
-                                "&:hover": {
-                                    backgroundColor: "rgba(255,255,255,0.08)",
-                                    transition: "all 0.2s ease",
-                                },
-                            }} > <PeopleIcon /></ListItemButton>
-                        )}
+                        <ListItemButton
+                            className="manager-nav-item"
+                            component={NavLink}
+                            to="/manager/addemployee"
+                            sx={{ justifyContent: sidebarOpen ? "flex-start" : "center" }}
+                        >
+                            <PeopleIcon />
+                            {sidebarOpen && "Employees Management"}
+                        </ListItemButton>
                     </ListItem>
                     <ListItem disablePadding>
-                        {sidebarOpen ? (
-                            <ListItemButton component={NavLink} to="/manager/addRole" sx={{
-                                padding: "15px", justifyContent: "flex-start", paddingLeft: "24px", gap: "12px", fontSize: "20px", fontFamily: "work sans", color: "whitesmoke",
-                                "&.active": {
-                                    backgroundColor: "rgba(255,255,255,0.15)",
-                                    borderLeft: "4px solid #90caf9",
-                                },
-                                "&:hover": {
-                                    backgroundColor: "rgba(255,255,255,0.08)",
-                                    transition: "all 0.2s ease",
-                                },
-                            }} > <SecurityIcon /> Role Management </ListItemButton>
-                        ) : (
-                            <ListItemButton component={NavLink} to="/manager/addRole" sx={{
-                                padding: "15px", justifyContent: "flex-start", paddingLeft: "24px", gap: "12px", fontSize: "20px", fontFamily: "work sans", color: "whitesmoke",
-                                "&.active": {
-                                    backgroundColor: "rgba(255,255,255,0.15)",
-                                    borderLeft: "4px solid #90caf9",
-                                },
-                                "&:hover": {
-                                    backgroundColor: "rgba(255,255,255,0.08)",
-                                    transition: "all 0.2s ease",
-                                },
-                            }} > <SecurityIcon /></ListItemButton>
-                        )}
+                        <ListItemButton
+                            className="manager-nav-item"
+                            component={NavLink}
+                            to="/manager/addRole"
+                            sx={{ justifyContent: sidebarOpen ? "flex-start" : "center" }}
+                        >
+                            <SecurityIcon />
+                            {sidebarOpen && "Role Management"}
+                        </ListItemButton>
                     </ListItem>
                     <ListItem disablePadding>
-                        {sidebarOpen ? (
-                            <ListItemButton component={NavLink} to="/manager/leave-management" sx={{
-                                padding: "15px", justifyContent: "flex-start", paddingLeft: "24px", gap: "12px", fontSize: "20px", fontFamily: "work sans", color: "whitesmoke",
-                                "&.active": {
-                                    backgroundColor: "rgba(255,255,255,0.15)",
-                                    borderLeft: "4px solid #90caf9",
-                                },
-                                "&:hover": {
-                                    backgroundColor: "rgba(255,255,255,0.08)",
-                                    transition: "all 0.2s ease",
-                                },
-                            }} > <EventNoteIcon /> Manage Leave </ListItemButton>
-                        ) : (
-                            <ListItemButton component={NavLink} to="/manager/leave-management" sx={{
-                                padding: "15px", justifyContent: "flex-start", paddingLeft: "24px", gap: "12px", fontSize: "20px", fontFamily: "work sans", color: "whitesmoke",
-                                "&.active": {
-                                    backgroundColor: "rgba(255,255,255,0.15)",
-                                    borderLeft: "4px solid #90caf9",
-                                },
-                                "&:hover": {
-                                    backgroundColor: "rgba(255,255,255,0.08)",
-                                    transition: "all 0.2s ease",
-                                },
-                            }} > <EventNoteIcon /></ListItemButton>
-                        )}
-
+                        <ListItemButton
+                            className="manager-nav-item"
+                            component={NavLink}
+                            to="/manager/leave-management"
+                            sx={{ justifyContent: sidebarOpen ? "flex-start" : "center" }}
+                        >
+                            <EventNoteIcon />
+                            {sidebarOpen && "Manage Leave"}
+                        </ListItemButton>
                     </ListItem>
                     <ListItem disablePadding>
-                        {sidebarOpen ? (
-                            <ListItemButton component={NavLink} to="/manager/task-assign" sx={{
-                                padding: "15px", justifyContent: "flex-start", paddingLeft: "24px", gap: "12px", fontSize: "20px", fontFamily: "work sans", color: "whitesmoke",
-                                "&.active": {
-                                    backgroundColor: "rgba(255,255,255,0.15)",
-                                    borderLeft: "4px solid #90caf9",
-                                },
-                                "&:hover": {
-                                    backgroundColor: "rgba(255,255,255,0.08)",
-                                    transition: "all 0.2s ease",
-                                },
-                            }} > <AssignmentIcon /> Task Assign </ListItemButton>
-                        ) : (
-                            <ListItemButton component={NavLink} to="/manager/task-assign" sx={{
-                                padding: "15px", justifyContent: "flex-start", paddingLeft: "24px", gap: "12px", fontSize: "20px", fontFamily: "work sans", color: "whitesmoke",
-                                "&.active": {
-                                    backgroundColor: "rgba(255,255,255,0.15)",
-                                    borderLeft: "4px solid #90caf9",
-                                },
-                                "&:hover": {
-                                    backgroundColor: "rgba(255,255,255,0.08)",
-                                    transition: "all 0.2s ease",
-                                },
-                            }} > <AssignmentIcon /></ListItemButton>
-                        )}
+                        <ListItemButton
+                            className="manager-nav-item"
+                            component={NavLink}
+                            to="/manager/task-assign"
+                            sx={{ justifyContent: sidebarOpen ? "flex-start" : "center" }}
+                        >
+                            <AssignmentIcon />
+                            {sidebarOpen && "Task Assign"}
+                        </ListItemButton>
                     </ListItem>
                     <ListItem disablePadding>
-                        {sidebarOpen ? (
-                            <ListItemButton component={NavLink} to="/manager/announcement" sx={{
-                                padding: "15px", justifyContent: "flex-start", paddingLeft: "24px", gap: "12px", fontSize: "20px", fontFamily: "work sans", color: "whitesmoke",
-                                "&.active": {
-                                    backgroundColor: "rgba(255,255,255,0.15)",
-                                    borderLeft: "4px solid #90caf9",
-                                },
-                                "&:hover": {
-                                    backgroundColor: "rgba(255,255,255,0.08)",
-                                    transition: "all 0.2s ease",
-                                },
-                            }} > <CampaignIcon /> Announcement </ListItemButton>
-                        ) : (
-                            <ListItemButton component={NavLink} to="/manager/announcement" sx={{
-                                padding: "15px", justifyContent: "flex-start", paddingLeft: "24px", gap: "12px", fontSize: "20px", fontFamily: "work sans", color: "whitesmoke",
-                                "&.active": {
-                                    backgroundColor: "rgba(255,255,255,0.15)",
-                                    borderLeft: "4px solid #90caf9",
-                                },
-                                "&:hover": {
-                                    backgroundColor: "rgba(255,255,255,0.08)",
-                                    transition: "all 0.2s ease",
-                                },
-                            }} > <CampaignIcon /></ListItemButton>
-                        )}
-
+                        <ListItemButton
+                            className="manager-nav-item"
+                            component={NavLink}
+                            to="/manager/announcement"
+                            sx={{ justifyContent: sidebarOpen ? "flex-start" : "center" }}
+                        >
+                            <CampaignIcon />
+                            {sidebarOpen && "Announcement"}
+                        </ListItemButton>
                     </ListItem>
                 </List>
             </div>

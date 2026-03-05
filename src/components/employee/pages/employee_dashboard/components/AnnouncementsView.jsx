@@ -1,5 +1,7 @@
 import axios from 'axios';
 import React, { useEffect, useState } from 'react';
+import './AnnouncementsView.css';
+import CampaignIcon from '@mui/icons-material/Campaign';
 
 const AnnouncementsView = () => {
 
@@ -29,7 +31,7 @@ const AnnouncementsView = () => {
                 {announcements.map(ann => (
                     <div key={ann.id} className="announcement-item">
                         <div className="ann-header">
-                            <h3>📢 {ann.title}</h3>
+                            <h3><CampaignIcon fontSize="small" /> {ann.title}</h3>
                             <span className="ann-date">{formatDate(ann.created_at)}</span>
                         </div>
                         <p className="ann-message">{ann.content}</p>

@@ -6,6 +6,7 @@ import { useNavigate } from 'react-router-dom';
 import { useAppContext } from '../../context/AppContext.jsx';
 import api from '../../../services/service.js';
 import notificationService from '../../../services/notificationService.js';
+import '../ManagerLayout.css';
 
 function Navbar() {
 
@@ -83,14 +84,17 @@ function Navbar() {
 
     return (
         <div>
-            <AppBar elevation={0} sx={{ width: sidebarOpen ? "calc(100% - 300px)" : "calc(100% - 80px)", left: sidebarOpen ? "300px" : "80px", padding: "15px", background: "rgb(8, 15, 37)" }}>
-                <Box sx={{ display: "flex", flexDirection: "row", justifyContent: "space-between", alignItems: "center" }}>
-                    <Box >
-                        <IconButton onClick={handleSidebarOpen}>
-                            <MenuIcon sx={{ color: "white" }} />
+            <AppBar className="manager-navbar" elevation={0} sx={{ width: sidebarOpen ? "calc(100% - 300px)" : "calc(100% - 80px)", left: sidebarOpen ? "300px" : "80px" }}>
+                <Box className="manager-navbar-container">
+                    <Box className="manager-navbar-left">
+                        <IconButton onClick={handleSidebarOpen} className="manager-menu-btn">
+                            <MenuIcon />
                         </IconButton>
+                        <Typography className="manager-navbar-title" sx={{ display: { xs: 'none', sm: 'block' } }}>
+                            EMPLOYEE MANAGEMENT
+                        </Typography>
                     </Box>
-                    <Box sx={{ display: "flex", alignItems: "center", gap: "15px" }}>
+                    <Box className="manager-navbar-actions">
                         {/* Notification Bell */}
                         <Box
                             sx={{
@@ -116,7 +120,7 @@ function Navbar() {
                                 strokeLinecap="round"
                                 strokeLinejoin="round"
                                 style={{
-                                    color: notificationCount > 0 ? '#3b82f6' : 'white',
+                                    color: notificationCount > 0 ? '#3b82f6' : 'black',
                                     animation: showNewNotificationAnimation ? 'bellShake 0.5s ease-in-out' : notificationCount > 0 ? 'bellPulse 2s ease-in-out infinite' : 'none',
                                     transition: 'color 0.3s ease'
                                 }}
@@ -151,14 +155,14 @@ function Navbar() {
                         <IconButton onClick={() => navigate('/manager/profile')}>
                             <Avatar
                                 src={userData?.profile_picture_url}
-                                sx={{ backgroundColor: "orangered", width: "32px", height: "32px", cursor: "pointer" }}
+                                sx={{ backgroundColor: "#ef4444", width: "32px", height: "32px", cursor: "pointer", fontSize: "14px", fontWeight: "bold" }}
                             >
                                 {userData?.username ? userData.username.charAt(0).toUpperCase() : "M"}
                             </Avatar>
                         </IconButton>
                         <Box>
-                            <IconButton onClick={handleLogout}>
-                                <LogoutIcon sx={{ color: "white" }} />
+                            <IconButton onClick={handleLogout} className="manager-menu-btn">
+                                <LogoutIcon />
                             </IconButton>
                         </Box>
                     </Box>

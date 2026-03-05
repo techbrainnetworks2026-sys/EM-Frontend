@@ -32,43 +32,47 @@ const LeaveHistory = ({ leaves = [] }) => {
         <div className="lh-view">
             <h2 className="lh-heading">Leave History</h2>
             <div className="lh-container">
-                <div className="lh-scroll lh-table-wrapper">
-                    <table className="lh-table">
-                        <thead>
-                            <tr>
-                                <th>From</th>
-                                <th>To</th>
-                                <th>Duration</th>
-                                <th>Type</th>
-                                <th>Reason</th>
-                                <th>Status</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            {leavesData.length > 0 ? (
-                                leavesData.map(leave => (
-                                    <tr key={leave.id}>
-                                        <td data-label="From" className="lh-col-date"><span className="lh-td-value">{leave.start_date}</span></td>
-                                        <td data-label="To" className="lh-col-date"><span className="lh-td-value">{leave.end_date}</span></td>
-                                        <td data-label="Duration" className="lh-col-duration">
-                                            <span className="lh-td-value">
-                                                {leave.duration_type === 'HOURLY'
-                                                    ? `${formatTime(leave.from_time)} - ${formatTime(leave.to_time)}`
-                                                    : leave.duration_type === 'HALF_DAY' ? 'Half Day' : 'Full Day'}
-                                            </span>
-                                        </td>
-                                        <td data-label="Type" className="lh-col-type"><span className="lh-td-value">{leave.leave_type}</span></td>
-                                        <td data-label="Reason" className="lh-col-reason"><span className="lh-td-value">{leave.reason}</span></td>
-                                        <td data-label="Status" className="lh-col-status"><span className="lh-td-value"><span className={`lh-status ${getStatusClass(leave.status)}`}>{leave.status}</span></span></td>
-                                    </tr>
-                                ))
-                            ) : (
-                                <tr>
-                                    <td colSpan="6" className="lh-empty">No leave history found.</td>
-                                </tr>
-                            )}
-                        </tbody>
-                    </table>
+                <div className="lh-header-row">
+                    <div className="lh-header-item">From</div>
+                    <div className="lh-header-item">To</div>
+                    <div className="lh-header-item">Duration</div>
+                    <div className="lh-header-item">Type</div>
+                    <div className="lh-header-item">Reason</div>
+                    <div className="lh-header-item">Status</div>
+                </div>
+                <div className="lh-body">
+                    {leavesData.length > 0 ? (
+                        leavesData.map(leave => (
+                            <div className="lh-row" key={leave.id}>
+                                <div className="lh-col lh-col-date" data-label="From">
+                                    <span className="lh-td-value">{leave.start_date}</span>
+                                </div>
+                                <div className="lh-col lh-col-date" data-label="To">
+                                    <span className="lh-td-value">{leave.end_date}</span>
+                                </div>
+                                <div className="lh-col lh-col-duration" data-label="Duration">
+                                    <span className="lh-td-value">
+                                        {leave.duration_type === 'HOURLY'
+                                            ? `${formatTime(leave.from_time)} - ${formatTime(leave.to_time)}`
+                                            : leave.duration_type === 'HALF_DAY' ? 'Half Day' : 'Full Day'}
+                                    </span>
+                                </div>
+                                <div className="lh-col lh-col-type" data-label="Type">
+                                    <span className="lh-td-value">{leave.leave_type}</span>
+                                </div>
+                                <div className="lh-col lh-col-reason" data-label="Reason">
+                                    <span className="lh-td-value">{leave.reason}</span>
+                                </div>
+                                <div className="lh-col lh-col-status" data-label="Status">
+                                    <span className={`lh-status ${getStatusClass(leave.status)}`}>
+                                        {leave.status}
+                                    </span>
+                                </div>
+                            </div>
+                        ))
+                    ) : (
+                        <div className="lh-empty">No leave history found.</div>
+                    )}
                 </div>
             </div>
         </div>

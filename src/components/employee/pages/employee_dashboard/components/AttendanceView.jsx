@@ -202,6 +202,19 @@ const AttendanceView = ({ attendance = [], leaves = [] }) => {
 
     const isClickable = (status) => ['PRESENT', 'ABSENT', 'LEAVE', 'HOLIDAY', 'HALF DAY', 'PERMISSION'].includes(status);
 
+    const calculateHours = (checkIn, checkOut) => {
+        if (!checkIn || !checkOut) return null;
+        const [h1, m1, s1] = checkIn.split(':').map(Number);
+        const [h2, m2, s2] = checkOut.split(':').map(Number);
+        const inSecs = h1 * 3600 + m1 * 60 + (s1 || 0);
+        const outSecs = h2 * 3600 + m2 * 60 + (s2 || 0);
+        const diffSecs = outSecs - inSecs;
+        if (diffSecs <= 0) return null;
+        const hrs = Math.floor(diffSecs / 3600);
+        const mins = Math.floor((diffSecs % 3600) / 60);
+        return `${hrs}h ${mins}m`;
+    };
+
     const downloadCSV = () => {
         generateCSV(daysArray, `attendance_${months[month]}_${year}.csv`);
     };
@@ -380,7 +393,7 @@ const AttendanceView = ({ attendance = [], leaves = [] }) => {
                                 </>
                             )}
                         </div>
-                        <button className="primary-btn fullwidth" onClick={() => setSelectedDayDetails(null)}>Close</button>
+                        <button className="attendance-close-btn" onClick={() => setSelectedDayDetails(null)}>Close</button>
                     </div>
                 </div>
             )}
@@ -446,9 +459,14 @@ const AttendanceView = ({ attendance = [], leaves = [] }) => {
 
                             <div className="day-body">
                                 <span className="day-status-label">{status}</span>
-                                {status === 'Holiday' && (
+                                {status === 'HOLIDAY' && (
                                     <div className="holiday-note">
                                         {holidays.find(h => h.date === dateStr)?.name}
+                                    </div>
+                                )}
+                                {status === 'PRESENT' && record?.check_in && record?.check_out && (
+                                    <div className="day-times">
+                                        <span style={{ textAlign: "center", fontWeight: "bold" }}>⏱️ {calculateHours(record.check_in, record.check_out)}</span>
                                     </div>
                                 )}
                             </div>

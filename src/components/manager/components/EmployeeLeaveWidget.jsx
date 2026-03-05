@@ -125,6 +125,20 @@ function EmployeeAttendanceCalendar({ employeeId, employeeName, onBack }) {
         return `${displayHour.toString().padStart(2, '0')}:${minute} ${period}`;
     };
 
+    const calculateTotalHours = (checkIn, checkOut) => {
+        if (!checkIn || !checkOut || checkIn === '-' || checkOut === '-') return "--";
+
+        const [inH, inM] = checkIn.split(':').map(Number);
+        const [outH, outM] = checkOut.split(':').map(Number);
+
+        let diffMinutes = (outH * 60 + outM) - (inH * 60 + inM);
+        if (diffMinutes < 0) diffMinutes += 24 * 60; // Handle over-midnight shifts
+
+        const hours = Math.floor(diffMinutes / 60);
+        const mins = diffMinutes % 60;
+        return `${hours}h ${mins}m`;
+    };
+
     const isLeaveDay = (dateStr) =>
         leaves.some((leave) => {
             if (leave.status !== 'APPROVED') return false;
@@ -181,6 +195,20 @@ function EmployeeAttendanceCalendar({ employeeId, employeeName, onBack }) {
         return s === 'LEAVE' || s === 'ABSENT';
     }).length;
 
+    let monthlyTotalMins = 0;
+    filteredAttendance.forEach((a) => {
+        if (normalizeStatus(a.status) === 'PRESENT' && a.check_in && a.check_out) {
+            const [inH, inM] = a.check_in.split(':').map(Number);
+            const [outH, outM] = a.check_out.split(':').map(Number);
+            let diffMins = (outH * 60 + outM) - (inH * 60 + inM);
+            if (diffMins < 0) diffMins += 24 * 60;
+            monthlyTotalMins += diffMins;
+        }
+    });
+    const totalHoursStr = monthlyTotalMins > 0
+        ? `${Math.floor(monthlyTotalMins / 60)}h ${monthlyTotalMins % 60}m`
+        : '0h 0m';
+
     const handleDayClick = (day) => {
         const dateStr = `${year}-${(month + 1).toString().padStart(2, '0')}-${day.toString().padStart(2, '0')}`;
         const status = getStatus(day);
@@ -211,6 +239,9 @@ function EmployeeAttendanceCalendar({ employeeId, employeeName, onBack }) {
                 checkIn: record?.check_in || '-',
                 checkOut: record?.check_out || '-',
             };
+            if (record?.check_in && record?.check_out) {
+                details.times.totalHours = calculateTotalHours(record.check_in, record.check_out);
+            }
         }
         setSelectedDay(details);
     };
@@ -229,7 +260,7 @@ function EmployeeAttendanceCalendar({ employeeId, employeeName, onBack }) {
             }
         }
 
-        const rows = [['Date', 'Day', 'Status', 'Check-In', 'Check-Out', 'Notes']];
+        const rows = [['Date', 'Day', 'Status', 'Check-In', 'Check-Out', 'Total Hours', 'Notes']];
         allDaysOfYear.forEach(({ day, month: m }) => {
             const dateStr = `${year}-${(m + 1).toString().padStart(2, '0')}-${day.toString().padStart(2, '0')}`;
 
@@ -259,12 +290,13 @@ function EmployeeAttendanceCalendar({ employeeId, employeeName, onBack }) {
 
             const status = getStatusForValue(day, m, year);
             const dayName = new Date(year, m, day).toLocaleDateString('en-US', { weekday: 'short' });
-            let checkIn = '-', checkOut = '-', notes = '';
+            let checkIn = '-', checkOut = '-', totalHrs = '-', notes = '';
 
             if (status === 'PRESENT') {
                 const rec = attendance.find((a) => a.date === dateStr);
                 checkIn = rec?.check_in ? formatTime(rec.check_in) : '-';
                 checkOut = rec?.check_out ? formatTime(rec.check_out) : '-';
+                if (rec?.check_in && rec?.check_out) totalHrs = calculateTotalHours(rec.check_in, rec.check_out);
             } else if (status === 'LEAVE') {
                 const lr = leaves.find((l) => l.start_date <= dateStr && l.end_date >= dateStr);
                 notes = lr?.reason || 'Leave';
@@ -277,7 +309,7 @@ function EmployeeAttendanceCalendar({ employeeId, employeeName, onBack }) {
                 notes = 'Future';
             }
 
-            rows.push([dateStr, dayName, status, checkIn, checkOut, notes]);
+            rows.push([dateStr, dayName, status, checkIn, checkOut, totalHrs, notes]);
         });
 
         const csvContent = rows.map((r) => r.join(',')).join('\n');
@@ -291,17 +323,18 @@ function EmployeeAttendanceCalendar({ employeeId, employeeName, onBack }) {
     };
 
     const generateCSV = (days, filename) => {
-        const rows = [['Date', 'Day', 'Status', 'Check-In', 'Check-Out', 'Notes']];
+        const rows = [['Date', 'Day', 'Status', 'Check-In', 'Check-Out', 'Total Hours', 'Notes']];
         days.forEach((day) => {
             const dateStr = `${year}-${(month + 1).toString().padStart(2, '0')}-${day.toString().padStart(2, '0')}`;
             const status = getStatus(day);
             const dayName = new Date(year, month, day).toLocaleDateString('en-US', { weekday: 'short' });
-            let checkIn = '-', checkOut = '-', notes = '';
+            let checkIn = '-', checkOut = '-', totalHrs = '-', notes = '';
 
             if (status === 'PRESENT') {
                 const rec = attendance.find((a) => a.date === dateStr);
                 checkIn = rec?.check_in ? formatTime(rec.check_in) : '-';
                 checkOut = rec?.check_out ? formatTime(rec.check_out) : '-';
+                if (rec?.check_in && rec?.check_out) totalHrs = calculateTotalHours(rec.check_in, rec.check_out);
             } else if (status === 'LEAVE') {
                 const lr = leaves.find((l) => l.start_date <= dateStr && l.end_date >= dateStr);
                 notes = lr?.reason || 'Leave';
@@ -314,7 +347,7 @@ function EmployeeAttendanceCalendar({ employeeId, employeeName, onBack }) {
                 notes = 'Future';
             }
 
-            rows.push([dateStr, dayName, status, checkIn, checkOut, notes]);
+            rows.push([dateStr, dayName, status, checkIn, checkOut, totalHrs, notes]);
         });
 
         const csvContent = rows.map((r) => r.join(',')).join('\n');
@@ -410,10 +443,12 @@ function EmployeeAttendanceCalendar({ employeeId, employeeName, onBack }) {
                 {[
                     { label: 'Present', value: totalPresent, color: '#22c55e' },
                     { label: 'Leave', value: totalLeave, color: '#ef4444' },
+                    { label: 'Total Hours', value: totalHoursStr, color: '#0ea5e9' },
                 ].map((s) => (
                     <Box key={s.label} sx={{
                         background: 'whitesmoke', border: `1px solid ${s.color}40`,
                         borderRadius: '8px', px: 2, py: 0.8, textAlign: 'center',
+                        minWidth: '90px'
                     }}>
                         <Typography sx={{ fontSize: '11px', opacity: 1, color: 'black' }}>{s.label}</Typography>
                         <Typography sx={{ fontWeight: 700, color: s.color, fontSize: '18px' }}>{s.value}</Typography>
@@ -439,6 +474,14 @@ function EmployeeAttendanceCalendar({ employeeId, employeeName, onBack }) {
                         const colors = statusColor[status] || statusColor['-'];
                         const clickable = ['PRESENT', 'ABSENT', 'LEAVE', 'HOLIDAY'].includes(status);
 
+                        let dayTotalHours = null;
+                        if (status === 'PRESENT') {
+                            const record = attendance.find((a) => a.date === dateStr);
+                            if (record?.check_in && record?.check_out) {
+                                dayTotalHours = calculateTotalHours(record.check_in, record.check_out);
+                            }
+                        }
+
                         return (
                             <Box
                                 key={day}
@@ -463,9 +506,16 @@ function EmployeeAttendanceCalendar({ employeeId, employeeName, onBack }) {
                                     <Typography sx={{ fontWeight: 700, fontSize: '12px', color: '#1e293b' }}>{day}</Typography>
                                     <Typography sx={{ fontSize: '9px', color: '#94a3b8', fontWeight: 600, textTransform: 'uppercase' }}>{dayName}</Typography>
                                 </Box>
-                                <Typography sx={{ fontSize: '9px', fontWeight: 700, color: '#475569', mt: 'auto' }}>
-                                    {status === '-' ? '' : status}
-                                </Typography>
+                                <Box sx={{ mt: 'auto', display: 'flex', justifyContent: 'space-between', alignItems: 'flex-end' }}>
+                                    <Typography sx={{ fontSize: '9px', fontWeight: 700, color: '#475569' }}>
+                                        {status === '-' ? '' : status}
+                                    </Typography>
+                                    {dayTotalHours && (
+                                        <Typography sx={{ fontSize: '9px', fontWeight: 700, color: '#0ea5e9' }}>
+                                            {dayTotalHours}
+                                        </Typography>
+                                    )}
+                                </Box>
                             </Box>
                         );
                     })}
@@ -500,6 +550,7 @@ function EmployeeAttendanceCalendar({ employeeId, employeeName, onBack }) {
                         ...(selectedDay.times ? [
                             { label: 'Check-In', value: formatTime(selectedDay.times.checkIn) },
                             { label: 'Check-Out', value: formatTime(selectedDay.times.checkOut) },
+                            ...(selectedDay.times.totalHours ? [{ label: 'Total Hours', value: selectedDay.times.totalHours }] : []),
                         ] : []),
                     ].map((row) => (
                         <Box key={row.label} sx={{ display: 'flex', justifyContent: 'space-between', py: 1.2, borderBottom: '1px solid #e2e8f0' }}>
@@ -513,59 +564,57 @@ function EmployeeAttendanceCalendar({ employeeId, employeeName, onBack }) {
     );
 }
 
-// ─── Employee Leave List (shown first when widget is clicked) ──────────────────
-function EmployeeLeaveList({ leaveRequests, onSelectEmployee }) {
-    if (leaveRequests.length === 0) {
+// ─── Employee List (shown first when widget is clicked) ────────────────────────
+function EmployeeList({ employees, onSelectEmployee }) {
+    if (employees.length === 0) {
         return (
             <Box sx={{ textAlign: 'center', py: 6 }}>
                 <EventNoteIcon sx={{ fontSize: 48, color: '#555', mb: 1 }} />
                 <Typography sx={{ color: 'whitesmoke', opacity: 0.6 }}>
-                    No leave requests found.
+                    No employees found.
                 </Typography>
             </Box>
         );
     }
 
-    // Deduplicate by employee id
-    const seen = new Set();
-    const uniqueEmployees = leaveRequests.filter((r) => {
-        if (seen.has(r.employee_id)) return false;
-        seen.add(r.employee_id);
-        return true;
-    });
-
     return (
         <Box>
             <Typography sx={{ fontSize: '13px', opacity: 2, color: 'black', mb: 2 }}>
-                Click a name to view their attendance
+                Click a name to view their full attendance history
             </Typography>
             <List disablePadding>
-                {uniqueEmployees.map((row, index) => (
+                {employees.map((row, index) => (
                     <ListItem
-                        key={row.employee_id ?? index}
+                        key={row.id ?? index}
                         sx={{
                             borderRadius: '10px', mb: 1,
                             background: 'white',
                             cursor: 'pointer',
                             transition: 'background 0.2s, transform 0.15s',
                             '&:hover': { background: '#cbd4e0ff', transform: 'translateX(4px)' },
+                            border: '1px solid #f1f5f9'
                         }}
-                        onClick={() => onSelectEmployee({ id: row.employee_id, name: row.employee_name })}
+                        onClick={() => onSelectEmployee({ id: row.id, name: row.username })}
                     >
                         <ListItemAvatar>
-                            <Avatar sx={{ bgcolor: '#0d47a1', fontWeight: 700, width: 42, height: 42 }}>
-                                {row.employee_name?.charAt(0)?.toUpperCase()}
+                            <Avatar sx={{ bgcolor: '#0ea5e9', fontWeight: 700, width: 42, height: 42 }}>
+                                {row.username?.charAt(0)?.toUpperCase()}
                             </Avatar>
                         </ListItemAvatar>
                         <ListItemText
                             primary={
-                                <Typography sx={{ fontWeight: 700, color: 'black', fontSize: '15px' }}>
-                                    {row.employee_name}
+                                <Typography sx={{ fontWeight: 700, color: '#1e293b', fontSize: '15px' }}>
+                                    {row.username}
+                                </Typography>
+                            }
+                            secondary={
+                                <Typography sx={{ fontSize: '12px', color: '#64748b' }}>
+                                    Employee ID: {row.id}
                                 </Typography>
                             }
                         />
-                        <Typography sx={{ fontSize: '12px', color: '#1773beff', opacity: 1 }}>
-                            View →
+                        <Typography sx={{ fontSize: '12px', color: '#0ea5e9', fontWeight: 600 }}>
+                            View Attendance →
                         </Typography>
                     </ListItem>
                 ))}
@@ -575,28 +624,31 @@ function EmployeeLeaveList({ leaveRequests, onSelectEmployee }) {
 }
 
 // ─── Main Widget ──────────────────────────────────────────────────────────────
-const EmployeeLeaveWidget = () => {
+const EmployeeAttendanceWidget = () => {
     const [open, setOpen] = useState(false);
-    const [leaveRequests, setLeaveRequests] = useState([]);
+    const [employees, setEmployees] = useState([]);
     const [selectedEmployee, setSelectedEmployee] = useState(null); // { id, name }
 
-    // Fetch all leaves (pending + approved) for the list
-    const fetchAllLeaves = async () => {
+    // Fetch all employees for the list (using same api endpoint as Dashboard approved users)
+    const fetchAllEmployees = async () => {
         try {
-            const [pendingRes, approvedRes] = await Promise.all([
-                api.get('leave/manager/pending-leaves/'),
-                api.get('leave/manager/approved-leaves/'),
-            ]);
-            setLeaveRequests([...pendingRes.data, ...approvedRes.data]);
+            const res = await api.get('accounts/manager/approved-users/');
+            setEmployees(res.data);
         } catch (err) {
             // API not ready yet — fall back to mock data for UI testing
-            console.warn('API unavailable, using mock leave data');
-            setLeaveRequests(MOCK_LEAVES);
+            console.warn('API unavailable, using mock employee data');
+            const uniqueMockEmployees = Array.from(
+                new Set(MOCK_LEAVES.map(l => l.employee_id))
+            ).map(id => {
+                const e = MOCK_LEAVES.find(l => l.employee_id === id);
+                return { id: e.employee_id, username: e.employee_name };
+            });
+            setEmployees(uniqueMockEmployees);
         }
     };
 
     useEffect(() => {
-        if (open) fetchAllLeaves();
+        if (open) fetchAllEmployees();
     }, [open]);
 
     const handleClose = () => {
@@ -604,7 +656,12 @@ const EmployeeLeaveWidget = () => {
         setSelectedEmployee(null);
     };
 
-    const totalLeaveCount = leaveRequests.length;
+    // Calculate count from the dashboard passing it down, or fetch it. For now, we will fetch it.
+    useEffect(() => {
+        fetchAllEmployees();
+    }, [])
+
+    const allEmployeesCount = employees.length;
 
     const dialogPaperProps = {
         sx: {
@@ -618,36 +675,17 @@ const EmployeeLeaveWidget = () => {
     return (
         <>
             {/* ── Widget Card ── */}
-            <div className="widget-4" style={{ cursor: 'pointer', boxShadow: "0 4px 6px rgba(0, 0, 0, 0.1)" }} onClick={() => setOpen(true)}>
-                <Box sx={{ display: 'flex', flexDirection: 'row', alignItems: 'center', columnGap: '20px' }}>
-                    <Box sx={{
-                        width: '60px', height: '60px', background: '#80deea',
-                        display: 'flex', alignItems: 'center', justifyContent: 'center', borderRadius: '5px',
-                    }}>
-                        <EventNoteIcon sx={{ fontSize: 40 }} />
+            <div className="manager-widget-card widget-cyan" style={{ cursor: 'pointer' }} onClick={() => setOpen(true)}>
+                <Box className="manager-widget-header">
+                    <Box className="manager-widget-info">
+                        <Typography className="manager-widget-title"> Employee Attendance </Typography>
+                        <Typography className="manager-widget-value"> {allEmployeesCount} </Typography>
                     </Box>
-                    <Box sx={{ textAlign: 'center' }}>
-                        <Typography sx={{ fontSize: '14px', opacity: 0.7, color: 'black' }}>
-                            Employee Leaves
-                        </Typography>
-                        <Typography variant="h5" fontWeight="bold" sx={{ color: 'black' }}>
-                            {totalLeaveCount}
-                        </Typography>
+                    <Box className="manager-widget-icon-box">
+                        <EventNoteIcon />
                     </Box>
                 </Box>
-                <Button
-                    size="small"
-                    sx={{
-                        alignSelf: 'flex-end',
-                        textTransform: 'none',
-                        fontWeight: 600,
-                        borderRadius: '8px',
-                        paddingX: '14px',
-                        border: '1px solid #80deea',
-                        color: '#80deea',
-                        '&:hover': { backgroundColor: '#80deea', color: '#000' },
-                    }}
-                >
+                <Button className="manager-widget-action">
                     View
                 </Button>
             </div>
@@ -671,7 +709,7 @@ const EmployeeLeaveWidget = () => {
                 }}>
                     {selectedEmployee
                         ? `Attendance — ${selectedEmployee.name}`
-                        : '📋 Employee Leave Details'}
+                        : '📋 Employee Attendance Directory'}
                     <IconButton size="small" onClick={handleClose} sx={{ color: '#64748b' }}>
                         <CloseIcon />
                     </IconButton>
@@ -685,8 +723,8 @@ const EmployeeLeaveWidget = () => {
                             onBack={() => setSelectedEmployee(null)}
                         />
                     ) : (
-                        <EmployeeLeaveList
-                            leaveRequests={leaveRequests}
+                        <EmployeeList
+                            employees={employees}
                             onSelectEmployee={setSelectedEmployee}
                         />
                     )}
@@ -724,4 +762,4 @@ const EmployeeLeaveWidget = () => {
     );
 };
 
-export default EmployeeLeaveWidget;
+export default EmployeeAttendanceWidget;

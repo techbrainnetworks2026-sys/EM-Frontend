@@ -71,7 +71,7 @@ const ApplyLeave = () => {
 
     return (
         <div className="dashboard-view apply-leave-view">
-            <h2>Apply Leave</h2>
+            <h2 className='apply-leave-heading'>Apply Leave</h2>
             <form onSubmit={handleSubmit} className="form-container">
                 <div className="form-group">
                     <label>Duration Type</label>
@@ -163,8 +163,8 @@ const ApplyLeave = () => {
                 </div>
 
                 <div className="form-actions">
-                    <button type="submit" className="primary-btn">Submit Application</button>
-                    <button type="button" className="secondary-btn" onClick={() => {
+                    <button type="submit" className="apply-leave-submit-btn">Submit Application</button>
+                    <button type="button" className="apply-leave-reset-btn" onClick={() => {
                         setFromDate("");
                         setToDate("");
                         setFromTime("");

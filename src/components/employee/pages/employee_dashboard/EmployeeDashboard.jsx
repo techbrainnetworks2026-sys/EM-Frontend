@@ -11,6 +11,22 @@ import api from '../../../../services/service.js';
 import { useAppContext } from "../../../context/AppContext.jsx";
 import notificationService from "../../../../services/notificationService.js";
 
+// Icons
+import DashboardIcon from '@mui/icons-material/Dashboard';
+import AccessTimeIcon from '@mui/icons-material/AccessTime';
+import EventNoteIcon from '@mui/icons-material/EventNote';
+import AssignmentIcon from '@mui/icons-material/Assignment';
+import AddCircleOutlineIcon from '@mui/icons-material/AddCircleOutline';
+import CampaignIcon from '@mui/icons-material/Campaign';
+import NotificationsNoneIcon from '@mui/icons-material/NotificationsNone';
+import PersonOutlineIcon from '@mui/icons-material/PersonOutline';
+import LogoutIcon from '@mui/icons-material/Logout';
+import HistoryIcon from '@mui/icons-material/History';
+import CalendarMonthIcon from '@mui/icons-material/CalendarMonth';
+import LoginIcon from '@mui/icons-material/Login';
+import LogoutOutlinedIcon from '@mui/icons-material/LogoutOutlined';
+import TimerIcon from '@mui/icons-material/Timer';
+
 export default function EmployeeDashboard() {
 
   const { userData } = useAppContext();
@@ -21,28 +37,29 @@ export default function EmployeeDashboard() {
   });
   const [showProfile, setShowProfile] = useState(false);
   const [sidebarOpen, setSidebarOpen] = useState(false);
-  const [notificationCount, setNotificationCount] = useState(0); // Dynamic count
+  const [notificationCount, setNotificationCount] = useState(0);
   const [showNewNotificationAnimation, setShowNewNotificationAnimation] = useState(false);
   const profileRef = useRef(null);
 
-  // Data State
   const [editProfile, setEditProfile] = useState(false);
   const [leaves, setLeaves] = useState([]);
   const [tasks, setTasks] = useState([]);
 
-  // Check-in State
   const [isCheckedIn, setIsCheckedIn] = useState(false);
   const [checkInTime, setCheckInTime] = useState(null);
   const [checkOutTime, setCheckOutTime] = useState(null);
   const [elapsedTime, setElapsedTime] = useState(null);
+  const [currentTime, setCurrentTime] = useState(new Date());
 
+  useEffect(() => {
+    const timer = setInterval(() => setCurrentTime(new Date()), 1000);
+    return () => clearInterval(timer);
+  }, []);
 
-  // Persist active view to sessionStorage
   useEffect(() => {
     sessionStorage.setItem("employee_active_view", active);
   }, [active]);
 
-  // Live elapsed time timer while checked in
   useEffect(() => {
     if (isCheckedIn && checkInTime) {
       const calcElapsed = () => {
@@ -56,7 +73,7 @@ export default function EmployeeDashboard() {
         const hrs = Math.floor(totalSec / 3600);
         const mins = Math.floor((totalSec % 3600) / 60);
         const secs = totalSec % 60;
-        setElapsedTime(`${hrs}h ${mins}m ${secs}s`);
+        setElapsedTime(`${hrs.toString().padStart(2, '0')}:${mins.toString().padStart(2, '0')}:${secs.toString().padStart(2, '0')}`);
       };
       calcElapsed();
       const interval = setInterval(calcElapsed, 1000);
@@ -64,34 +81,30 @@ export default function EmployeeDashboard() {
     }
   }, [isCheckedIn, checkInTime]);
 
-  // Calculate total worked hours between check-in and check-out
   const getWorkedHours = () => {
-    if (!checkInTime || !checkOutTime) return null;
+    if (!checkInTime || !checkOutTime) return "--:--:--";
     const [h1, m1, s1] = checkInTime.split(':').map(Number);
     const [h2, m2, s2] = checkOutTime.split(':').map(Number);
     const inMs = (h1 * 3600 + m1 * 60 + (s1 || 0)) * 1000;
     const outMs = (h2 * 3600 + m2 * 60 + (s2 || 0)) * 1000;
     const diffMs = outMs - inMs;
-    if (diffMs <= 0) return '0h 0m';
-    const totalMin = Math.floor(diffMs / 60000);
-    const hrs = Math.floor(totalMin / 60);
-    const mins = totalMin % 60;
-    return `${hrs}h ${mins}m`;
+    if (diffMs <= 0) return '00:00:00';
+    const totalSec = Math.floor(diffMs / 1000);
+    const hrs = Math.floor(totalSec / 3600);
+    const mins = Math.floor((totalSec % 3600) / 60);
+    const secs = totalSec % 60;
+    return `${hrs.toString().padStart(2, '0')}:${mins.toString().padStart(2, '0')}:${secs.toString().padStart(2, '0')}`;
   };
 
-  // Close profile dropdown when clicking outside
   useEffect(() => {
     const handleClickOutside = (event) => {
       if (profileRef.current && !profileRef.current.contains(event.target)) {
         setShowProfile(false);
       }
     };
-
     if (showProfile) {
       document.addEventListener('mousedown', handleClickOutside);
-      return () => {
-        document.removeEventListener('mousedown', handleClickOutside);
-      };
+      return () => document.removeEventListener('mousedown', handleClickOutside);
     }
   }, [showProfile]);
 
@@ -99,51 +112,37 @@ export default function EmployeeDashboard() {
     try {
       const [attendanceRes, leaveRes, taskRes] = await Promise.all([
         api.get("attendance/history/"),
-        api.get("leave/history/"),     // your employee leave history endpoint
-        api.get('task/tasks/') // employee tasks
+        api.get("leave/history/"),
+        api.get('task/tasks/')
       ]);
       setAttendance(attendanceRes.data);
       setLeaves(leaveRes.data);
       setTasks(taskRes.data);
-    } catch (err) {
-      // Error handled
-    }
+    } catch (err) { }
   };
 
-  // Fetch notification count
   const fetchNotificationCount = async () => {
     try {
       const response = await api.get('notifications/unread-count/');
       const newCount = response.data.unread_count || 0;
-
-      // Show shake animation only when count increases
       if (newCount > notificationCount) {
         setShowNewNotificationAnimation(true);
         setTimeout(() => setShowNewNotificationAnimation(false), 600);
       }
-
       setNotificationCount(newCount);
-    } catch (err) {
-      // Error handled
-    }
+    } catch (err) { }
   };
 
   useEffect(() => {
     if (userData) {
       fetchDashboardData();
       fetchNotificationCount();
-
-      // Connect to WebSocket for real-time updates
       notificationService.connectWebSocket(userData.id, (data) => {
         if (data.type === 'notification_count') {
           setNotificationCount(data.unread_count);
-
-          // Show shake animation if there's a new notification
           if (data.new_notification) {
             setShowNewNotificationAnimation(true);
             setTimeout(() => setShowNewNotificationAnimation(false), 600);
-
-            // Trigger a browser notification if supported (optional, handled by sw if background)
             if (Notification.permission === 'granted' && document.visibilityState === 'visible') {
               new Notification(data.new_notification.title, {
                 body: data.new_notification.message,
@@ -153,12 +152,8 @@ export default function EmployeeDashboard() {
           }
         }
       });
-
-      return () => {
-        notificationService.disconnectWebSocket();
-      };
+      return () => notificationService.disconnectWebSocket();
     }
-
   }, [userData]);
 
   const now = new Date();
@@ -170,135 +165,80 @@ export default function EmployeeDashboard() {
       if (l.status.toUpperCase() !== "APPROVED") return false;
       return dateStr >= l.start_date && dateStr <= l.end_date;
     });
-    if (!leave) return null;
-    return leave.duration_type;
+    return leave ? leave.duration_type : null;
   };
 
   const presentDays = useMemo(() => {
-    // Generate all days in current month up to today
-    const daysInMonth = new Date(currentYear, currentMonth + 1, 0).getDate();
     const today = now.getDate();
     let count = 0;
-
-    for (let day = 1; day <= daysInMonth; day++) {
-      const date = new Date(currentYear, currentMonth, day);
-      if (date > now) continue;
+    for (let day = 1; day <= today; day++) {
       const dateStr = `${currentYear}-${(currentMonth + 1).toString().padStart(2, '0')}-${day.toString().padStart(2, '0')}`;
-
       const hasAttendance = attendance.some(a => a.date === dateStr && ["PRESENT", "ONGOING"].includes(a.status));
       const leaveType = getLeaveStatusForDate(dateStr);
-
-      if (hasAttendance || leaveType === 'HOURLY' || leaveType === 'HALF_DAY') {
-        count++;
-      }
+      if (hasAttendance || leaveType === 'HOURLY' || leaveType === 'HALF_DAY') count++;
     }
     return count;
-  }, [attendance, leaves, currentMonth, currentYear, now]);
-
+  }, [attendance, leaves, currentMonth, currentYear]);
 
   const totalLeavesTaken = useMemo(() => {
     let count = 0;
-
-    // 1. Count full day approved leaves for the current year
     leaves.forEach(leave => {
       if (leave.status.toUpperCase() === "APPROVED" && leave.duration_type === 'FULL_DAY') {
         let start = new Date(leave.start_date);
         let end = new Date(leave.end_date);
         while (start <= end) {
-          if (start.getFullYear() === currentYear) {
-            count++;
-          }
+          if (start.getFullYear() === currentYear) count++;
           start.setDate(start.getDate() + 1);
         }
       }
     });
-
-    // 2. Count absent days in the current year
-    const startOfYear = new Date(currentYear, 0, 1);
-    let curr = new Date(startOfYear);
-    const today = new Date();
-
-    while (curr <= today) {
-      const dateStr = `${curr.getFullYear()}-${(curr.getMonth() + 1).toString().padStart(2, '0')}-${curr.getDate().toString().padStart(2, '0')}`;
-
-      const isAbsent = attendance.some(a => a.date === dateStr && a.status === "ABSENT");
-      if (isAbsent) {
-        count++;
-      }
-
-      curr.setDate(curr.getDate() + 1);
-    }
-
+    attendance.forEach(a => {
+      if (a.status === "ABSENT" && new Date(a.date).getFullYear() === currentYear) count++;
+    });
     return count;
   }, [leaves, attendance, currentYear]);
 
-
-  const tasksInProgress = useMemo(() => {
-    return tasks.filter(
-      t => t.status === "IN_PROGRESS" || t.status === "PENDING"
-    ).length;
-  }, [tasks]);
-
-  const tasksCompleted = useMemo(() => {
-    return tasks.filter(
-      t => t.status === "COMPLETED"
-    ).length;
-  }, [tasks]);
-
+  const tasksInProgress = useMemo(() => tasks.filter(t => t.status === "IN_PROGRESS" || t.status === "PENDING").length, [tasks]);
+  const tasksCompleted = useMemo(() => tasks.filter(t => t.status === "COMPLETED").length, [tasks]);
 
   useEffect(() => {
     const fetchTodayAttendance = async () => {
       try {
         const res = await api.get("attendance/today/");
-
         if (!res.data || Object.keys(res.data).length === 0) return;
-
-        if (res.data?.check_in && !res.data?.check_out) {
-          setIsCheckedIn(true);
+        if (res.data?.check_in) {
           setCheckInTime(res.data.check_in);
+          if (!res.data?.check_out) setIsCheckedIn(true);
+          else {
+            setIsCheckedIn(false);
+            setCheckOutTime(res.data.check_out);
+          }
         }
-
-        if (res.data?.check_in && res.data?.check_out) {
-          setIsCheckedIn(false);
-          setCheckInTime(res.data.check_in);
-          setCheckOutTime(res.data.check_out);
-        }
-
-      } catch (err) {
-        // Error handled
-      }
+      } catch (err) { }
     };
-
     fetchTodayAttendance();
   }, []);
 
-  const formatTime = (time) => {
-    if (!time) return "";
-
-    return new Date(`1970-01-01T${time}`)
-      .toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+  const formatTimeDisplay = (time) => {
+    if (!time) return "--:--:--";
+    const [h, m, s] = time.split(':').map(Number);
+    const date = new Date();
+    date.setHours(h, m, s || 0);
+    return date.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', second: '2-digit', hour12: true });
   };
 
+  const dayProgress = Math.round((presentDays / 22) * 100);
+
   const handleApplyLeave = (newLeave) => {
-    const leaveEntry = {
-      id: leaves.length + 1,
-      ...newLeave,
-      status: 'Pending'
-    };
-    setLeaves([...leaves, leaveEntry]);
-    setActive('leaves'); // Redirect to history
+    setLeaves([...leaves, { id: leaves.length + 1, ...newLeave, status: 'Pending' }]);
+    setActive('leaves');
   };
 
   const handleTaskStatusUpdate = (taskId, newStatus) => {
-    const updatedTasks = tasks.map(task =>
-      task.id === taskId ? { ...task, status: newStatus } : task
-    );
-    setTasks(updatedTasks);
+    setTasks(tasks.map(t => t.id === taskId ? { ...t, status: newStatus } : t));
   };
 
-  const handleAddTask = (newTask) => {
-    setTasks([...tasks, { ...newTask, id: tasks.length + 1 }]);
-  };
+  const handleAddTask = (newTask) => setTasks([...tasks, { ...newTask, id: tasks.length + 1 }]);
 
   const handleNotificationClick = async () => {
     try {
@@ -306,9 +246,7 @@ export default function EmployeeDashboard() {
       setNotificationCount(0);
       setShowNewNotificationAnimation(false);
       setActive("announcements");
-    } catch (err) {
-      console.error("Failed to mark notifications as read", err);
-    }
+    } catch (err) { }
   };
 
   const handleLogout = () => {
@@ -316,213 +254,168 @@ export default function EmployeeDashboard() {
     navigate('/');
   };
 
-
-
-  const handleCheckIn = async (e) => {
+  const handleCheckAction = async (e) => {
     e.stopPropagation();
-
     try {
-      const res = await api.post("attendance/check-in/");
-
-      setIsCheckedIn(true);
-      setCheckInTime(res.data.time);   // ← TIME FROM DJANGO
-      setCheckOutTime(null);
+      if (!isCheckedIn) {
+        const res = await api.post("attendance/check-in/");
+        setIsCheckedIn(true);
+        setCheckInTime(res.data.time);
+        setCheckOutTime(null);
+      } else {
+        const res = await api.post("attendance/check-out/");
+        setIsCheckedIn(false);
+        setCheckOutTime(res.data.time);
+      }
       fetchDashboardData();
-    } catch (err) {
-      // Error handled
-    }
+    } catch (err) { }
   };
-
-  const handleCheckOut = async (e) => {
-    e.stopPropagation();
-
-    try {
-      const res = await api.post("attendance/check-out/");
-
-      setIsCheckedIn(false);
-      setCheckOutTime(res.data.time);
-      fetchDashboardData();
-    } catch (err) {
-      // Error handled
-    }
-  };
-
-
-
-  useEffect(() => {
-    fetchDashboardData();
-  }, []);
 
   return (
     <div className="layout">
-
-
-      {/* Header */}
-      <header className="header">
-        <div className="header-left">
-          <button className="hamburger-menu" onClick={() => setSidebarOpen(!sidebarOpen)}>
-            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-              <line x1="3" y1="12" x2="21" y2="12"></line>
-              <line x1="3" y1="6" x2="21" y2="6"></line>
-              <line x1="3" y1="18" x2="21" y2="18"></line>
-            </svg>
-          </button>
-          <div className="logo">Techbrain Networks</div>
-        </div>
-        <div className="header-right">
-          <div
-            className={`notification ${notificationCount > 0 ? 'has-notifications' : ''} ${showNewNotificationAnimation ? 'new-notification' : ''}`}
-            onClick={handleNotificationClick}
-            title={notificationCount > 0 ? `You have ${notificationCount} new notification(s)` : 'No new notifications'}
-          >
-            <svg className="notification-icon" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-              <path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"></path>
-              <path d="M13.73 21a2 2 0 0 1-3.46 0"></path>
-            </svg>
-            {notificationCount > 0 && <span className="badge" title={`${notificationCount} new`}>{notificationCount}</span>}
-          </div>
-
-          <div className="profile-area" ref={profileRef}>
-            <button
-              className="profile-toggle"
-              onClick={() => setShowProfile(!showProfile)}
-              aria-label="Profile menu"
-              title="Click to open profile menu"
-            >
-              <div className="header-avatar">
-                {userData?.profile_picture_url ? (
-                  <img src={userData.profile_picture_url} alt="Profile" />
-                ) : (
-                  <span className="avatar-placeholder">👤</span>
-                )}
-              </div>
-              <span className="profile-name">{userData?.username}</span>
-            </button>
-            {showProfile && (
-              <div className="profile-dropdown">
-                <button onClick={() => {
-                  setActive("profile");
-                  setShowProfile(false);
-                }}>Profile</button>
-                <button className="logout" onClick={handleLogout}>Logout</button>
-              </div>
-            )}
-          </div>
-        </div>
-      </header>
-
-      {/* Sidebar Overlay for Mobile */}
       {sidebarOpen && <div className="sidebar-overlay" onClick={() => setSidebarOpen(false)}></div>}
 
-      {/* Sidebar */}
       <aside className={`sidebar ${sidebarOpen ? 'sidebar-open' : ''}`}>
-        <button className="sidebar-close-btn" onClick={() => setSidebarOpen(false)}>
-          ✕
-        </button>
-        <button className={active === 'dashboard' ? 'active' : ''} onClick={() => { setActive("dashboard"); setSidebarOpen(false); }}>Dashboard</button>
-        <button className={active === 'attendance' ? 'active' : ''} onClick={() => { setActive("attendance"); setSidebarOpen(false); }}>Attendance</button>
-        <button className={active === 'leaves' ? 'active' : ''} onClick={() => { setActive("leaves"); setSidebarOpen(false); }}>Leaves</button>
-        <button className={active === 'tasks' ? 'active' : ''} onClick={() => { setActive("tasks"); setSidebarOpen(false); }}>Tasks</button>
-        <button className={active === 'applyLeave' ? 'active' : ''} onClick={() => { setActive("applyLeave"); setSidebarOpen(false); }}>Apply Leave</button>
-        <button className={active === 'announcements' ? 'active' : ''} onClick={() => { setActive("announcements"); setSidebarOpen(false); }}>Announcements</button>
+        <div className="sidebar-brand">
+          <div className="logo">Techbrain Networks</div>
+        </div>
+        <nav className="sidebar-nav">
+          <button className={active === 'dashboard' ? 'active' : ''} onClick={() => { setActive("dashboard"); setSidebarOpen(false); }}>
+            <DashboardIcon /> Dashboard
+          </button>
+          <button className={active === 'attendance' ? 'active' : ''} onClick={() => { setActive("attendance"); setSidebarOpen(false); }}>
+            <AccessTimeIcon /> Attendance
+          </button>
+          <button className={active === 'leaves' ? 'active' : ''} onClick={() => { setActive("leaves"); setSidebarOpen(false); }}>
+            <EventNoteIcon /> Leaves
+          </button>
+          <button className={active === 'tasks' ? 'active' : ''} onClick={() => { setActive("tasks"); setSidebarOpen(false); }}>
+            <AssignmentIcon /> Tasks
+          </button>
+          <button className={active === 'applyLeave' ? 'active' : ''} onClick={() => { setActive("applyLeave"); setSidebarOpen(false); }}>
+            <AddCircleOutlineIcon /> Apply Leave
+          </button>
+          <button className={active === 'announcements' ? 'active' : ''} onClick={() => { setActive("announcements"); setSidebarOpen(false); }}>
+            <CampaignIcon /> Announcements
+          </button>
+        </nav>
+        <div className="sidebar-footer">
+          © {new Date().getFullYear()} Techbrain Networks
+        </div>
       </aside>
 
-      {/* Main Content */}
-      <main className="content">
-
-        {/* DASHBOARD HOME */}
-        {active === "dashboard" && (
-          <div className="dashboard-home">
-            <h2 className="welcome-user">Welcome, {userData?.username}</h2>
-            <div className="cards">
-              {/* Widget 1: Total Days Present */}
-
-
-              {/* Widget 2: Today's Status (Interactive) */}
-              <div className="card checkin-card">
-                <h2>Today's Status</h2>
-                <div className="date-text">
-                  {new Date().toLocaleDateString('en-US', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' })}
-                </div>
-
-                {!isCheckedIn && !checkOutTime ? (
-                  <div className="status-content">
-                    <div className="status-text">Not Checked In</div>
-                    <button className="checkin-btn" onClick={handleCheckIn}>Check In</button>
-                  </div>
-                ) : isCheckedIn ? (
-                  <div className="status-content">
-                    <div className="check-time">In: {formatTime(checkInTime)}</div>
-                    {elapsedTime && <div className="hours-worked">⏱️ {elapsedTime}</div>}
-                    <div className="working-badges">🕒 Working</div>
-                    <button className="checkout-btn" onClick={handleCheckOut}>Check Out</button>
-                  </div>
-                ) : (
-                  <div className="status-content">
-                    <div className="check-time">In: {formatTime(checkInTime)}</div>
-                    <div className="check-time">Out: {formatTime(checkOutTime)}</div>
-                    {getWorkedHours() && <div className="hours-worked">⏱️ Worked: {getWorkedHours()}</div>}
-                    <div className="completed-badge">✅ Day Completed</div>
-                  </div>
-                )}
-              </div>
-              <div className="card" onClick={() => setActive('attendance')}>
-                <h3>Total Days Present</h3>
-                <div className="card-value">{presentDays} / 22</div>
-                <p>
-                  {now.toLocaleString('default', { month: 'long' })} {currentYear}
-                </p>
-              </div>
-
-              {/* Widget 2 */}
-              <div className="card" onClick={() => setActive('leaves')}>
-                <h3>Yearly Leave Taken</h3>
-                <div className="card-value">{totalLeavesTaken} Days</div>
-                <p>View History</p>
-              </div>
-
-              {/* Widget 3 */}
-              <div className="card" onClick={() => setActive('tasks')}>
-                <h3>Task Completion</h3>
-                <div className="card-stat">In Progress: <b>{tasksInProgress}</b></div>
-                <div className="card-stat">Completed: <b>{tasksCompleted}</b></div>
-              </div>
-
-              {/* Widget 4 */}
-              <div className="card highlight-card" onClick={() => setActive('applyLeave')}>
-                <h4 className="apply-Leave">Apply Leave</h4>
-              </div>
+      <div className="main-container">
+        <header className="header">
+          <div className="header-left">
+            <button className="hamburger-menu" onClick={() => setSidebarOpen(!sidebarOpen)}>
+              <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                <line x1="3" y1="12" x2="21" y2="12"></line><line x1="3" y1="6" x2="21" y2="6"></line><line x1="3" y1="18" x2="21" y2="18"></line>
+              </svg>
+            </button>
+            <div className="welcome-text">
+              <h1>Welcome back, <span className="user-name">{userData?.username || 'User'}</span></h1>
+              <p>Here's your daily overview</p>
             </div>
           </div>
-        )}
+          <div className="header-right">
+            <div className={`notification ${notificationCount > 0 ? 'has-notifications' : ''} ${showNewNotificationAnimation ? 'new-notification' : ''}`} onClick={handleNotificationClick}>
+              <NotificationsNoneIcon />
+              {notificationCount > 0 && <span className="badge">{notificationCount}</span>}
+            </div>
+            <div className="profile-area" ref={profileRef}>
+              <button className="header-avatar" onClick={() => setShowProfile(!showProfile)}>
+                {userData?.profile_picture_url ? <img src={userData.profile_picture_url} alt="Profile" /> : <PersonOutlineIcon />}
+              </button>
+              {showProfile && (
+                <div className="profile-dropdown">
+                  <button className="profile-btn" onClick={() => { setActive("profile"); setShowProfile(false); }}><PersonOutlineIcon /> Profile</button>
+                  <button onClick={handleLogout} className="logout-btn"><LogoutIcon /> Logout</button>
+                </div>
+              )}
+            </div>
+          </div>
+        </header>
 
-        {/* SUB VIEWS */}
-        {active === "dashboard" && (
-          // ... (Dashboard widgets are above, this section conditionally renders if I extracted them, 
-          // but based on current file structure, 'dashboard' view renders the cards.
-          // Wait, looking at lines 122-187, the cards are rendered when active==='dashboard'.
-          // Lines 195+ are for OTHER views.
-          // I need to check where active === "attendance" is handled.
-          // Ah, I need to see the line where AttendanceView is rendered.
-          null
-        )}
+        <main className="content">
+          {active === "dashboard" && (
+            <div className="dashboard-grid">
+              <div className="card status-card">
+                <div className="card-header">
+                  <div className="header-title">
+                    <h2>Today's Status</h2>
+                    <p className="date-display">{currentTime.toLocaleDateString('en-US', { weekday: 'long', month: 'long', day: 'numeric', year: 'numeric' })}</p>
+                  </div>
+                  <div className="digital-clock">
+                    {currentTime.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', second: '2-digit', hour12: true })}
+                  </div>
+                </div>
+                <div className="status-stats-grid">
+                  <div className="stat-item">
+                    <div className="stat-label"><LoginIcon /> CHECK IN</div>
+                    <div className="stat-value">{checkInTime ? formatTimeDisplay(checkInTime).split(' ')[0] : "--:--:--"}</div>
+                  </div>
+                  <div className="stat-item">
+                    <div className="stat-label"><LogoutOutlinedIcon /> CHECK OUT</div>
+                    <div className="stat-value">{checkOutTime ? formatTimeDisplay(checkOutTime).split(' ')[0] : "--:--:--"}</div>
+                  </div>
+                  <div className="stat-item">
+                    <div className="stat-label"><TimerIcon /> TOTAL HOURS</div>
+                    <div className="stat-value">{isCheckedIn ? elapsedTime : getWorkedHours()}</div>
+                  </div>
+                </div>
+                <button className={`action-btn ${isCheckedIn ? 'checkout-style' : 'checkin-style'}`} onClick={handleCheckAction}>
+                  {isCheckedIn ? 'Check Out' : 'Check In'}
+                </button>
+              </div>
 
-        {/* Render Views based on active state */}
-        {active === "attendance" && <AttendanceView attendance={attendance} leaves={leaves} />}
-        {active === "leaves" && <LeaveHistory leaves={leaves} />}
-        {active === "applyLeave" && <ApplyLeave onApply={handleApplyLeave} />}
-        {active === "tasks" && <TaskManager tasks={tasks} onUpdateStatus={handleTaskStatusUpdate} onAddTask={handleAddTask} />}
-        {active === "announcements" && <AnnouncementsView />}
+              <div className="card mini-card" onClick={() => setActive('attendance')}>
+                <div className="icon-wrapper blue"><CalendarMonthIcon /></div>
+                <span className="card-label">DAYS PRESENT</span>
+                <div className="main-value">
+                  <span className="current">{presentDays}</span><span className="separator">/</span><span className="total">22</span>
+                </div>
+                <p className="sub-value">{currentTime.toLocaleString('default', { month: 'long', year: 'numeric' })}</p>
+                <div className="progress-bar"><div className="progress-fill" style={{ width: `${dayProgress}%` }}></div></div>
+                <div className="progress-text">Progress <span>{dayProgress}%</span></div>
+              </div>
 
-        {active === "profile" && (
-          <ProfileView
-            user={userData}
-            editProfile={editProfile}
-            setEditProfile={setEditProfile}
-          />
-        )}
+              <div className="card mini-card" onClick={() => setActive('leaves')}>
+                <div className="icon-wrapper orange"><EventNoteIcon /></div>
+                <span className="card-label">YEARLY LEAVES</span>
+                <div className="main-value">
+                  <span className="current">{totalLeavesTaken}</span><span className="unit">Days taken</span>
+                </div>
+                <p className="sub-value">24 remaining</p>
+                <button className="footer-link"><HistoryIcon /> View History</button>
+              </div>
 
-      </main>
+              <div className="card middle-card">
+                <span className="card-label">QUICK ACTIONS</span>
+                <div className="quick-actions-grid">
+                  <button className="quick-btn" onClick={() => setActive('applyLeave')}>
+                    <AddCircleOutlineIcon /><span>Apply Leave</span>
+                  </button>
+                </div>
+              </div>
+
+              <div className="card mini-card" onClick={() => setActive('tasks')}>
+                <div className="icon-wrapper red"><AssignmentIcon /></div>
+                <span className="card-label">TASKS</span>
+                <div className="main-value"><span className="current">{tasksInProgress}</span><span className="unit">In Progress</span></div>
+                <div className="main-value"><span className="current">{tasksCompleted}</span><span className="unit">Completed</span></div>
+                <button className="footer-link">View All Tasks ↗</button>
+              </div>
+            </div>
+          )}
+
+          {active === "attendance" && <AttendanceView attendance={attendance} leaves={leaves} />}
+          {active === "leaves" && <LeaveHistory leaves={leaves} />}
+          {active === "applyLeave" && <ApplyLeave onApply={handleApplyLeave} />}
+          {active === "tasks" && <TaskManager tasks={tasks} onUpdateStatus={handleTaskStatusUpdate} onAddTask={handleAddTask} />}
+          {active === "announcements" && <AnnouncementsView />}
+          {active === "profile" && <ProfileView user={userData} editProfile={editProfile} setEditProfile={setEditProfile} />}
+        </main>
+      </div>
     </div>
   );
 }

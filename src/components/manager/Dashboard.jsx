@@ -8,8 +8,8 @@ import CalendarMonthIcon from '@mui/icons-material/CalendarMonth';
 import { useNavigate } from 'react-router-dom';
 import { useAppContext } from '../context/AppContext.jsx';
 import api from '../../services/service.js';
-import EmployeeLeaveWidget from './components/EmployeeLeaveWidget.jsx';
-
+import EmployeeAttendanceWidget from './components/EmployeeLeaveWidget.jsx';
+import './ManagerLayout.css';
 
 function Dashboard() {
 
@@ -95,95 +95,70 @@ function Dashboard() {
         return `${displayHour.toString().padStart(2, "0")}:${minute} ${period}`;
     };
 
+    const calculateTotalHours = (checkIn, checkOut) => {
+        if (!checkIn || !checkOut) return "--";
+
+        const [inH, inM] = checkIn.split(':').map(Number);
+        const [outH, outM] = checkOut.split(':').map(Number);
+
+        let diffMinutes = (outH * 60 + outM) - (inH * 60 + inM);
+        if (diffMinutes < 0) diffMinutes += 24 * 60; // Handle over-midnight shifts
+
+        const hours = Math.floor(diffMinutes / 60);
+        const mins = diffMinutes % 60;
+        return `${hours}h ${mins}m`;
+    };
+
     return (
         <div>
-            <Typography variant='h5' component='p' sx={{ fontFamily: "work sans", fontWeight: "500", color: "#080808" }}>Welcome Manager!</Typography>
+            <Typography className="manager-dashboard-header" component="h1">Welcome Manager!</Typography>
             <div style={{ marginTop: "20px" }} >
-                <div className='widgets' style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))', gap: '20px' }}>
-                    <div className='widget-1' style={{ boxShadow: "0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05)", background: "#ffffff", borderRadius: "16px", padding: "20px", display: "flex", flexDirection: "column", justifyContent: "space-between", border: "1px solid #fee2e2" }}>
-                        <Box sx={{ display: "flex", flexDirection: "row", alignItems: "center", columnGap: "20px", mb: 2 }}>
-                            <Box sx={{ width: "56px", height: "56px", background: "#fee2e2", display: "flex", alignItems: "center", justifyContent: "center", borderRadius: "12px" }}>
-                                <GroupsIcon sx={{ fontSize: 32, color: "#ef4444" }} />
+                <div className="manager-widget-grid">
+                    <div className="manager-widget-card widget-red">
+                        <Box className="manager-widget-header">
+                            <Box className="manager-widget-info">
+                                <Typography className="manager-widget-title"> Total Employees </Typography>
+                                <Typography className="manager-widget-value"> {approvedUsersCount} </Typography>
                             </Box>
-                            <Box>
-                                <Typography sx={{ fontSize: "12px", fontWeight: 600, color: "#64748b", textTransform: "uppercase", letterSpacing: "0.5px" }}> Total Employees </Typography>
-                                <Typography variant="h4" fontWeight="800" sx={{ color: "#1e293b" }}> {approvedUsersCount} </Typography>
-                            </Box>
-                        </Box>
-
-                        <Button size="small" onClick={() => navigate('/manager/addemployee')}
-                            sx={{
-                                alignSelf: "flex-end",
-                                textTransform: "none",
-                                fontWeight: 700,
-                                borderRadius: "8px",
-                                px: 2,
-                                py: 1,
-                                background: "#fee2e2",
-                                color: "#ef4444",
-                                border: "none",
-                                "&:hover": {
-                                    backgroundColor: "#fecaca",
-                                },
-                            }}
-                        >Manage</Button>
-                    </div>
-                    <div className='widget-2' style={{ boxShadow: "0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05)", background: "#ffffff", borderRadius: "16px", padding: "20px", display: "flex", flexDirection: "column", justifyContent: "space-between", border: "1px solid #ede9fe" }}>
-                        <Box sx={{ display: "flex", flexDirection: "row", alignItems: "center", columnGap: "20px", mb: 2 }}>
-                            <Box sx={{ width: "56px", height: "56px", background: "#ede9fe", display: "flex", alignItems: "center", justifyContent: "center", borderRadius: "12px" }}>
-                                <GroupOffIcon sx={{ fontSize: 32, color: "#8b5cf6" }} />
-                            </Box>
-                            <Box>
-                                <Typography sx={{ fontSize: "12px", fontWeight: 600, color: "#64748b", textTransform: "uppercase", letterSpacing: "0.5px" }}> Employee Requests </Typography>
-                                <Typography variant="h4" fontWeight="800" sx={{ color: "#1e293b" }}> {pendingUsersCount} </Typography>
+                            <Box className="manager-widget-icon-box">
+                                <GroupsIcon />
                             </Box>
                         </Box>
 
-                        <Button size="small" onClick={() => navigate('/manager/pending-employees')}
-                            sx={{
-                                alignSelf: "flex-end",
-                                textTransform: "none",
-                                fontWeight: 700,
-                                borderRadius: "8px",
-                                px: 2,
-                                py: 1,
-                                background: "#ede9fe",
-                                color: "#8b5cf6",
-                                border: "none",
-                                "&:hover": {
-                                    backgroundColor: "#ddd6fe",
-                                },
-                            }}
-                        >View </Button>
+                        <Button className="manager-widget-action" onClick={() => navigate('/manager/addemployee')}>
+                            Manage
+                        </Button>
                     </div>
-                    <div className='widget-3' style={{ boxShadow: "0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05)", background: "#ffffff", borderRadius: "16px", padding: "20px", display: "flex", flexDirection: "column", justifyContent: "space-between", border: "1px solid #ecfdf5" }}>
-                        <Box sx={{ display: "flex", flexDirection: "row", alignItems: "center", columnGap: "20px", mb: 2 }}>
-                            <Box sx={{ width: "56px", height: "56px", background: "#ecfdf5", display: "flex", alignItems: "center", justifyContent: "center", borderRadius: "12px" }}>
-                                <DescriptionIcon sx={{ fontSize: 32, color: "#10b981" }} />
+                    <div className="manager-widget-card widget-purple">
+                        <Box className="manager-widget-header">
+                            <Box className="manager-widget-info">
+                                <Typography className="manager-widget-title"> Employee Requests </Typography>
+                                <Typography className="manager-widget-value"> {pendingUsersCount} </Typography>
                             </Box>
-                            <Box>
-                                <Typography sx={{ fontSize: "12px", fontWeight: 600, color: "#64748b", textTransform: "uppercase", letterSpacing: "0.5px" }}> Leave Requests </Typography>
-                                <Typography variant="h4" fontWeight="800" sx={{ color: "#1e293b" }}> {leaveRequestsCount} </Typography>
+                            <Box className="manager-widget-icon-box">
+                                <GroupOffIcon />
                             </Box>
                         </Box>
-                        <Button size="small" onClick={() => navigate('/manager/leave-management')}
-                            sx={{
-                                alignSelf: "flex-end",
-                                textTransform: "none",
-                                fontWeight: 700,
-                                borderRadius: "8px",
-                                px: 2,
-                                py: 1,
-                                background: "#ecfdf5",
-                                color: "#10b981",
-                                border: "none",
-                                "&:hover": {
-                                    backgroundColor: "#d1fae5",
-                                },
-                            }}
-                        >View</Button>
+
+                        <Button className="manager-widget-action" onClick={() => navigate('/manager/pending-employees')}>
+                            View
+                        </Button>
                     </div>
-                    <EmployeeLeaveWidget />
+                    <div className="manager-widget-card widget-green">
+                        <Box className="manager-widget-header">
+                            <Box className="manager-widget-info">
+                                <Typography className="manager-widget-title"> Leave Requests </Typography>
+                                <Typography className="manager-widget-value"> {leaveRequestsCount} </Typography>
+                            </Box>
+                            <Box className="manager-widget-icon-box">
+                                <DescriptionIcon />
+                            </Box>
+                        </Box>
+                        <Button className="manager-widget-action" onClick={() => navigate('/manager/leave-management')}>
+                            View
+                        </Button>
+                    </div>
+                    <EmployeeAttendanceWidget />
                 </div>
                 <Box sx={{
                     display: "flex",
@@ -251,15 +226,13 @@ function Dashboard() {
                     <TableContainer component={Paper}
                         sx={{
                             background: "#ffffff",
-                            borderRadius: "12px",
-                            boxShadow: "0 4px 12px rgba(0,0,0,0.1)",
+                            borderRadius: "16px",
+                            boxShadow: "0 4px 12px rgba(0,0,0,0.03)",
                             border: "1px solid #e2e8f0"
                         }}
                     >
                         <Table>
-                            {/* ... table content exists here in original snippet ... */}
-
-                            <TableHead sx={{ display: { xs: "none", sm: "table-header-group" } }}>
+                            <TableHead sx={{ display: { xs: "none", sm: "table-header-group" }, backgroundColor: "transparent" }}>
                                 <TableRow>
                                     <TableCell sx={{ color: "#1e293b", fontWeight: 600 }}>
                                         Employee Name
@@ -269,6 +242,9 @@ function Dashboard() {
                                     </TableCell>
                                     <TableCell sx={{ color: "#1e293b", fontWeight: 600 }}>
                                         Check-Out Time
+                                    </TableCell>
+                                    <TableCell sx={{ color: "#1e293b", fontWeight: 600 }}>
+                                        Total Hours
                                     </TableCell>
                                     <TableCell sx={{ color: "#1e293b", fontWeight: 600 }}>
                                         Status
@@ -290,17 +266,22 @@ function Dashboard() {
                                                 <TableCell sx={{ color: "#334155" }}>
                                                     {formatTime(row.check_out)}
                                                 </TableCell>
+                                                <TableCell sx={{ color: "#334155", fontWeight: 500 }}>
+                                                    {calculateTotalHours(row.check_in, row.check_out)}
+                                                </TableCell>
                                                 <TableCell>
                                                     <Chip label={row.status}
                                                         size="small"
                                                         sx={{
                                                             backgroundColor:
-                                                                row.status === "PRESENT" ? "#e8f5e9" : row?.status === "ONGOING" ? "#e0e7ff" : "#ffebee",
-                                                            color: row.status === "PRESENT" ? "#2e7d32" : row?.status === "ONGOING" ? "#3730a3" : "#d32f2f",
-                                                            fontWeight: 700,
+                                                                row.status === "PRESENT" ? "#f0fdf4" : row?.status === "ONGOING" ? "#f3e8ff" : "#fef2f2",
+                                                            color: row.status === "PRESENT" ? "#166534" : row?.status === "ONGOING" ? "#7e22ce" : "#991b1b",
+                                                            fontWeight: 600,
                                                             fontSize: "11px",
-                                                            border: `1px solid ${row.status === "PRESENT" ? "#c8e6c9" : row?.status === "ONGOING" ? "#c7d2fe" : "#ffcdd2"}`,
+                                                            border: `1px solid ${row.status === "PRESENT" ? "#bbf7d0" : row?.status === "ONGOING" ? "#e9d5ff" : "#fecaca"}`,
                                                             textTransform: "uppercase",
+                                                            borderRadius: "6px",
+                                                            padding: "4px"
                                                         }}
                                                     />
                                                 </TableCell>
@@ -334,12 +315,15 @@ function Dashboard() {
                                                                 size="small"
                                                                 sx={{
                                                                     backgroundColor:
-                                                                        row.status === "PRESENT" ? "#e8f5e9" : row?.status === "ONGOING" ? "#e8eaf6" : "#ffebee",
+                                                                        row.status === "PRESENT" ? "#f0fdf4" : row?.status === "ONGOING" ? "#f3e8ff" : "#fef2f2",
                                                                     color:
-                                                                        row.status === "PRESENT" ? "#2e7d32" : row?.status === "ONGOING" ? "#3f51b5" : "#d32f2f",
-                                                                    fontWeight: 700,
+                                                                        row.status === "PRESENT" ? "#166534" : row?.status === "ONGOING" ? "#7e22ce" : "#991b1b",
+                                                                    fontWeight: 600,
                                                                     fontSize: "11px",
-                                                                    border: `1px solid ${row.status === "PRESENT" ? "#c8e6c9" : row?.status === "ONGOING" ? "#c5cae9" : "#ffcdd2"}`
+                                                                    border: `1px solid ${row.status === "PRESENT" ? "#bbf7d0" : row?.status === "ONGOING" ? "#e9d5ff" : "#fecaca"}`,
+                                                                    textTransform: "uppercase",
+                                                                    borderRadius: "6px",
+                                                                    padding: "4px"
                                                                 }}
                                                             />
                                                         </Box>
@@ -361,6 +345,14 @@ function Dashboard() {
                                                                 </Typography>
                                                                 <Typography sx={{ fontSize: "14px", color: "#334155", fontWeight: 500 }}>
                                                                     {formatTime(row.check_out)}
+                                                                </Typography>
+                                                            </Box>
+                                                            <Box sx={{ flex: 1 }}>
+                                                                <Typography sx={{ fontSize: "11px", color: "#64748b", fontWeight: 600, textTransform: "uppercase" }}>
+                                                                    Total Hrs
+                                                                </Typography>
+                                                                <Typography sx={{ fontSize: "14px", color: "#334155", fontWeight: 500 }}>
+                                                                    {calculateTotalHours(row.check_in, row.check_out)}
                                                                 </Typography>
                                                             </Box>
                                                         </Box>

@@ -1,14 +1,14 @@
 @import url('https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700&display=swap');
 
 :root {
-    --primary-color: #6366f1;
-    --primary-hover: #4f46e5;
-    --bg-gradient: linear-gradient(135deg, #0f172a 0%, #1e1b4b 100%);
-    --card-bg: rgba(30, 41, 59, 0.7);
-    --text-main: #f8fafc;
-    --text-muted: #94a3b8;
-    --border-color: rgba(255, 255, 255, 0.1);
-    --input-bg: rgba(15, 23, 42, 0.5);
+    --primary-color: #3b82f6;
+    --primary-hover: #2563eb;
+    --bg-gradient: linear-gradient(135deg, #f0f9ff 0%, #e0f2fe 100%);
+    --card-bg: #ffffff;
+    --text-main: #1e293b;
+    --text-muted: #64748b;
+    --border-color: #e2e8f0;
+    --input-bg: #f8fafc;
 }
 
 /* ========================= */
@@ -46,14 +46,13 @@
 /* Card */
 .signin-card {
     background: var(--card-bg);
-    backdrop-filter: blur(12px);
-    -webkit-backdrop-filter: blur(12px);
     border: 1px solid var(--border-color);
     border-radius: 16px;
     padding: 2.5rem 2rem;
     width: 100%;
     max-width: 420px;
-    box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
+    box-shadow: 0 20px 40px -10px rgba(0, 0, 0, 0.08);
+    /* Softer ambient shadow */
     display: flex;
     flex-direction: column;
     animation: signin-fadeIn 0.6s ease-out;
@@ -82,10 +81,7 @@
     font-size: 2.25rem;
     font-weight: 700;
     margin: 0;
-    background: linear-gradient(to right, #818cf8, #c084fc);
-    -webkit-background-clip: text;
-    background-clip: text;
-    -webkit-text-fill-color: transparent;
+    color: var(--text-main);
 }
 
 /* Form */
@@ -128,7 +124,9 @@
 
 .signin-form-group input:focus {
     border-color: var(--primary-color);
-    box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.1);
+    box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.15);
+    /* Blue glow */
+    background: #ffffff;
 }
 
 .signin-form-group input.input-error {
@@ -136,7 +134,7 @@
 }
 
 .signin-form-group input.input-error:focus {
-    box-shadow: 0 0 0 3px rgba(239, 68, 68, 0.1);
+    box-shadow: 0 0 0 3px rgba(239, 68, 68, 0.15);
 }
 
 .error-message {
@@ -164,7 +162,7 @@
 .signin-auth-button:hover {
     background: var(--primary-hover);
     transform: translateY(-1px);
-    box-shadow: 0 4px 12px rgba(99, 102, 241, 0.3);
+    box-shadow: 0 8px 16px -4px rgba(59, 130, 246, 0.3);
 }
 
 .signin-auth-button:active {

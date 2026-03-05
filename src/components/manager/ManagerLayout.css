@@ -1,0 +1,339 @@
+@import url('https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700&display=swap');
+
+:root {
+    --manager-sidebar-bg: #1e1e2f;
+    --manager-sidebar-text: #ffffff;
+    --manager-sidebar-active: #3b82f6;
+    --manager-sidebar-hover: rgba(255, 255, 255, 0.08);
+    --manager-navbar-bg: #ffffff;
+    --manager-main-bg: #f8fafc;
+    --manager-text-main: #1e293b;
+    --manager-text-muted: #64748b;
+    --manager-border: #e2e8f0;
+}
+
+/* ========================= */
+/* Manager Global Layout     */
+/* ========================= */
+.manager-app-layout {
+    display: flex;
+    min-height: 100vh;
+    background-color: var(--manager-main-bg);
+    font-family: 'Outfit', sans-serif;
+}
+
+.manager-main-section {
+    flex-grow: 1;
+    display: flex;
+    flex-direction: column;
+    min-height: 100vh;
+    transition: margin-left 0.3s ease;
+}
+
+.manager-dashboard-content {
+    flex-grow: 1;
+    padding: 24px;
+    margin-top: 70px;
+    /* Space for navbar */
+    overflow-x: hidden;
+}
+
+/* ========================= */
+/* Sidebar                   */
+/* ========================= */
+.manager-sidebar {
+    height: 100vh;
+    position: fixed;
+    top: 0;
+    left: 0;
+    z-index: 1200;
+    background-color: var(--manager-sidebar-bg);
+    color: var(--manager-sidebar-text);
+    transition: width 0.3s ease;
+    overflow-y: auto;
+    box-shadow: 2px 0 8px rgba(0, 0, 0, 0.15);
+}
+
+.manager-sidebar::-webkit-scrollbar {
+    width: 6px;
+}
+
+.manager-sidebar::-webkit-scrollbar-thumb {
+    background: rgba(255, 255, 255, 0.2);
+    border-radius: 10px;
+}
+
+.manager-sidebar-header {
+    display: flex;
+    align-items: center;
+    justify-content: flex-start;
+    height: 80px;
+    padding: 0 20px;
+    gap: 12px;
+}
+
+.manager-logo-icon {
+    width: 36px;
+    height: 36px;
+    background-color: var(--manager-sidebar-active);
+    color: #ffffff;
+    border-radius: 10px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: 700;
+    font-size: 16px;
+    flex-shrink: 0;
+}
+
+.manager-logo-text-container {
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+    white-space: nowrap;
+}
+
+.manager-logo-title {
+    font-family: 'Outfit', sans-serif;
+    color: #ffffff;
+    font-weight: 600;
+    font-size: 15px;
+    margin: 0;
+}
+
+.manager-logo-subtitle {
+    font-size: 11px;
+    opacity: 0.6;
+    color: #ffffff;
+    font-family: 'Outfit', sans-serif;
+    margin: 0;
+}
+
+.manager-sidebar-divider {
+    border-color: rgba(255, 255, 255, 0.1) !important;
+    margin: 0 15px !important;
+}
+
+.manager-nav-list {
+    display: flex;
+    flex-direction: column;
+    padding: 20px 10px !important;
+    gap: 8px;
+}
+
+.manager-nav-item {
+    border-radius: 10px !important;
+    padding: 12px 16px !important;
+    gap: 16px !important;
+    color: #94a3b8 !important;
+    font-family: 'Outfit', sans-serif !important;
+    font-size: 15px !important;
+    font-weight: 500 !important;
+    transition: all 0.2s ease !important;
+}
+
+.manager-nav-item:hover {
+    background-color: var(--manager-sidebar-hover) !important;
+    color: #ffffff !important;
+}
+
+.manager-nav-item.active {
+    background-color: var(--manager-sidebar-active) !important;
+    color: #ffffff !important;
+    box-shadow: 0 4px 12px rgba(59, 130, 246, 0.3) !important;
+}
+
+.manager-nav-item .MuiSvgIcon-root {
+    font-size: 22px !important;
+    color: inherit !important;
+}
+
+/* ========================= */
+/* Navbar                    */
+/* ========================= */
+.manager-navbar {
+    background-color: var(--manager-navbar-bg) !important;
+    box-shadow: 0 1px 4px rgba(0, 0, 0, 0.05) !important;
+    border-bottom: 1px solid var(--manager-border) !important;
+    height: 70px;
+    display: flex;
+    justify-content: center;
+    padding: 0 24px !important;
+    transition: width 0.3s ease, left 0.3s ease;
+}
+
+.manager-navbar-container {
+    display: flex;
+    flex-direction: row;
+    justify-content: space-between;
+    align-items: center;
+    width: 100%;
+    height: 100%;
+}
+
+.manager-navbar-left {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+}
+
+.manager-navbar-title {
+    color: var(--manager-text-muted);
+    font-weight: 600 !important;
+    font-size: 13px !important;
+    letter-spacing: 1px !important;
+    text-transform: uppercase;
+}
+
+.manager-menu-btn {
+    color: var(--manager-text-main) !important;
+}
+
+.manager-navbar-actions {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+}
+
+/* ========================= */
+/* Dashboard                 */
+/* ========================= */
+.manager-dashboard-header {
+    font-family: 'Outfit', sans-serif !important;
+    font-weight: 700 !important;
+    color: var(--manager-text-main) !important;
+    font-size: 24px !important;
+    margin-bottom: 24px !important;
+}
+
+.manager-widget-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+    gap: 20px;
+    margin-bottom: 32px;
+}
+
+.manager-widget-card {
+    background: #ffffff;
+    border-radius: 16px;
+    padding: 24px;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.03);
+    border: 1px solid var(--manager-border);
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.manager-widget-card:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 10px 25px rgba(0, 0, 0, 0.05);
+}
+
+.manager-widget-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 20px;
+}
+
+.manager-widget-info {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+}
+
+.manager-widget-title {
+    font-size: 12px !important;
+    font-weight: 600 !important;
+    color: var(--manager-text-muted) !important;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+.manager-widget-value {
+    font-size: 32px !important;
+    font-weight: 800 !important;
+    color: var(--manager-text-main) !important;
+    line-height: 1 !important;
+}
+
+.manager-widget-icon-box {
+    width: 48px;
+    height: 48px;
+    border-radius: 12px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.manager-widget-icon-box .MuiSvgIcon-root {
+    font-size: 24px !important;
+}
+
+.manager-widget-action {
+    align-self: flex-end;
+    text-transform: none !important;
+    font-weight: 600 !important;
+    font-size: 13px !important;
+    border-radius: 8px !important;
+    padding: 6px 16px !important;
+    background: #ffffff !important;
+}
+
+/* Theme specific overrides for widgets */
+.widget-red .manager-widget-icon-box {
+    background: #fee2e2;
+    color: #ef4444;
+}
+
+.widget-red .manager-widget-action {
+    border: 1px solid #fca5a5 !important;
+    color: #ef4444 !important;
+}
+
+.widget-red .manager-widget-action:hover {
+    background: #fee2e2 !important;
+}
+
+.widget-purple .manager-widget-icon-box {
+    background: #f3e8ff;
+    color: #a855f7;
+}
+
+.widget-purple .manager-widget-action {
+    border: 1px solid #d8b4fe !important;
+    color: #a855f7 !important;
+}
+
+.widget-purple .manager-widget-action:hover {
+    background: #f3e8ff !important;
+}
+
+.widget-green .manager-widget-icon-box {
+    background: #dcfce7;
+    color: #22c55e;
+}
+
+.widget-green .manager-widget-action {
+    border: 1px solid #86efac !important;
+    color: #22c55e !important;
+}
+
+.widget-green .manager-widget-action:hover {
+    background: #dcfce7 !important;
+}
+
+.widget-cyan .manager-widget-icon-box {
+    background: #e0f2fe;
+    color: #0ea5e9;
+}
+
+.widget-cyan .manager-widget-action {
+    border: 1px solid #7dd3fc !important;
+    color: #0ea5e9 !important;
+}
+
+.widget-cyan .manager-widget-action:hover {
+    background: #e0f2fe !important;
+}
