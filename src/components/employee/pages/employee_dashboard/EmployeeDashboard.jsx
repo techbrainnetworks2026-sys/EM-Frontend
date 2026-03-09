@@ -118,7 +118,9 @@ export default function EmployeeDashboard() {
       setAttendance(attendanceRes.data);
       setLeaves(leaveRes.data);
       setTasks(taskRes.data);
-    } catch (err) { }
+    } catch (err) { 
+      console.log("Error marking notifications as read:", err);
+     }
   };
 
   const fetchNotificationCount = async () => {
@@ -130,7 +132,9 @@ export default function EmployeeDashboard() {
         setTimeout(() => setShowNewNotificationAnimation(false), 600);
       }
       setNotificationCount(newCount);
-    } catch (err) { }
+    } catch (err) { 
+      console.log("Error marking notifications as read:", err);
+     }
   };
 
   useEffect(() => {
@@ -214,7 +218,9 @@ export default function EmployeeDashboard() {
             setCheckOutTime(res.data.check_out);
           }
         }
-      } catch (err) { }
+      } catch (err) { 
+        console.log("Error marking notifications as read:", err);
+       }
     };
     fetchTodayAttendance();
   }, []);
@@ -246,7 +252,9 @@ export default function EmployeeDashboard() {
       setNotificationCount(0);
       setShowNewNotificationAnimation(false);
       setActive("announcements");
-    } catch (err) { }
+    } catch (err) { 
+      console.log("Error marking notifications as read:", err);
+    }
   };
 
   const handleLogout = () => {
@@ -268,7 +276,9 @@ export default function EmployeeDashboard() {
         setCheckOutTime(res.data.time);
       }
       fetchDashboardData();
-    } catch (err) { }
+    } catch (err) { 
+      console.log("Error marking notifications as read:", err);
+     }
   };
 
   return (
