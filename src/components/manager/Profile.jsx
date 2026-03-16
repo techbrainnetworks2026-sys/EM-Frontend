@@ -24,6 +24,8 @@ const Profile = () => {
         mobile_number: userData?.mobile_number || "",
         department: userData?.department || "",
         designation: userData?.designation || "",
+        profile_picture: "",
+        profile_preview: ""
     });
 
     const [passwordForm, setPasswordForm] = useState({
@@ -92,13 +94,59 @@ const Profile = () => {
         setSearchTerm("");
     };
 
-    const handleProfileChange = (e) => {
-        setProfileForm({
-            ...profileForm,
-            [e.target.name]: e.target.value
-        });
-    };
+    // Profile Update
+    const handleUpdateProfile = async () => {
+        try {
 
+            const formData = new FormData();
+
+            formData.append("username", profileForm.username);
+            formData.append("mobile_number", profileForm.mobile_number);
+            formData.append("department", profileForm.department);
+            formData.append("designation", profileForm.designation);
+
+            if (profileForm.profile_picture) {
+                formData.append("profile_picture", profileForm.profile_picture);
+            }
+
+            const res = await api.patch(
+                "accounts/profile/update/",
+                formData,
+                {
+                    headers: {
+                        "Content-Type": "multipart/form-data"
+                    }
+                }
+            );
+
+            alert("Profile updated successfully");
+
+            setOpenEdit(false);
+
+        } catch (err) {
+            console.log(err);
+            alert("Profile update failed");
+        }
+    };
+    // Profile Update
+    const handleProfileChange = (e) => {
+        const { name, value, files } = e.target;
+
+        if (files && files[0]) {
+            const imageFile = files[0];
+
+            setProfileForm({
+                ...profileForm,
+                [name]: imageFile,
+                profile_preview: URL.createObjectURL(imageFile)
+            });
+        } else {
+            setProfileForm({
+                ...profileForm,
+                [name]: value
+            });
+        }
+    };
     const handlePasswordChange = (e) => {
         setPasswordForm({
             ...passwordForm,
@@ -135,16 +183,23 @@ const Profile = () => {
                 mb: 4,
                 boxShadow: "0 10px 15px -3px rgba(13, 71, 161, 0.2)"
             }}>
-                <Avatar sx={{
-                    width: { xs: 80, sm: 100 },
-                    height: { xs: 80, sm: 100 },
-                    bgcolor: "rgba(255,255,255,0.2)",
-                    color: "white",
-                    fontSize: { xs: "32px", sm: "40px" },
-                    fontWeight: 700,
-                    border: "4px solid rgba(255,255,255,0.1)"
-                }}>
-                    {userData?.username ? userData.username.charAt(0).toUpperCase() : "M"}
+                <Avatar
+                    src={profileForm?.profile_preview || userData?.profile_picture}
+                    sx={{
+                        width: { xs: 80, sm: 100 },
+                        height: { xs: 80, sm: 100 },
+                        bgcolor: "rgba(255,255,255,0.2)",
+                        color: "white",
+                        fontSize: { xs: "32px", sm: "40px" },
+                        fontWeight: 700,
+                        border: "4px solid rgba(255,255,255,0.1)"
+                    }}
+                >
+                    {!profileForm?.profile_preview &&
+                        !userData?.profile_picture &&
+                        (userData?.username
+                            ? userData.username.charAt(0).toUpperCase()
+                            : "M")}
                 </Avatar>
 
                 <Box sx={{ flex: 1, textAlign: { xs: "center", sm: "left" } }}>
@@ -493,11 +548,60 @@ const Profile = () => {
                     }
                 }}
             >
-                <DialogTitle sx={{ fontWeight: 700, color: "#1e293b", borderBottom: "1px solid #f1f5f9" }}>
+                <DialogTitle
+                    sx={{
+                        fontWeight: 700,
+                        color: "#1e293b",
+                        borderBottom: "1px solid #f1f5f9",
+                        textAlign: "center"
+                    }}
+                >
                     Edit Profile Details
                 </DialogTitle>
+
                 <DialogContent sx={{ py: 3 }}>
-                    <Box sx={{ display: "flex", flexDirection: "column", gap: 2, mt: 1 }}>
+
+                    {/* Profile Image Section */}
+                    <Box
+                        sx={{
+                            display: "flex",
+                            flexDirection: "column",
+                            alignItems: "center",
+                            mb: 3
+                        }}
+                    >
+                        <Avatar
+                            src={profileForm?.profile_preview || profileForm?.profile_picture}
+                            sx={{
+                                width: 90,
+                                height: 90,
+                                mb: 1,
+                                border: "3px solid #e2e8f0"
+                            }}
+                        />
+
+                        <Button
+                            variant="outlined"
+                            component="label"
+                            sx={{
+                                textTransform: "none",
+                                borderRadius: "8px"
+                            }}
+                        >
+                            Upload Photo
+                            <input
+                                hidden
+                                accept="image/*"
+                                type="file"
+                                name="profile_picture"
+                                onChange={handleProfileChange}
+                            />
+                        </Button>
+                    </Box>
+
+                    {/* Form Fields */}
+                    <Box sx={{ display: "flex", flexDirection: "column", gap: 2 }}>
+
                         <TextField
                             label="Full Name"
                             name="username"
@@ -506,6 +610,7 @@ const Profile = () => {
                             fullWidth
                             variant="outlined"
                         />
+
                         <TextField
                             label="Email Address"
                             name="email"
@@ -514,6 +619,7 @@ const Profile = () => {
                             fullWidth
                             helperText="Email cannot be changed"
                         />
+
                         <TextField
                             label="Mobile Number"
                             name="mobile_number"
@@ -521,6 +627,7 @@ const Profile = () => {
                             onChange={handleProfileChange}
                             fullWidth
                         />
+
                         <Box sx={{ display: "flex", gap: 2 }}>
                             <TextField
                                 label="Department"
@@ -529,6 +636,7 @@ const Profile = () => {
                                 onChange={handleProfileChange}
                                 fullWidth
                             />
+
                             <TextField
                                 label="Designation"
                                 name="designation"
@@ -537,11 +645,32 @@ const Profile = () => {
                                 fullWidth
                             />
                         </Box>
+
                     </Box>
                 </DialogContent>
+
                 <DialogActions sx={{ px: 3, py: 2, bgcolor: "#f8fafc" }}>
-                    <Button onClick={() => setOpenEdit(false)} sx={{ textTransform: "none", color: "#64748b", fontWeight: 600 }}>Cancel</Button>
-                    <Button variant="contained" sx={{ textTransform: "none", bgcolor: "#0d47a1", fontWeight: 600, borderRadius: "8px" }}>
+                    <Button
+                        onClick={() => setOpenEdit(false)}
+                        sx={{
+                            textTransform: "none",
+                            color: "#64748b",
+                            fontWeight: 600
+                        }}
+                    >
+                        Cancel
+                    </Button>
+
+                    <Button
+                        variant="contained"
+                        onClick={handleUpdateProfile}
+                        sx={{
+                            textTransform: "none",
+                            bgcolor: "#0d47a1",
+                            fontWeight: 600,
+                            borderRadius: "8px"
+                        }}
+                    >
                         Update Profile
                     </Button>
                 </DialogActions>

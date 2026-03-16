@@ -19,9 +19,15 @@ const AddTask = () => {
     const [title, setTitle] = useState("");
     const [description, setDescription] = useState("");
     const [assignedTo, setAssignedTo] = useState("");
-    const [dueDate, setDueDate] = useState("");
+    const [startDate, setStartDate] = useState("");
+    const [endDate, setEndDate] = useState("");
+    const [status, setStatus] = useState("");
+    const [errors, setErrors] = useState({});
     const [priority, setPriority] = useState("");
     const [arows, setARows] = useState([]);
+    const [editOpen, setEditOpen] = useState(false);
+    const [editTaskId, setEditTaskId] = useState(null);
+    const [newEndDate, setNewEndDate] = useState("");
     const handleClose = () => setOpen(false);
 
     const groupedEmployees = Object.values(
@@ -86,12 +92,30 @@ const AddTask = () => {
     const handleAddTask = async (e) => {
         e.preventDefault();
         try {
+            // Validation
+            const newErrors = {};
+            if (!title) newErrors.title = 'Task Title is required';
+            if (!startDate) newErrors.startDate = 'Start Date is required';
+            if (!endDate) newErrors.endDate = 'End Date is required';
+            if (!priority) newErrors.priority = 'Priority is required';
+            if (!assignedTo) newErrors.assignedTo = 'Assignee is required';
+            if (!description) newErrors.description = 'Description is required';
+            if (startDate && endDate && new Date(endDate) < new Date(startDate)) {
+                newErrors.endDate = 'End Date cannot be before Start Date';
+            }
+            if (Object.keys(newErrors).length > 0) {
+                setErrors(newErrors);
+                return;
+            }
+            setErrors({});
             const res = await api.post('task/tasks/', {
                 title: title,
                 description: description,
                 assigned_to: assignedTo,
-                start_date: dueDate,
-                priority: priority
+                start_date: startDate,
+                end_date: endDate,
+                priority: priority,
+                status: 'PENDING'
             });
             setMessage("Task assigned successfully!");
             setSOpen(true);
@@ -109,6 +133,55 @@ const AddTask = () => {
     const handleSClose = (event, reason) => {
         if (reason === "clickaway") return;
         setSOpen(false);
+    };
+
+    const handleEditClick = (task) => {
+        setEditTaskId(task.id);
+        setNewEndDate(task.end_date ? task.end_date.split('T')[0] : "");
+        setEditOpen(true);
+    };
+
+    const handleEditClose = () => {
+        setEditOpen(false);
+        setEditTaskId(null);
+        setNewEndDate("");
+    };
+
+    const handleEditSubmit = async () => {
+        if (!newEndDate) {
+            setMessage("End Date is required");
+            setSeverity("error");
+            setSOpen(true);
+            return;
+        }
+        try {
+            await api.patch(`task/tasks/${editTaskId}/`, { end_date: newEndDate });
+            fetchEmployeesTask();
+            setMessage("Task end date updated!");
+            setSeverity("success");
+            setSOpen(true);
+            handleEditClose();
+        } catch (err) {
+            console.log(err);
+            setMessage("Failed to update end date");
+            setSeverity("error");
+            setSOpen(true);
+        }
+    };
+
+    const handleStatusUpdate = async (id, newStatus) => {
+        try {
+            await api.patch(`task/tasks/${id}/`, { status: newStatus });
+            fetchEmployeesTask();
+            setMessage(`Task marked as ${newStatus.replace('_', ' ')}!`);
+            setSeverity("success");
+            setSOpen(true);
+        } catch (err) {
+            console.log(err);
+            setMessage("Failed to update status");
+            setSeverity("error");
+            setSOpen(true);
+        }
     };
 
 
@@ -154,62 +227,76 @@ const AddTask = () => {
                     <Table sx={{ minWidth: 650 }}>
                         <TableHead sx={{ display: { xs: "none", sm: "table-header-group" }, bgcolor: "#f8fafc" }}>
                             <TableRow>
-                                <TableCell sx={{ color: "#475569", fontWeight: 700, fontSize: "12px", textTransform: "uppercase" }}>Employee</TableCell>
-                                <TableCell sx={{ color: "#475569", fontWeight: 700, fontSize: "12px", textTransform: "uppercase" }}>Role</TableCell>
-                                <TableCell align="center" sx={{ color: "#475569", fontWeight: 700, fontSize: "12px", textTransform: "uppercase" }}>Pending Tasks</TableCell>
-                                <TableCell align="center" sx={{ color: "#475569", fontWeight: 700, fontSize: "12px", textTransform: "uppercase" }}>Completed</TableCell>
+                                <TableCell sx={{ color: "#475569", fontWeight: 700, fontSize: "12px", textTransform: "uppercase" }}>Task Title</TableCell>
+                                <TableCell sx={{ color: "#475569", fontWeight: 700, fontSize: "12px", textTransform: "uppercase" }}>Assigned Employee</TableCell>
+                                <TableCell sx={{ color: "#475569", fontWeight: 700, fontSize: "12px", textTransform: "uppercase" }}>Priority</TableCell>
+                                <TableCell sx={{ color: "#475569", fontWeight: 700, fontSize: "12px", textTransform: "uppercase" }}>Start Date</TableCell>
+                                <TableCell sx={{ color: "#475569", fontWeight: 700, fontSize: "12px", textTransform: "uppercase" }}>End Date</TableCell>
+                                <TableCell sx={{ color: "#475569", fontWeight: 700, fontSize: "12px", textTransform: "uppercase" }}>Status</TableCell>
                                 <TableCell align="center" sx={{ color: "#475569", fontWeight: 700, fontSize: "12px", textTransform: "uppercase" }}>Action</TableCell>
                             </TableRow>
                         </TableHead>
 
                         <TableBody>
                             {!isMobile ?
-                                employeesWithSummary.map((row, index) => (
-                                    <TableRow key={index} sx={{ "&:hover": { background: "#f8fafc" }, transition: "0.2s" }}>
+                                selectedEmployee.map((row) => (
+                                    <TableRow key={row.id} sx={{ "&:hover": { background: "#f8fafc" }, transition: "0.2s" }}>
+                                        <TableCell>
+                                            <Typography sx={{ fontWeight: 600, color: "#1e293b" }}>
+                                                {row.title || "-"}
+                                            </Typography>
+                                        </TableCell>
                                         <TableCell>
                                             <Box sx={{ display: "flex", alignItems: "center", gap: 1.5 }}>
                                                 <Avatar sx={{ width: 32, height: 32, fontSize: "12px", bgcolor: "#e0e7ff", color: "#4338ca", fontWeight: 700 }}>
-                                                    {(row.employee?.username || "U").charAt(0).toUpperCase()}
+                                                    {(row.assigned_to_details?.username || "U").charAt(0).toUpperCase()}
                                                 </Avatar>
                                                 <Typography sx={{ fontWeight: 600, color: "#1e293b" }}>
-                                                    {row.employee?.username || "Unknown"}
+                                                    {row.assigned_to_details?.username || "Unknown"}
                                                 </Typography>
                                             </Box>
                                         </TableCell>
                                         <TableCell>
-                                            <Chip
-                                                label={row.employee?.designation || "Employee"}
+                                            <Typography>{row.priority || "-"}</Typography>
+                                        </TableCell>
+                                        <TableCell>
+                                            <Typography>{row.start_date ? row.start_date.split('T')[0] : "-"}</Typography>
+                                        </TableCell>
+                                        <TableCell>
+                                            <Typography>{row.end_date ? row.end_date.split('T')[0] : "-"}</Typography>
+                                        </TableCell>
+                                        <TableCell>
+                                            <Chip label={row.status || "PENDING"}
+                                                sx={{
+                                                    bgcolor: (!row.status || row.status === 'PENDING') ? '#e0e0e0' :
+                                                        row.status === 'IN_PROGRESS' ? '#90caf9' :
+                                                            row.status === 'COMPLETED' ? '#a5d6a7' : '#e0e0e0',
+                                                    color: '#000',
+                                                    fontWeight: 'bold',
+                                                    fontSize: '11px'
+                                                }}
                                                 size="small"
-                                                sx={{ bgcolor: "#f1f5f9", color: "#475569", fontWeight: 600, fontSize: "11px" }}
                                             />
                                         </TableCell>
                                         <TableCell align="center">
-                                            <Typography sx={{ fontWeight: 700, color: row.taskSummary.inProgress > 0 ? "#ef4444" : "#64748b" }}>
-                                                {row.taskSummary.inProgress}
-                                            </Typography>
-                                        </TableCell>
-                                        <TableCell align="center">
-                                            <Typography sx={{ fontWeight: 700, color: "#10b981" }}>
-                                                {row.taskSummary.completed}
-                                            </Typography>
-                                        </TableCell>
-                                        <TableCell align="center">
-                                            <Button
-                                                size="small"
-                                                endIcon={<KeyboardArrowRightIcon />}
-                                                onClick={() => navigate("/manager/employee-task/" + row.employee.id)}
-                                                sx={{ textTransform: "none", fontWeight: 600, color: "#0d47a1" }}
-                                            >
-                                                Details
-                                            </Button>
+                                            <Box sx={{ display: "flex", gap: 1, justifyContent: "center" }}>
+                                                {(!row.status || row.status === 'PENDING') && (
+                                                    <Button size="small" variant="contained" sx={{ textTransform: 'none' }} onClick={() => handleStatusUpdate(row.id, 'IN_PROGRESS')}>Start Task</Button>
+                                                )}
+                                                {row.status === 'IN_PROGRESS' && (
+                                                    <>
+                                                        <Button size="small" variant="contained" color="success" sx={{ textTransform: 'none' }} onClick={() => handleStatusUpdate(row.id, 'COMPLETED')}>Complete</Button>
+                                                        <Button size="small" variant="outlined" sx={{ textTransform: 'none' }} onClick={() => handleEditClick(row)}>Edit</Button>
+                                                    </>
+                                                )}
+                                            </Box>
                                         </TableCell>
                                     </TableRow>
                                 )) :
-                                employeesWithSummary.map((row, index) => (
-                                    <TableRow key={index}>
-                                        <TableCell colSpan={5} sx={{ p: 1, borderBottom: "none" }}>
+                                selectedEmployee.map((row) => (
+                                    <TableRow key={row.id}>
+                                        <TableCell colSpan={7} sx={{ p: 1, borderBottom: "none" }}>
                                             <Box
-                                                onClick={() => navigate("/manager/employee-task/" + row.employee.id)}
                                                 sx={{
                                                     background: "#ffffff",
                                                     borderRadius: "16px",
@@ -218,37 +305,60 @@ const AddTask = () => {
                                                     boxShadow: "0 4px 6px -1px rgba(0, 0, 0, 0.05)",
                                                     display: "flex",
                                                     flexDirection: "column",
-                                                    gap: 1.5,
-                                                    cursor: "pointer"
+                                                    gap: 1.5
                                                 }}
                                             >
+                                                <Typography sx={{ fontWeight: 700, color: "#1e293b", fontSize: "16px" }}>
+                                                    {row.title}
+                                                </Typography>
                                                 <Box sx={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
                                                     <Box sx={{ display: "flex", alignItems: "center", gap: 1.5 }}>
                                                         <Avatar sx={{ bgcolor: "#e0e7ff", color: "#4338ca", fontWeight: 700 }}>
-                                                            {row.employee.username.charAt(0).toUpperCase()}
+                                                            {(row.assigned_to_details?.username || "U").charAt(0).toUpperCase()}
                                                         </Avatar>
                                                         <Box>
                                                             <Typography sx={{ fontWeight: 700, color: "#1e293b" }}>
-                                                                {row.employee.username}
+                                                                {row.assigned_to_details?.username || "Unknown"}
                                                             </Typography>
                                                             <Typography sx={{ fontSize: "12px", color: "#64748b" }}>
-                                                                {row.employee.designation}
+                                                                Priority: {row.priority}
                                                             </Typography>
                                                         </Box>
                                                     </Box>
-                                                    <KeyboardArrowRightIcon sx={{ color: "#94a3b8" }} />
+                                                    <Chip label={row.status || "PENDING"}
+                                                        sx={{
+                                                            bgcolor: (!row.status || row.status === 'PENDING') ? '#e0e0e0' :
+                                                                row.status === 'IN_PROGRESS' ? '#90caf9' :
+                                                                    row.status === 'COMPLETED' ? '#a5d6a7' : '#e0e0e0',
+                                                            color: '#000',
+                                                            fontWeight: 'bold',
+                                                            fontSize: '11px'
+                                                        }}
+                                                        size="small"
+                                                    />
                                                 </Box>
 
                                                 <Box sx={{ display: "flex", gap: 2, pt: 1, borderTop: "1px solid #f1f5f9" }}>
                                                     <Box sx={{ flex: 1, textAlign: "center" }}>
-                                                        <Typography sx={{ fontSize: "11px", fontWeight: 700, color: "#94a3b8", textTransform: "uppercase" }}>Pending</Typography>
-                                                        <Typography sx={{ fontSize: "18px", fontWeight: 800, color: row.taskSummary.inProgress > 0 ? "#ef4444" : "#1e293b" }}>{row.taskSummary.inProgress}</Typography>
+                                                        <Typography sx={{ fontSize: "11px", fontWeight: 700, color: "#94a3b8", textTransform: "uppercase" }}>Start</Typography>
+                                                        <Typography sx={{ fontSize: "14px", fontWeight: 800, color: "#1e293b" }}>{row.start_date ? row.start_date.split('T')[0] : "-"}</Typography>
                                                     </Box>
                                                     <Box sx={{ width: "1px", bgcolor: "#f1f5f9" }} />
                                                     <Box sx={{ flex: 1, textAlign: "center" }}>
-                                                        <Typography sx={{ fontSize: "11px", fontWeight: 700, color: "#94a3b8", textTransform: "uppercase" }}>Completed</Typography>
-                                                        <Typography sx={{ fontSize: "18px", fontWeight: 800, color: "#10b981" }}>{row.taskSummary.completed}</Typography>
+                                                        <Typography sx={{ fontSize: "11px", fontWeight: 700, color: "#94a3b8", textTransform: "uppercase" }}>End</Typography>
+                                                        <Typography sx={{ fontSize: "14px", fontWeight: 800, color: "#1e293b" }}>{row.end_date ? row.end_date.split('T')[0] : "-"}</Typography>
                                                     </Box>
+                                                </Box>
+                                                <Box sx={{ display: "flex", gap: 1, justifyContent: "center", mt: 1 }}>
+                                                    {(!row.status || row.status === 'PENDING') && (
+                                                        <Button size="small" variant="contained" sx={{ textTransform: 'none', width: '100%' }} onClick={() => handleStatusUpdate(row.id, 'IN_PROGRESS')}>Start Task</Button>
+                                                    )}
+                                                    {row.status === 'IN_PROGRESS' && (
+                                                        <>
+                                                            <Button size="small" variant="contained" color="success" sx={{ textTransform: 'none', flex: 1 }} onClick={() => handleStatusUpdate(row.id, 'COMPLETED')}>Complete</Button>
+                                                            <Button size="small" variant="outlined" sx={{ textTransform: 'none', flex: 1 }} onClick={() => handleEditClick(row)}>Edit</Button>
+                                                        </>
+                                                    )}
                                                 </Box>
                                             </Box>
                                         </TableCell>
@@ -275,19 +385,35 @@ const AddTask = () => {
                 <DialogContent sx={{ px: 3, py: 2 }}>
                     <Grid container spacing={2.5} sx={{ mt: 0.5 }}>
                         <Grid item xs={12}>
-                            <TextField label="Task Title" fullWidth required value={title} onChange={(e) => setTitle(e.target.value)} />
+                            <TextField label="Task Title" fullWidth required value={title} onChange={(e) => setTitle(e.target.value)} error={!!errors.title} helperText={errors.title} />
                         </Grid>
 
                         <Grid item xs={12} sm={6}>
                             <TextField
-                                label="Due Date"
+                                label="Start Date"
                                 type="date"
                                 InputLabelProps={{ shrink: true }}
                                 fullWidth
                                 required
                                 inputProps={{ min: today }}
-                                value={dueDate}
-                                onChange={(e) => setDueDate(e.target.value)}
+                                value={startDate}
+                                onChange={(e) => setStartDate(e.target.value)}
+                                error={!!errors.startDate}
+                                helperText={errors.startDate}
+                            />
+                        </Grid>
+                        <Grid item xs={12} sm={6}>
+                            <TextField
+                                label="End Date"
+                                type="date"
+                                InputLabelProps={{ shrink: true }}
+                                fullWidth
+                                required
+                                inputProps={{ min: today }}
+                                value={endDate}
+                                onChange={(e) => setEndDate(e.target.value)}
+                                error={!!errors.endDate}
+                                helperText={errors.endDate}
                             />
                         </Grid>
 
@@ -347,6 +473,47 @@ const AddTask = () => {
                     </Button>
                 </DialogActions>
             </Dialog>
+
+            {/* Edit End Date Dialog */}
+            <Dialog
+                open={editOpen}
+                onClose={handleEditClose}
+                fullWidth
+                maxWidth="xs"
+                PaperProps={{
+                    sx: { borderRadius: "16px" }
+                }}
+            >
+                <DialogTitle sx={{ fontWeight: 800, color: "#1e293b" }}>
+                    Edit End Date
+                </DialogTitle>
+                <DialogContent>
+                    <TextField
+                        label="New End Date"
+                        type="date"
+                        InputLabelProps={{ shrink: true }}
+                        fullWidth
+                        required
+                        inputProps={{ min: today }}
+                        value={newEndDate}
+                        onChange={(e) => setNewEndDate(e.target.value)}
+                        sx={{ mt: 2 }}
+                    />
+                </DialogContent>
+                <DialogActions sx={{ p: 2 }}>
+                    <Button onClick={handleEditClose} sx={{ textTransform: "none", color: "#64748b" }}>
+                        Cancel
+                    </Button>
+                    <Button
+                        variant="contained"
+                        onClick={handleEditSubmit}
+                        sx={{ textTransform: "none", bgcolor: "#0d47a1" }}
+                    >
+                        Save
+                    </Button>
+                </DialogActions>
+            </Dialog>
+
             <Snackbar
                 open={sopen}
                 autoHideDuration={1800}

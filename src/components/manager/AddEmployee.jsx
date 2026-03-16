@@ -8,6 +8,7 @@ import BadgeIcon from '@mui/icons-material/Badge';
 import BusinessIcon from '@mui/icons-material/Business';
 import WorkIcon from '@mui/icons-material/Work';
 import VisibilityIcon from '@mui/icons-material/Visibility';
+import CakeIcon from '@mui/icons-material/Cake';
 import { useAppContext } from '../context/AppContext.jsx';
 import api from '../../services/service.js';
 import MuiAlert from "@mui/material/Alert";
@@ -363,8 +364,8 @@ const AddEmployee = () => {
                                 ).map((row, index) => (
                                     <TableRow key={index} hover>
                                         <TableCell sx={{ color: "#334155" }}>
-                                            <div style={{ display: "flex", alignItems: "left", justifyContent: "left", columnGap: "10px" }}>
-                                                <Avatar sx={{ width: 32, height: 32, background: "#0d47a1" }}>
+                                            <div style={{ display: "flex", alignItems: "center", justifyContent: "left", columnGap: "10px" }}>
+                                                <Avatar src={row.profile_picture_url || (row.profile_picture ? `http://127.0.0.1:8000${row.profile_picture}` : "")} sx={{ width: 32, height: 32, background: "#0d47a1" }}>
                                                     {row.username.charAt(0).toUpperCase()}
                                                 </Avatar>
                                                 {row.username}
@@ -413,7 +414,7 @@ const AddEmployee = () => {
                                             }}>
                                                 <Box sx={{ display: "flex", alignItems: "center", justifyContent: "space-between" }}>
                                                     <Box sx={{ display: "flex", alignItems: "center", gap: 1.5 }}>
-                                                        <Avatar sx={{ width: 40, height: 40, bgcolor: "#0d47a1" }}>
+                                                        <Avatar src={row.profile_picture_url || (row.profile_picture ? `http://127.0.0.1:8000${row.profile_picture}` : "")} sx={{ width: 40, height: 40, bgcolor: "#0d47a1" }}>
                                                             {row.username.charAt(0).toUpperCase()}
                                                         </Avatar>
                                                         <Box>
@@ -686,7 +687,9 @@ const AddEmployee = () => {
 
                     {selectedUser && (
                         <Box sx={{ display: "flex", alignItems: "center", gap: 2.5 }}>
-                            <Avatar sx={{
+                            <Avatar 
+                                src={selectedUser.profile_picture_url || (selectedUser.profile_picture ? `http://127.0.0.1:8000${selectedUser.profile_picture}` : "")}
+                                sx={{
                                 width: 76, height: 76,
                                 bgcolor: "rgba(255,255,255,0.2)",
                                 border: "3px solid rgba(255,255,255,0.5)",
@@ -725,6 +728,7 @@ const AddEmployee = () => {
                                 { icon: <EmailIcon sx={{ fontSize: 17, color: "#3b82f6" }} />, label: "Email", value: selectedUser.email, fullWidth: true },
                                 { icon: <PhoneIcon sx={{ fontSize: 17, color: "#10b981" }} />, label: "Mobile Number", value: selectedUser.mobile_number },
                                 { icon: <BloodtypeIcon sx={{ fontSize: 17, color: "#ef4444" }} />, label: "Blood Group", value: selectedUser.blood_group },
+                                { icon: <CakeIcon sx={{ fontSize: 17, color: "#ec4899" }} />, label: "Date of Birth", value: selectedUser.date_of_birth },
                                 { icon: <BadgeIcon sx={{ fontSize: 17, color: "#8b5cf6" }} />, label: "Role", value: selectedUser.role },
                                 { icon: <BusinessIcon sx={{ fontSize: 17, color: "#f59e0b" }} />, label: "Department", value: selectedUser.department },
                                 { icon: <WorkIcon sx={{ fontSize: 17, color: "#0d47a1" }} />, label: "Designation", value: selectedUser.designation },

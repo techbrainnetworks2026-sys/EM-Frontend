@@ -1,4 +1,5 @@
-import { Avatar, Box, Button, Chip, Dialog, DialogActions, DialogContent, DialogTitle, IconButton, Paper, Table, TableBody, TableCell, TableContainer, TableHead, TableRow, TextField, Typography } from '@mui/material'
+import { Avatar, Box, Button, Chip, Dialog, DialogActions, DialogContent, DialogTitle, IconButton, Paper, Table, TableBody, TableCell, TableContainer, TableHead, TableRow, TextField, Typography ,Divider,
+ Grid } from '@mui/material'
 import React, { useEffect, useState } from 'react';
 import VisibilityIcon from '@mui/icons-material/Visibility';
 import PersonIcon from '@mui/icons-material/Person';
@@ -133,9 +134,9 @@ const PendingEmployees = () => {
                                         <TableCell sx={{ color: "#334155" }}>
                                             <div style={{ display: "flex", alignItems: "left", justifyContent: "left", columnGap: "10px" }}>
                                                 <Avatar sx={{ width: 32, height: 32, background: "#0d47a1" }}>
-                                                    {row.username.charAt(0).toUpperCase()}
+                                                    {row.username?.charAt(0)?.toUpperCase()}
                                                 </Avatar>
-                                                {row.username}
+                                                {row.username || "--"}
                                             </div>
                                         </TableCell>
                                         <TableCell align="left" sx={{ color: "#334155" }}>
@@ -184,7 +185,7 @@ const PendingEmployees = () => {
                                             }}>
                                                 <Box sx={{ display: "flex", alignItems: "center", gap: 2 }}>
                                                     <Avatar sx={{ width: 40, height: 40, bgcolor: "#0d47a1", fontWeight: 700 }}>
-                                                        {row.username.charAt(0).toUpperCase()}
+                                                       {row.username?.charAt(0)?.toUpperCase()}
                                                     </Avatar>
                                                     <Box>
                                                         <Typography sx={{ fontWeight: 700, color: "#1e293b", fontSize: "15px" }}>
@@ -257,7 +258,7 @@ const PendingEmployees = () => {
                         <Box sx={{ display: "flex", flexDirection: "column", gap: 3, mt: 1 }}>
                             <Box sx={{ display: "flex", alignItems: "center", gap: 2.5 }}>
                                 <Avatar sx={{ width: 56, height: 56, bgcolor: "#0d47a1", fontSize: "20px", fontWeight: 700 }}>
-                                    {selectedUser.username.charAt(0).toUpperCase()}
+                                    {selectedUser.username?.charAt(0)?.toUpperCase()}
                                 </Avatar>
                                 <Box>
                                     <Typography sx={{ fontWeight: 700, fontSize: "18px", color: "#1e293b" }}>

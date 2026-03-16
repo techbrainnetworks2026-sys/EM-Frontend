@@ -5,7 +5,8 @@ import { Snackbar } from '@mui/material';
 import MuiAlert from "@mui/material/Alert";
 import { useAppContext } from '../../../context/AppContext.jsx';
 import { validateEmail, validateRequired } from '../../utils/validation';
-
+import Visibility from "@mui/icons-material/Visibility";
+import VisibilityOff from "@mui/icons-material/VisibilityOff";
 const SignIn = () => {
     const [email, setEmail] = useState('');
     const [password, setPassword] = useState('');
@@ -14,7 +15,7 @@ const SignIn = () => {
     const [open, setOpen] = useState(false);
     const [message, setMessage] = useState("");
     const [severity, setSeverity] = useState("success");
-
+const [showPassword, setShowPassword] = useState(false);
     const validate = () => {
         let tempErrors = {};
         let isValid = true;
@@ -94,21 +95,35 @@ const SignIn = () => {
                             {errors.email && <span className="error-message">{errors.email}</span>}
                         </div>
 
-                        <div className="signin-form-group">
-                            <label>Password</label>
-                            <input
-                                type="password"
-                                name="password"
-                                placeholder="Enter your password"
-                                value={password}
-                                onChange={(e) => {
-                                    setPassword(e.target.value);
-                                    if (errors.password) setErrors({ ...errors, password: null });
-                                }}
-                                className={errors.password ? 'input-error' : ''}
-                            />
-                            {errors.password && <span className="error-message">{errors.password}</span>}
-                        </div>
+                       <div className="signin-form-group">
+  <label>Password</label>
+
+  <div className="password-wrapper">
+    <input
+      type={showPassword ? "text" : "password"}
+      name="password"
+      placeholder="Enter your password"
+      value={password}
+      onChange={(e) => {
+        setPassword(e.target.value);
+        if (errors.password) setErrors({ ...errors, password: null });
+      }}
+      className={errors.password ? "input-error" : ""}
+    />
+
+    <button
+      type="button"
+      className="password-toggle-btn"
+      onClick={() => setShowPassword(!showPassword)}
+    >
+      {showPassword ? <VisibilityOff fontSize="small" /> : <Visibility fontSize="small" />}
+    </button>
+  </div>
+
+  {errors.password && (
+    <span className="error-message">{errors.password}</span>
+  )}
+</div>
 
                         <div style={{ textAlign: 'right', marginTop: '-0.5rem' }}>
                             <Link to="/forgot-password" style={{ fontSize: '0.9rem', color: 'var(--text-muted)', textDecoration: 'none' }}>Forgot password?</Link>
