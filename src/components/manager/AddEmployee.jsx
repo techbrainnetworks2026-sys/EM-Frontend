@@ -687,14 +687,14 @@ const AddEmployee = () => {
 
                     {selectedUser && (
                         <Box sx={{ display: "flex", alignItems: "center", gap: 2.5 }}>
-                            <Avatar 
+                            <Avatar
                                 src={selectedUser.profile_picture_url || (selectedUser.profile_picture ? `http://127.0.0.1:8000${selectedUser.profile_picture}` : "")}
                                 sx={{
-                                width: 76, height: 76,
-                                bgcolor: "rgba(255,255,255,0.2)",
-                                border: "3px solid rgba(255,255,255,0.5)",
-                                fontSize: "30px", fontWeight: 800, color: "white"
-                            }}>
+                                    width: 76, height: 76,
+                                    bgcolor: "rgba(255,255,255,0.2)",
+                                    border: "3px solid rgba(255,255,255,0.5)",
+                                    fontSize: "30px", fontWeight: 800, color: "white"
+                                }}>
                                 {(selectedUser.username || "U").charAt(0).toUpperCase()}
                             </Avatar>
                             <Box>

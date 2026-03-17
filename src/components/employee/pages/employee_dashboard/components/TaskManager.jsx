@@ -55,7 +55,8 @@ const TaskManager = () => {
                         id: task.id,
                         title: task.title,
                         description: task.description,
-                        status: task.status === "PENDING" ? "Pending" : "Completed",
+                        status: task.status === 'PENDING' ? 'Pending' :
+                            task.status === 'IN_PROGRESS' ? 'In Progress' : 'Completed',
                         startDate: task.start_date,
                         endDate: task.end_date
                     }))
