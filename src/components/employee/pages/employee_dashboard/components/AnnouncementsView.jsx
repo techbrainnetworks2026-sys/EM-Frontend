@@ -45,4 +45,4 @@ const AnnouncementsView = () => {
     );
 };
 
-export default AnnouncementsView;
+export default React.memo(AnnouncementsView);

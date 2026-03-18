@@ -10,9 +10,9 @@ function ManagerLayout() {
     const { sidebarOpen } = useAppContext();
 
     return (
-        <div className="manager-app-layout">
+        <div className={`manager-app-layout ${sidebarOpen ? 'sidebar-open' : ''}`}>
             <Sidebar />
-            <div className="manager-main-section" style={{ marginLeft: sidebarOpen ? "300px" : "80px" }}>
+            <div className="manager-main-section">
                 <Navbar />
                 <div className="manager-dashboard-content" >
                     <Outlet />

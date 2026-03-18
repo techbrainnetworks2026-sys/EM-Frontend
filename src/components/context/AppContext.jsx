@@ -1,4 +1,4 @@
-import { createContext, useContext, useEffect, useState } from "react";
+import { createContext, useContext, useEffect, useState, useMemo, useCallback } from "react";
 import { useNavigate } from "react-router-dom";
 import { useTheme, useMediaQuery } from "@mui/material";
 import api from "../../services/service.js";
@@ -14,16 +14,16 @@ export const AppContextProvider = ({ children }) => {
     const [userData, setUserData] = useState(null);
     const navigate = useNavigate();
 
-    const Register = async (username, email, password, role, department, designation, blood_group, mobile_number, date_of_birth) => {
+    const Register = useCallback(async (username, email, password, role, department, designation, blood_group, mobile_number, date_of_birth) => {
         try {
             const res = await api.post("accounts/register/", { username, email, password, role, department, designation, blood_group, mobile_number, date_of_birth });
             return res.data;
         } catch (err) {
             throw err;
         }
-    }
+    }, []);
 
-    const Login = async (email, password) => {
+    const Login = useCallback(async (email, password) => {
         try {
             const res = await api.post("accounts/login/", { email, password });
             localStorage.setItem("token", res.data.token);
@@ -32,7 +32,7 @@ export const AppContextProvider = ({ children }) => {
         } catch (err) {
             throw err;
         }
-    }
+    }, []);
 
     useEffect(() => {
         const fetchUserDetails = async () => {
@@ -56,10 +56,7 @@ export const AppContextProvider = ({ children }) => {
         }
     }, [isMobile]);
 
-
-
-
-    const value = {
+    const value = useMemo(() => ({
         sidebarOpen,
         setSidebarOpen,
         isMobile,
@@ -68,7 +65,7 @@ export const AppContextProvider = ({ children }) => {
         navigate,
         userData,
         setUserData,
-    }
+    }), [sidebarOpen, isMobile, Register, Login, navigate, userData]);
 
     return (
         <AppContext.Provider value={value}>

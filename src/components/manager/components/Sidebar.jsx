@@ -16,7 +16,7 @@ function Sidebar() {
     const { sidebarOpen, setSidebarOpen } = useAppContext();
 
     return (
-        <div className={`manager-sidebar ${sidebarOpen ? 'open' : 'closed'}`} style={{ width: sidebarOpen ? "300px" : "80px" }}>
+        <div className={`manager-sidebar ${sidebarOpen ? 'open' : 'closed'}`}>
             <div className="manager-sidebar-header">
                 {sidebarOpen ? (
                     <>

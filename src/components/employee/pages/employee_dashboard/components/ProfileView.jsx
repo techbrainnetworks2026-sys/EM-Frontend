@@ -44,16 +44,175 @@ const getCroppedImg = async (imageSrc, pixelCrop) => {
     });
 };
 
+const CropperModal = React.memo(({
+    imageToCrop,
+    crop,
+    zoom,
+    setCrop,
+    setZoom,
+    onCropComplete,
+    handleApplyCrop,
+    setImageToCrop
+}) => (
+    <div className="cropper-modal-overlay">
+        <div className="cropper-modal-content">
+            <div className="cropper-container">
+                <Cropper
+                    image={imageToCrop}
+                    crop={crop}
+                    zoom={zoom}
+                    aspect={1}
+                    onCropChange={setCrop}
+                    onCropComplete={onCropComplete}
+                    onZoomChange={setZoom}
+                    cropShape="round"
+                    objectFit="cover"
+                    showGrid={false}
+                />
+            </div>
+            <div className="cropper-controls">
+                <input
+                    type="range"
+                    value={zoom}
+                    min={1}
+                    max={3}
+                    step={0.1}
+                    aria-labelledby="Zoom"
+                    onChange={(e) => setZoom(Number(e.target.value))}
+                    className="zoom-range"
+                />
+                <div className="cropper-actions">
+                    <button
+                        type="button"
+                        className="secondary-btn"
+                        onClick={() => setImageToCrop(null)}
+                    >
+                        Close
+                    </button>
+                    <button
+                        type="button"
+                        className="primary-btn"
+                        onClick={handleApplyCrop}
+                    >
+                        Apply Picture
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+));
+
+const ProfileHeader = React.memo(({ userData, previewUrl, editProfile, handleImageUpload }) => (
+    <div className="profile-header-section">
+        <div className="profile-image-section">
+            <div className="profile-image-large">
+                {previewUrl ? (
+                    <img src={previewUrl} alt="Cropped Profile" />
+                ) : userData.profile_picture_url ? (
+                    <img src={userData.profile_picture_url} alt="User Profile" />
+                ) : (
+                    <span className="avatar-placeholder big">👤</span>
+                )}
+            </div>
+            {editProfile && (
+                <div className="upload-container">
+                    <label htmlFor="pfp-upload" className="upload-btn" title="Upload Photo">
+                        📷
+                    </label>
+                    <input
+                        id="pfp-upload"
+                        type="file"
+                        accept="image/*"
+                        onChange={handleImageUpload}
+                        className="hidden-input"
+                    />
+                </div>
+            )}
+        </div>
+        <div className="profile-main-info">
+            <h2>{userData.username}</h2>
+            <p className="designation-text">{userData.designation}</p>
+        </div>
+    </div>
+));
+
+const ProfileForm = React.memo(({ editProfile, editFormData, userData, handleProfileChange }) => (
+    <div className="profile-form-grid">
+        <div className="form-group">
+            <label>Email</label>
+            <input value={userData.email || ''} disabled />
+        </div>
+
+        <div className="form-group">
+            <label>Blood Group</label>
+            <select
+                name="blood_group"
+                value={editProfile ? editFormData.blood_group : (userData.blood_group || "")}
+                disabled={!editProfile}
+                onChange={handleProfileChange}
+            >
+                <option value="">Select Group</option>
+                <option value="A+">A+</option>
+                <option value="A-">A-</option>
+                <option value="B+">B+</option>
+                <option value="B-">B-</option>
+                <option value="O+">O+</option>
+                <option value="O-">O-</option>
+                <option value="AB+">AB+</option>
+                <option value="AB-">AB-</option>
+            </select>
+        </div>
+
+        <div className="form-group">
+            <label>Mobile</label>
+            <input
+                name="mobile_number"
+                value={editProfile ? editFormData.mobile_number : (userData.mobile_number || '')}
+                disabled={!editProfile}
+                onChange={handleProfileChange}
+            />
+        </div>
+
+        <div className="form-group">
+            <label>Date of Birth</label>
+            <input
+                type="date"
+                name="date_of_birth"
+                value={editProfile ? editFormData.date_of_birth : (userData.date_of_birth || '')}
+                disabled={!editProfile}
+                onChange={handleProfileChange}
+            />
+        </div>
+
+        <div className="form-group">
+            <label>Department</label>
+            <input
+                name="department"
+                value={editProfile ? editFormData.department : (userData.department || '')}
+                disabled={!editProfile}
+                onChange={handleProfileChange}
+            />
+        </div>
+
+        <div className="form-group">
+            <label>Designation</label>
+            <input
+                name="designation"
+                value={editProfile ? editFormData.designation : (userData.designation || '')}
+                disabled={!editProfile}
+                onChange={handleProfileChange}
+            />
+        </div>
+    </div>
+));
+
 const ProfileView = () => {
     const { userData, setUserData } = useAppContext();
     const [editProfile, setEditProfile] = useState(false);
     const [loading, setLoading] = useState(false);
     const [message, setMessage] = useState('');
 
-    // Local state for editing form to avoid mutating global API state on every keystroke
     const [editFormData, setEditFormData] = useState({});
-
-    // Image cropping state
     const [imageToCrop, setImageToCrop] = useState(null);
     const [crop, setCrop] = useState({ x: 0, y: 0 });
     const [zoom, setZoom] = useState(1);
@@ -61,7 +220,6 @@ const ProfileView = () => {
     const [croppedImage, setCroppedImage] = useState(null);
     const [previewUrl, setPreviewUrl] = useState(null);
 
-    // Sync local form state when entering edit mode
     useEffect(() => {
         if (editProfile && userData) {
             setEditFormData({
@@ -74,7 +232,6 @@ const ProfileView = () => {
         }
     }, [editProfile, userData]);
 
-    // Handle Blob object URL lifecycle to prevent memory leaks
     useEffect(() => {
         if (croppedImage) {
             const tempUrl = URL.createObjectURL(croppedImage);
@@ -85,7 +242,6 @@ const ProfileView = () => {
         }
     }, [croppedImage]);
 
-    // Cleanup cropping modal body scroll lock
     useEffect(() => {
         if (imageToCrop) {
             const original = window.getComputedStyle(document.body).overflow;
@@ -139,22 +295,18 @@ const ProfileView = () => {
             setMessage('');
 
             const formData = new FormData();
-
-            // Append updated fields
             Object.entries(editFormData).forEach(([key, value]) => {
                 if (value) {
                     formData.append(key, value);
                 }
             });
 
-            // Add cropped image if available
             if (croppedImage) {
                 formData.append('profile_picture', croppedImage, 'profile_picture.jpg');
             }
 
             const response = await api.patch('/accounts/profile/update/', formData);
 
-            // Update global user state with response
             if (response?.data?.user) {
                 setUserData((prev) => ({
                     ...prev,
@@ -166,11 +318,9 @@ const ProfileView = () => {
             setMessage('Profile saved successfully!');
             setEditProfile(false);
 
-            // Clear message after 3 seconds
             setTimeout(() => setMessage(''), 3000);
         } catch (error) {
             console.error('Error saving profile:', error);
-
             const errorMessage = error.response?.data?.error
                 || error.response?.data?.detail
                 || error.response?.data?.message
@@ -178,7 +328,6 @@ const ProfileView = () => {
                     .map(([key, value]) => `${key}: ${value}`)
                     .join(', '))
                 || 'Error saving profile. Please try again.';
-
             setMessage(errorMessage);
         } finally {
             setLoading(false);
@@ -197,156 +346,33 @@ const ProfileView = () => {
 
     return (
         <div className="dashboard-view-profile-view-container">
-            {/* Cropper Modal */}
             {imageToCrop && (
-                <div className="cropper-modal-overlay">
-                    <div className="cropper-modal-content">
-                        <div className="cropper-container">
-                            <Cropper
-                                image={imageToCrop}
-                                crop={crop}
-                                zoom={zoom}
-                                aspect={1}
-                                onCropChange={setCrop}
-                                onCropComplete={onCropComplete}
-                                onZoomChange={setZoom}
-                                cropShape="round"
-                                objectFit="cover"
-                                showGrid={false}
-                            />
-                        </div>
-                        <div className="cropper-controls">
-                            <input
-                                type="range"
-                                value={zoom}
-                                min={1}
-                                max={3}
-                                step={0.1}
-                                aria-labelledby="Zoom"
-                                onChange={(e) => setZoom(Number(e.target.value))}
-                                className="zoom-range"
-                            />
-                            <div className="cropper-actions">
-                                <button
-                                    type="button"
-                                    className="secondary-btn"
-                                    onClick={() => setImageToCrop(null)}
-                                >
-                                    Close
-                                </button>
-                                <button
-                                    type="button"
-                                    className="primary-btn"
-                                    onClick={handleApplyCrop}
-                                >
-                                    Apply Picture
-                                </button>
-                            </div>
-                        </div>
-                    </div>
-                </div>
+                <CropperModal
+                    imageToCrop={imageToCrop}
+                    crop={crop}
+                    zoom={zoom}
+                    setCrop={setCrop}
+                    onCropComplete={onCropComplete}
+                    setZoom={setZoom}
+                    handleApplyCrop={handleApplyCrop}
+                    setImageToCrop={setImageToCrop}
+                />
             )}
 
             <div className="profile-card">
-                <div className="profile-header-section">
-                    <div className="profile-image-section">
-                        <div className="profile-image-large">
-                            {previewUrl ? (
-                                <img src={previewUrl} alt="Cropped Profile" />
-                            ) : userData.profile_picture_url ? (
-                                <img src={userData.profile_picture_url} alt="User Profile" />
-                            ) : (
-                                <span className="avatar-placeholder big">👤</span>
-                            )}
-                        </div>
-                        {editProfile && (
-                            <div className="upload-container">
-                                <label htmlFor="pfp-upload" className="upload-btn" title="Upload Photo">
-                                    📷
-                                </label>
-                                <input
-                                    id="pfp-upload"
-                                    type="file"
-                                    accept="image/*"
-                                    onChange={handleImageUpload}
-                                    className="hidden-input"
-                                />
-                            </div>
-                        )}
-                    </div>
-                    <div className="profile-main-info">
-                        <h2>{userData.username}</h2>
-                        <p className="designation-text">{userData.designation}</p>
-                    </div>
-                </div>
+                <ProfileHeader
+                    userData={userData}
+                    previewUrl={previewUrl}
+                    editProfile={editProfile}
+                    handleImageUpload={handleImageUpload}
+                />
 
-                <div className="profile-form-grid">
-                    <div className="form-group">
-                        <label>Email</label>
-                        <input value={userData.email || ''} disabled />
-                    </div>
-
-                    <div className="form-group">
-                        <label>Blood Group</label>
-                        <select
-                            name="blood_group"
-                            value={editProfile ? editFormData.blood_group : (userData.blood_group || "")}
-                            disabled={!editProfile}
-                            onChange={handleProfileChange}
-                        >
-                            <option value="">Select Group</option>
-                            <option value="A+">A+</option>
-                            <option value="A-">A-</option>
-                            <option value="B+">B+</option>
-                            <option value="B-">B-</option>
-                            <option value="O+">O+</option>
-                            <option value="O-">O-</option>
-                            <option value="AB+">AB+</option>
-                            <option value="AB-">AB-</option>
-                        </select>
-                    </div>
-
-                    <div className="form-group">
-                        <label>Mobile</label>
-                        <input
-                            name="mobile_number"
-                            value={editProfile ? editFormData.mobile_number : (userData.mobile_number || '')}
-                            disabled={!editProfile}
-                            onChange={handleProfileChange}
-                        />
-                    </div>
-
-                    <div className="form-group">
-                        <label>Date of Birth</label>
-                        <input
-                            type="date"
-                            name="date_of_birth"
-                            value={editProfile ? editFormData.date_of_birth : (userData.date_of_birth || '')}
-                            disabled={!editProfile}
-                            onChange={handleProfileChange}
-                        />
-                    </div>
-
-                    <div className="form-group">
-                        <label>Department</label>
-                        <input
-                            name="department"
-                            value={editProfile ? editFormData.department : (userData.department || '')}
-                            disabled={!editProfile}
-                            onChange={handleProfileChange}
-                        />
-                    </div>
-
-                    <div className="form-group">
-                        <label>Designation</label>
-                        <input
-                            name="designation"
-                            value={editProfile ? editFormData.designation : (userData.designation || '')}
-                            disabled={!editProfile}
-                            onChange={handleProfileChange}
-                        />
-                    </div>
-                </div>
+                <ProfileForm
+                    editProfile={editProfile}
+                    editFormData={editFormData}
+                    userData={userData}
+                    handleProfileChange={handleProfileChange}
+                />
 
                 {message && (
                     <div className={`message ${message.includes('successfully') ? 'success' : 'error'}`}>
@@ -383,4 +409,4 @@ const ProfileView = () => {
     );
 };
 
-export default ProfileView;
+export default React.memo(ProfileView);

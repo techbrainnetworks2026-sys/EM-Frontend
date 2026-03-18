@@ -5,6 +5,7 @@ import LeaveHistory from "./components/LeaveHistory";
 import ApplyLeave from "./components/ApplyLeave";
 import TaskManager from "./components/TaskManager";
 import AnnouncementsView from "./components/AnnouncementsView";
+import DigitalClock from "./components/DigitalClock";
 import { useNavigate } from "react-router-dom";
 import ProfileView from "./components/ProfileView";
 import api from '../../../../services/service.js';
@@ -49,12 +50,6 @@ export default function EmployeeDashboard() {
   const [checkInTime, setCheckInTime] = useState(null);
   const [checkOutTime, setCheckOutTime] = useState(null);
   const [elapsedTime, setElapsedTime] = useState(null);
-  const [currentTime, setCurrentTime] = useState(new Date());
-
-  useEffect(() => {
-    const timer = setInterval(() => setCurrentTime(new Date()), 1000);
-    return () => clearInterval(timer);
-  }, []);
 
   useEffect(() => {
     sessionStorage.setItem("employee_active_view", active);
@@ -110,17 +105,29 @@ export default function EmployeeDashboard() {
 
   const fetchDashboardData = async () => {
     try {
-      const [attendanceRes, leaveRes, taskRes] = await Promise.all([
+      const [attendanceRes, leaveRes, taskRes, todayRes] = await Promise.all([
         api.get("attendance/history/"),
         api.get("leave/history/"),
-        api.get('task/tasks/')
+        api.get('task/tasks/'),
+        api.get("attendance/today/")
       ]);
       setAttendance(attendanceRes.data);
       setLeaves(leaveRes.data);
       setTasks(taskRes.data);
-    } catch (err) { 
-      console.log("Error marking notifications as read:", err);
-     }
+
+      if (todayRes.data && Object.keys(todayRes.data).length > 0) {
+        if (todayRes.data?.check_in) {
+          setCheckInTime(todayRes.data.check_in);
+          if (!todayRes.data?.check_out) setIsCheckedIn(true);
+          else {
+            setIsCheckedIn(false);
+            setCheckOutTime(todayRes.data.check_out);
+          }
+        }
+      }
+    } catch (err) {
+      console.log("Error fetching dashboard data:", err);
+    }
   };
 
   const fetchNotificationCount = async () => {
@@ -132,9 +139,9 @@ export default function EmployeeDashboard() {
         setTimeout(() => setShowNewNotificationAnimation(false), 600);
       }
       setNotificationCount(newCount);
-    } catch (err) { 
+    } catch (err) {
       console.log("Error marking notifications as read:", err);
-     }
+    }
   };
 
   useEffect(() => {
@@ -160,7 +167,7 @@ export default function EmployeeDashboard() {
     }
   }, [userData]);
 
-  const now = new Date();
+  const now = useMemo(() => new Date(), []);
   const currentMonth = now.getMonth();
   const currentYear = now.getFullYear();
 
@@ -205,25 +212,6 @@ export default function EmployeeDashboard() {
   const tasksInProgress = useMemo(() => tasks.filter(t => t.status === "IN_PROGRESS" || t.status === "PENDING").length, [tasks]);
   const tasksCompleted = useMemo(() => tasks.filter(t => t.status === "COMPLETED").length, [tasks]);
 
-  useEffect(() => {
-    const fetchTodayAttendance = async () => {
-      try {
-        const res = await api.get("attendance/today/");
-        if (!res.data || Object.keys(res.data).length === 0) return;
-        if (res.data?.check_in) {
-          setCheckInTime(res.data.check_in);
-          if (!res.data?.check_out) setIsCheckedIn(true);
-          else {
-            setIsCheckedIn(false);
-            setCheckOutTime(res.data.check_out);
-          }
-        }
-      } catch (err) { 
-        console.log("Error marking notifications as read:", err);
-       }
-    };
-    fetchTodayAttendance();
-  }, []);
 
   const formatTimeDisplay = (time) => {
     if (!time) return "--:--:--";
@@ -252,7 +240,7 @@ export default function EmployeeDashboard() {
       setNotificationCount(0);
       setShowNewNotificationAnimation(false);
       setActive("announcements");
-    } catch (err) { 
+    } catch (err) {
       console.log("Error marking notifications as read:", err);
     }
   };
@@ -276,9 +264,9 @@ export default function EmployeeDashboard() {
         setCheckOutTime(res.data.time);
       }
       fetchDashboardData();
-    } catch (err) { 
+    } catch (err) {
       console.log("Error marking notifications as read:", err);
-     }
+    }
   };
 
   return (
@@ -353,11 +341,9 @@ export default function EmployeeDashboard() {
                 <div className="card-header">
                   <div className="header-title">
                     <h2>Today's Status</h2>
-                    <p className="date-display">{currentTime.toLocaleDateString('en-US', { weekday: 'long', month: 'long', day: 'numeric', year: 'numeric' })}</p>
+                    <p className="date-display">{new Date().toLocaleDateString('en-US', { weekday: 'long', month: 'long', day: 'numeric', year: 'numeric' })}</p>
                   </div>
-                  <div className="digital-clock">
-                    {currentTime.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', second: '2-digit', hour12: true })}
-                  </div>
+                  <DigitalClock />
                 </div>
                 <div className="status-stats-grid">
                   <div className="stat-item">
@@ -384,7 +370,7 @@ export default function EmployeeDashboard() {
                 <div className="main-value">
                   <span className="current">{presentDays}</span><span className="separator">/</span><span className="total">22</span>
                 </div>
-                <p className="sub-value">{currentTime.toLocaleString('default', { month: 'long', year: 'numeric' })}</p>
+                <p className="sub-value">{new Date().toLocaleString('default', { month: 'long', year: 'numeric' })}</p>
                 <div className="progress-bar"><div className="progress-fill" style={{ width: `${dayProgress}%` }}></div></div>
                 <div className="progress-text">Progress <span>{dayProgress}%</span></div>
               </div>
@@ -395,7 +381,7 @@ export default function EmployeeDashboard() {
                 <div className="main-value">
                   <span className="current">{totalLeavesTaken}</span><span className="unit">Days taken</span>
                 </div>
-                <p className="sub-value">24 remaining</p>
+
                 <button className="footer-link"><HistoryIcon /> View History</button>
               </div>
 

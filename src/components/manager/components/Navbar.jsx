@@ -84,7 +84,7 @@ function Navbar() {
 
     return (
         <div>
-            <AppBar className="manager-navbar" elevation={0} sx={{ width: sidebarOpen ? "calc(100% - 300px)" : "calc(100% - 80px)", left: sidebarOpen ? "300px" : "80px" }}>
+            <AppBar className="manager-navbar" elevation={0}>
                 <Box className="manager-navbar-container">
                     <Box className="manager-navbar-left">
                         <IconButton onClick={handleSidebarOpen} className="manager-menu-btn">

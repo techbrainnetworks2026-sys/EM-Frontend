@@ -79,4 +79,4 @@ const LeaveHistory = ({ leaves = [] }) => {
     );
 };
 
-export default LeaveHistory;
+export default React.memo(LeaveHistory);

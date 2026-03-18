@@ -1,0 +1,1 @@
+const p=n=>{if(!n||n==="-")return"--";const o=n.split(":");if(o.length<2)return n;const r=parseInt(o[0],10),s=o[1];if(isNaN(r))return n;const t=r>=12?"PM":"AM";return`${(r%12===0?12:r%12).toString().padStart(2,"0")}:${s} ${t}`};export{p as f};

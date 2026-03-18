@@ -195,4 +195,4 @@ const ApplyLeave = () => {
     );
 };
 
-export default ApplyLeave;
+export default React.memo(ApplyLeave);

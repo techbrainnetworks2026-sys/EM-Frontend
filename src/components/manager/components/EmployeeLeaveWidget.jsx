@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import {
-    Box, Button, Dialog, DialogActions, DialogContent,
+    Box, Button, Chip, Dialog, DialogActions, DialogContent,
     DialogTitle, IconButton, List, ListItem, ListItemAvatar,
     ListItemText, Avatar, Typography
 } from '@mui/material';
@@ -624,13 +624,26 @@ function EmployeeList({ employees, onSelectEmployee }) {
 }
 
 // ─── Main Widget ──────────────────────────────────────────────────────────────
-const EmployeeAttendanceWidget = () => {
+const EmployeeAttendanceWidget = ({ employees: propEmployees }) => {
     const [open, setOpen] = useState(false);
     const [employees, setEmployees] = useState([]);
     const [selectedEmployee, setSelectedEmployee] = useState(null); // { id, name }
+    
+    const handleClose = () => {
+        setOpen(false);
+        setSelectedEmployee(null);
+    };
 
-    // Fetch all employees for the list (using same api endpoint as Dashboard approved users)
+    // Use propEmployees if available, otherwise fetch
+    useEffect(() => {
+        if (propEmployees && propEmployees.length > 0) {
+            setEmployees(propEmployees);
+        }
+    }, [propEmployees]);
+
+    // Fetch all employees for the list (fallback if not passed from dashboard)
     const fetchAllEmployees = async () => {
+        if (propEmployees && propEmployees.length > 0) return;
         try {
             const res = await api.get('accounts/manager/approved-users/');
             setEmployees(res.data);
@@ -648,18 +661,14 @@ const EmployeeAttendanceWidget = () => {
     };
 
     useEffect(() => {
-        if (open) fetchAllEmployees();
-    }, [open]);
+        if (open && (!employees || employees.length === 0)) fetchAllEmployees();
+    }, [open, employees]);
 
-    const handleClose = () => {
-        setOpen(false);
-        setSelectedEmployee(null);
-    };
-
-    // Calculate count from the dashboard passing it down, or fetch it. For now, we will fetch it.
     useEffect(() => {
-        fetchAllEmployees();
-    }, [])
+        if (!propEmployees || propEmployees.length === 0) {
+            fetchAllEmployees();
+        }
+    }, [propEmployees])
 
     const allEmployeesCount = employees.length;
 
